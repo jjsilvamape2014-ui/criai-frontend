@@ -23,7 +23,7 @@ const FEATURES = [
   { icon: '🔍', title: 'Resolução 4K', desc: 'Cada imagem é renderizada em alta resolução. Perfeita para impressão, redes sociais e web.' },
   { icon: '🎯', title: 'Prompt inteligente', desc: 'Descreva em português o que quer — nossa IA otimiza automaticamente o prompt para melhor resultado.' },
   { icon: '✂️', title: 'Texto sobre imagem', desc: 'Adicione texto diretamente na imagem com fontes profissionais. Ideal para posts e anúncios.' },
-  { icon: '💰', title: 'Grátis para começar', desc: 'Ganhe 10 imagens e 2 vídeos grátis todo mês. Sem cartão, sem compromisso.' },
+  { icon: '💰', title: 'Grátis para começar', desc: 'Ganhe 10 imagens grátis todo mês. Sem cartão, sem compromisso.' },
 ];
 
 const USE_CASES = [
@@ -85,8 +85,7 @@ export default function Home() {
           {/* Texto embaixo da imagem */}
           <p className="text-center text-base sm:text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-loose sm:leading-relaxed animate-fade-up" style={{ animationDelay: '0.2s' }}>
             Descreva o que você imagina e veja nossa inteligência artificial transformar
-            em <span className="text-gray-200 font-medium">imagens 4K</span> e
-            <span className="text-gray-200 font-medium"> vídeos profissionais</span> em poucos segundos.
+            em <span className="text-gray-200 font-medium">imagens 4K profissionais</span> em poucos segundos.
             Do zero ou editando uma imagem que você já tem.
           </p>
 
@@ -337,7 +336,7 @@ export default function Home() {
               <p className="text-4xl font-bold text-white mb-1">R$ 0</p>
               <p className="text-sm text-gray-500 mb-6">para sempre</p>
               <ul className="space-y-3 text-sm text-gray-300 mb-8 text-left max-w-xs mx-auto">
-                <li className="flex items-center gap-2"><span className="text-green-400">✓</span> 10 imagens + 2 vídeos/mês</li>
+                <li className="flex items-center gap-2"><span className="text-green-400">✓</span> 10 imagens/mês em 4K</li>
                 <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Resolução 4K</li>
                 <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Sem watermark</li>
                 <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Texto em português nítido</li>
@@ -354,7 +353,7 @@ export default function Home() {
               <p className="text-sm text-gray-500 mb-6">por mês</p>
               <ul className="space-y-3 text-sm text-gray-300 mb-8 text-left max-w-xs mx-auto">
                 <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Imagens ilimitadas em 4K</li>
-                <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Vídeos ilimitados</li>
+                <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Todos os estilos de anúncio</li>
                 <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Modelos exclusivos premium</li>
                 <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Upscale 4K automático</li>
                 <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Sem fila — prioridade máxima</li>

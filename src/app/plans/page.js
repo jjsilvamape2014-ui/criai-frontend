@@ -76,7 +76,7 @@ export default function PlansPage() {
             <p className="text-4xl font-bold text-gray-900 mb-1">R$ 0<span className="text-base font-normal text-gray-400"> para sempre</span></p>
             <p className="text-sm text-gray-400 mb-6">Teste tudo sem pagar nada</p>
             <ul className="space-y-3 text-sm text-gray-600 mb-6">
-              <li className="flex items-center gap-2">✅ Créditos grátis de imagem e vídeo</li>
+              <li className="flex items-center gap-2">✅ Créditos grátis de imagem</li>
               <li className="flex items-center gap-2">✅ Resolução 4K</li>
               <li className="flex items-center gap-2">✅ Sem watermark</li>
               <li className="flex items-center gap-2">✅ Texto em português nítido</li>
@@ -106,7 +106,7 @@ export default function PlansPage() {
             <p className="text-sm text-gray-400 mb-6">Crie sem limites, quando quiser</p>
             <ul className="space-y-3 text-sm text-gray-600 mb-6">
               <li className="flex items-center gap-2">✅ Imagens ilimitadas em 4K</li>
-              <li className="flex items-center gap-2">✅ Vídeos ilimitados</li>
+              <li className="flex items-center gap-2">✅ Todos os estilos de anúncio</li>
               <li className="flex items-center gap-2">✅ Modelos exclusivos premium</li>
               <li className="flex items-center gap-2">✅ Upscale 4K automático</li>
               <li className="flex items-center gap-2">✅ Sem fila — prioridade máxima</li>
@@ -140,7 +140,6 @@ export default function PlansPage() {
                 <p className="text-3xl font-bold text-gray-900 mb-2">{pkg.price}</p>
                 <ul className="space-y-1 text-sm text-gray-500 mb-4">
                   <li>{pkg.images} imagens</li>
-                  {pkg.videos > 0 && <li>{pkg.videos} vídeos</li>}
                   <li className="text-green-600 font-medium">Não expira</li>
                 </ul>
                 <button
@@ -161,7 +160,7 @@ export default function PlansPage() {
           <div className="space-y-3">
             {[
               { q: 'O plano Free é grátis mesmo?', a: 'Sim! Você ganha créditos gratuitos para começar a criar. Quando os créditos acabarem, o app te mostra a assinatura Premium de R$ 39,99/mês para continuar.' },
-              { q: 'O que acontece quando meus créditos gratuitos acabam?', a: 'Você vê a tela de assinatura do Premium por R$ 39,99/mês. Ao assinar, passa a gerar imagens e vídeos sem limites durante o mês.' },
+              { q: 'O que acontece quando meus créditos gratuitos acabam?', a: 'Você vê a tela de assinatura do Premium por R$ 39,99/mês. Ao assinar, passa a gerar imagens sem limites durante o mês.' },
               { q: 'Posso cancelar o Premium a qualquer momento?', a: 'Sim. Você continua com os benefícios até o fim do período pago.' },
               { q: 'Precisa de cartão de crédito para o plano Free?', a: 'Não. O plano Free é 100% gratuito, sem cartão e sem compromisso.' },
               { q: 'Posso usar as imagens comercialmente?', a: 'Sim. Todas as imagens geradas são suas. Use onde quiser, sem restrições.' },
