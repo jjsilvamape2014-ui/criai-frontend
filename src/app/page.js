@@ -109,6 +109,20 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Generator - logo na parte inicial */}
+      <section id="gerador" className="relative py-14 scroll-mt-20">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary-900/5 to-transparent" />
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-10">
+            <p className="text-sm font-semibold text-primary-400 uppercase tracking-wider mb-3">Experimente agora</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white">
+              Gere sua primeira imagem <span className="gradient-text">grátis</span>
+            </h2>
+          </div>
+          <GeneratorTabs />
+        </div>
+      </section>
+
       {/* Showcase Carousel - animated hero images */}
       <section className="relative py-10 sm:py-14 overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-radial from-primary-600/15 via-transparent to-transparent rounded-full blur-3xl -z-10" />
@@ -219,20 +233,6 @@ export default function Home() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Generator */}
-      <section id="gerador" className="relative py-16 scroll-mt-20">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary-900/5 to-transparent" />
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-10">
-            <p className="text-sm font-semibold text-primary-400 uppercase tracking-wider mb-3">Experimente agora</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white">
-              Gere sua primeira imagem <span className="gradient-text">grátis</span>
-            </h2>
-          </div>
-          <GeneratorTabs />
         </div>
       </section>
 
