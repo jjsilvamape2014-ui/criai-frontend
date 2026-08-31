@@ -3,14 +3,14 @@ import GeneratorTabs from '@/components/GeneratorTabs';
 import Logo from '@/components/Logo';
 
 const SHOWCASE_IMAGES = [
-  { url: 'https://images.unsplash.com/photo-1686191128892-3b370d7c893a?w=600&h=600&fit=crop', prompt: 'Aurora boreal sobre montanhas' },
-  { url: 'https://images.unsplash.com/photo-1684369175833-40ae2b917681?w=600&h=600&fit=crop', prompt: 'Retrato futurista cyberpunk' },
-  { url: 'https://images.unsplash.com/photo-1695653028335-6bc00e4a094b?w=600&h=600&fit=crop', prompt: 'Castelo flutuante nas nuvens' },
-  { url: 'https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?w=600&h=600&fit=crop', prompt: 'Paisagem alienígena com dois sóis' },
-  { url: 'https://images.unsplash.com/photo-1697577418970-95d99b5a55cf?w=600&h=600&fit=crop', prompt: 'Gato astronauta no espaço' },
-  { url: 'https://images.unsplash.com/photo-1694951462238-ac845f5e15de?w=600&h=600&fit=crop', prompt: 'Drone sobre cidade futurista' },
-  { url: 'https://images.unsplash.com/photo-1683009427513-dd0e3c571d88?w=600&h=600&fit=crop', prompt: 'Sereia em recife de coral' },
-  { url: 'https://images.unsplash.com/photo-1695653422543-7da6d6744364?w=600&h=600&fit=crop', prompt: 'Dragão de cristal sobre lava' },
+  { url: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?w=600&h=600&fit=crop', prompt: 'Fogos de artificio neon sobre cidade' },
+  { url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=600&h=600&fit=crop', prompt: 'Galaxia e ceu estrelado em 8K' },
+  { url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&h=600&fit=crop', prompt: 'Vale com neblina ao amanhecer' },
+  { url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=600&fit=crop', prompt: 'Montanha nevada cinematografica' },
+  { url: 'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=600&h=600&fit=crop', prompt: 'Paisagem de drone em alta resolucao' },
+  { url: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&h=600&fit=crop', prompt: 'Abstrato digital com cores vivas' },
+  { url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&h=600&fit=crop', prompt: 'Cordilheira ao por do sol' },
+  { url: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=600&fit=crop', prompt: 'Floresta mística com raios de luz' },
 ];
 
 const FEATURES = [
@@ -123,9 +123,9 @@ export default function Home() {
 
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { before: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=500&h=500&fit=crop', after: 'https://images.unsplash.com/photo-1686191128892-3b370d7c893a?w=500&h=500&fit=crop', label: 'Foto comum → Obra de arte', prompt: 'Cachorro astronauta flutuando no espaço, ilustração digital 4K' },
-              { before: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=500&h=500&fit=crop', after: 'https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?w=500&h=500&fit=crop', label: 'Paisagem → Mundo alienígena', prompt: 'Paisagem alienígena com dois sóis e vegetação fluorescente' },
-              { before: 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=500&h=500&fit=crop', after: 'https://images.unsplash.com/photo-1697577418970-95d99b5a55cf?w=500&h=500&fit=crop', label: 'Rascunho → Imagem profissional', prompt: 'Gato astronauta em estação espacial, fotorrealismo 4K' },
+              { before: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?w=500&h=500&fit=crop', after: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=500&h=500&fit=crop', label: 'Foto comum → Obra de arte', prompt: 'Ceu estrelado com galaxia em 8K, astrofotografia' },
+              { before: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=500&fit=crop', after: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=500&h=500&fit=crop', label: 'Paisagem → Foto profissional', prompt: 'Cordilheira dramatica ao por do sol, fotorrealismo' },
+              { before: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500&h=500&fit=crop', after: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=500&h=500&fit=crop', label: 'Ambiente → Cena cinematográfica', prompt: 'Floresta mística com raios de luz atravessando' },
             ].map((pair, i) => (
               <div key={i} className="group">
                 <div className="relative rounded-2xl overflow-hidden border border-white/10 hover:border-primary-500/30 transition-all duration-500">
