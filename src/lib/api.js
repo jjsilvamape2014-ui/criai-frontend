@@ -65,10 +65,10 @@ class ApiClient {
     });
   }
 
-  async generateVideo(imageUrl) {
+  async generateVideo(imageUrl, options = {}) {
     return this.request('/generate/video', {
       method: 'POST',
-      body: JSON.stringify({ imageUrl }),
+      body: JSON.stringify({ imageUrl, ...options }),
     });
   }
 

@@ -59,13 +59,17 @@ export default function Home() {
           </div>
 
           {/* Heading - with Dreamina-style letter animation */}
-          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 leading-[1.1] tracking-tight animate-fade-up" style={{ animationDelay: '0.1s' }}>
-            Crie imagens<br />
-            <span className="gradient-text-hero"><AnimatedTitle /></span> com IA
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 leading-[1.15] tracking-tight animate-fade-up max-w-4xl mx-auto" style={{ animationDelay: '0.1s' }}>
+            Transforme suas ideias em
+            <span className="block mt-2"><span className="gradient-text-hero"><AnimatedTitle /></span></span>
+            em segundos
           </h1>
 
-          <p className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-up" style={{ animationDelay: '0.2s' }}>
-            Descreva o que você imagina — nossa inteligência artificial transforma em imagens 4K e vídeos profissionais em segundos.
+          <p className="text-base sm:text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-loose sm:leading-relaxed animate-fade-up" style={{ animationDelay: '0.2s' }}>
+            Descreva o que você imagina e veja nossa inteligência artificial transformar
+            em <span className="text-gray-200 font-medium">imagens 4K</span> e
+            <span className="text-gray-200 font-medium"> vídeos profissionais</span> em poucos segundos.
+            Do zero ou editando uma imagem que você já tem.
           </p>
 
           {/* CTA buttons */}
