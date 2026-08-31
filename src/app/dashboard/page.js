@@ -61,7 +61,7 @@ export default function DashboardPage() {
   return (
     <>
       <Header />
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 pt-24">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 pt-36">
         <h1 className="text-2xl font-bold text-white mb-6">Dashboard</h1>
 
         {/* Summary cards */}

@@ -25,7 +25,7 @@ export default function LoginPage() {
   return (
     <>
       <Header />
-      <div className="min-h-[80vh] flex items-center justify-center px-4 pt-20">
+      <div className="min-h-[80vh] flex items-center justify-center px-4 pt-32">
         <div className="w-full max-w-md">
           <div className="card-glow">
             <h1 className="text-2xl font-bold text-white mb-2">Bem-vindo de volta</h1>

@@ -48,7 +48,7 @@ export default function Home() {
         <div className="absolute top-40 right-0 w-[400px] h-[400px] bg-gradient-radial from-blue-600/20 via-transparent to-transparent rounded-full blur-3xl animate-aurora" style={{ animationDelay: '4s' }} />
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-radial from-fuchsia-600/10 via-transparent to-transparent rounded-full blur-3xl animate-aurora" style={{ animationDelay: '8s' }} />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 pt-20 pb-24 text-center">
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-32 pb-16">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm text-gray-300 mb-8 animate-fade-up">
             <span className="relative flex h-2 w-2">
@@ -58,14 +58,31 @@ export default function Home() {
             Comece grátis — quando acabar, é só R$ 39,99/mês
           </div>
 
-          {/* Heading - with Dreamina-style letter animation */}
-          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 leading-[1.15] tracking-tight animate-fade-up max-w-4xl mx-auto" style={{ animationDelay: '0.1s' }}>
-            Transforme suas ideias em
-            <span className="block mt-2"><span className="gradient-text-hero"><AnimatedTitle /></span></span>
-            em segundos
-          </h1>
+          {/* Big beautiful cinematic image */}
+          <div className="relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl shadow-primary-600/20 animate-fade-up mb-14" style={{ animationDelay: '0.1s' }}>
+            <img
+              src="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1600&h=900&fit=crop"
+              alt="Criação de imagens com IA"
+              className="w-full h-[40vh] sm:h-[58vh] lg:h-[64vh] object-cover"
+              loading="eager"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/30 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-primary-900/30 via-transparent to-blue-900/30" />
+            <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10 flex items-end justify-between gap-4">
+              <div className="text-white">
+                <span className="inline-block px-3 py-1 rounded-full bg-white/15 border border-white/20 text-xs font-semibold backdrop-blur mb-3">
+                  ✨ Criado com Criai
+                </span>
+                <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold leading-[1.1] tracking-tight">
+                  Transforme suas ideias
+                  <span className="block mt-1"><span className="gradient-text-hero"><AnimatedTitle /></span></span>
+                </h1>
+              </div>
+            </div>
+          </div>
 
-          <p className="text-base sm:text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-loose sm:leading-relaxed animate-fade-up" style={{ animationDelay: '0.2s' }}>
+          {/* Texto embaixo da imagem */}
+          <p className="text-center text-base sm:text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-loose sm:leading-relaxed animate-fade-up" style={{ animationDelay: '0.2s' }}>
             Descreva o que você imagina e veja nossa inteligência artificial transformar
             em <span className="text-gray-200 font-medium">imagens 4K</span> e
             <span className="text-gray-200 font-medium"> vídeos profissionais</span> em poucos segundos.
@@ -85,7 +102,7 @@ export default function Home() {
 
           {/* Styles ready to use - Dreamina inspired */}
           <div className="mb-16 animate-fade-up" style={{ animationDelay: '0.4s' }}>
-            <p className="text-xs text-gray-500 uppercase tracking-widest mb-4">Não sabe o que criar? Escolha um estilo</p>
+            <p className="text-xs text-gray-500 uppercase tracking-widest mb-4 text-center">Não sabe o que criar? Escolha um estilo</p>
             <StyleChips />
           </div>
 
