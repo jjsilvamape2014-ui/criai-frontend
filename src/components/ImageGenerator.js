@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import TextOnImage from '@/components/TextOnImage';
+import ProductStyleChips from '@/components/ProductStyleChips';
 
 export default function ImageGenerator() {
   const [prompt, setPrompt] = useState('');
@@ -21,6 +22,7 @@ export default function ImageGenerator() {
   const [referenceImage, setReferenceImage] = useState(null);
   const [referenceStrength, setReferenceStrength] = useState(0.6);
   const [showGallery, setShowGallery] = useState(false);
+  const [showProductStyles, setShowProductStyles] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -141,6 +143,26 @@ export default function ImageGenerator() {
         <div className="flex justify-between text-xs text-gray-500 mb-4">
           <span>{prompt.length}/500</span>
           <span>Quanto mais detalhes, melhor o resultado</span>
+        </div>
+
+        {/* Product styles - quick shortcuts */}
+        <div className="mb-4 rounded-xl border border-white/10 bg-white/[0.03] p-3">
+          <button
+            onClick={() => setShowProductStyles(!showProductStyles)}
+            className="flex items-center justify-between w-full text-left"
+          >
+            <span className="text-xs font-semibold text-gray-300 flex items-center gap-2">
+              <span className="text-sm">✨</span> Estilos para anúncio de produto
+              <span className="text-[10px] text-primary-400 font-medium">({showProductStyles ? 'fechar' : 'ver 27 estilos'})</span>
+            </span>
+            <svg className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${showProductStyles ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+          </button>
+          {showProductStyles && (
+            <div className="mt-3">
+              <p className="text-[11px] text-gray-500 mb-3">Descreva seu produto e clique num estilo — ele é adicionado à sua descrição para criar um anúncio impactante.</p>
+              <ProductStyleChips />
+            </div>
+          )}
         </div>
 
         {/* Reference image - use someone from gallery or upload */}
