@@ -150,7 +150,7 @@ export default function TextOnImage({ baseImageUrl, onExport }) {
   return (
     <div className="card">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-gray-900">✏️ Texto em Português nítido</h3>
+        <h3 className="font-semibold text-white">✏️ Texto em Português nítido</h3>
         <span className="text-xs text-gray-400">Texto 100% correto, renderizado localmente</span>
       </div>
 
@@ -162,8 +162,8 @@ export default function TextOnImage({ baseImageUrl, onExport }) {
             onClick={() => applyPreset(p.id)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
               presetId === p.id
-                ? 'border-primary-500 bg-primary-50 text-primary-700'
-                : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                ? 'border-primary-500 bg-primary-500/10 text-primary-300'
+                : 'border-white/10 text-gray-400 hover:border-white/20 hover:text-white'
             }`}
           >
             {p.name}
@@ -172,7 +172,7 @@ export default function TextOnImage({ baseImageUrl, onExport }) {
       </div>
 
       {/* Texto */}
-      <label className="block text-sm font-semibold text-gray-700 mb-1">Texto em português</label>
+      <label className="block text-sm font-semibold text-gray-300 mb-1">Texto em português</label>
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
@@ -184,37 +184,37 @@ export default function TextOnImage({ baseImageUrl, onExport }) {
       {/* Fonte e formatação */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">Fonte</label>
+          <label className="block text-xs font-medium text-gray-400 mb-1">Fonte</label>
           <select value={fontId} onChange={(e) => setFontId(e.target.value)} className="input text-sm py-2">
             {FONTS.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
           </select>
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">Cor do texto</label>
+          <label className="block text-xs font-medium text-gray-400 mb-1">Cor do texto</label>
           <input type="color" value={fontColor} onChange={(e) => setFontColor(e.target.value)} className="w-full h-9 rounded-lg border border-gray-200 cursor-pointer" />
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">Borda</label>
+          <label className="block text-xs font-medium text-gray-400 mb-1">Borda</label>
           <input type="color" value={strokeColor} onChange={(e) => setStrokeColor(e.target.value)} className="w-full h-9 rounded-lg border border-gray-200 cursor-pointer" />
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">Tamanho</label>
+          <label className="block text-xs font-medium text-gray-400 mb-1">Tamanho</label>
           <input type="range" min={30} max={200} value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className="w-full mt-2" />
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-2">Posição (vertical)</label>
+          <label className="block text-xs font-medium text-gray-400 mb-2">Posição (vertical)</label>
           <input type="range" min={0.05} max={0.95} step={0.01} value={yPos} onChange={(e) => setYPos(Number(e.target.value))} className="w-full mt-2" />
         </div>
         <div className="flex items-end gap-3">
-          <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
-            <input type="checkbox" checked={bold} onChange={(e) => setBold(e.target.checked)} className="accent-primary-600 w-4 h-4" />
+          <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
+            <input type="checkbox" checked={bold} onChange={(e) => setBold(e.target.checked)} className="accent-primary-500 w-4 h-4" />
             Negrito
           </label>
         </div>
       </div>
 
       {/* Preview */}
-      <div className="rounded-xl overflow-hidden border border-gray-200 bg-gray-100 relative">
+      <div className="rounded-xl overflow-hidden border border-white/10 bg-white/5 relative">
         <canvas ref={canvasRef} className="w-full h-auto max-h-[480px] object-contain" />
       </div>
 
