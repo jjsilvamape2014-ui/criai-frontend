@@ -1,11 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ImageGenerator from '@/components/ImageGenerator';
 import VideoGenerator from '@/components/VideoGenerator';
 
 export default function GeneratorTabs() {
   const [tab, setTab] = useState('image');
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.detail?.tab) setTab(e.detail.tab);
+    };
+    window.addEventListener('criai:switch-tab', handler);
+    return () => window.removeEventListener('criai:switch-tab', handler);
+  }, []);
 
   return (
     <div>

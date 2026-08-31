@@ -27,6 +27,15 @@ export default function ImageGenerator() {
     }
   }, []);
 
+  useEffect(() => {
+    const handler = (e) => {
+      const p = e.detail?.prompt;
+      if (p) setPrompt(p);
+    };
+    window.addEventListener('criai:set-prompt', handler);
+    return () => window.removeEventListener('criai:set-prompt', handler);
+  }, []);
+
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
     const token = localStorage.getItem('token');
