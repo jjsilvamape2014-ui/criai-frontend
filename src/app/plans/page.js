@@ -70,10 +70,10 @@ export default function PlansPage() {
           {/* Free */}
           <div className={`card border-2 ${user?.plan === 'FREE' ? 'border-primary-500' : 'border-gray-200'}`}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Free</h3>
+              <h3 className="text-lg font-semibold text-gray-900">Gratuito</h3>
               {user?.plan === 'FREE' && <span className="text-xs bg-primary-100 text-primary-700 px-2 py-1 rounded-full font-bold">ATUAL</span>}
             </div>
-            <p className="text-4xl font-bold text-gray-900 mb-1">Grátis<span className="text-base font-normal text-gray-400"> para começar</span></p>
+            <p className="text-4xl font-bold text-gray-900 mb-1">R$ 0<span className="text-base font-normal text-gray-400"> para sempre</span></p>
             <p className="text-sm text-gray-400 mb-6">Teste tudo sem pagar nada</p>
             <ul className="space-y-3 text-sm text-gray-600 mb-6">
               <li className="flex items-center gap-2">✅ Créditos grátis de imagem e vídeo</li>
