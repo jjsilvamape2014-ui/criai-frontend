@@ -47,14 +47,20 @@ export default function ImageGenerator() {
       const p = e.detail?.prompt;
       if (p) setPrompt(p);
     };
+    const appendHandler = (e) => {
+      const p = e.detail?.prompt;
+      if (p) setPrompt(prev => (prev ? prev + ', ' + p : p));
+    };
     const refHandler = (e) => {
       const ref = e.detail?.image;
       if (ref) setReferenceImage(ref);
     };
     window.addEventListener('criai:set-prompt', handler);
+    window.addEventListener('criai:append-prompt', appendHandler);
     window.addEventListener('criai:set-reference', refHandler);
     return () => {
       window.removeEventListener('criai:set-prompt', handler);
+      window.removeEventListener('criai:append-prompt', appendHandler);
       window.removeEventListener('criai:set-reference', refHandler);
     };
   }, []);

@@ -3,6 +3,7 @@ import GeneratorTabs from '@/components/GeneratorTabs';
 import Logo from '@/components/Logo';
 import AnimatedTitle from '@/components/AnimatedTitle';
 import StyleChips from '@/components/StyleChips';
+import ProductStyleChips from '@/components/ProductStyleChips';
 import ShowcaseCarousel from '@/components/ShowcaseCarousel';
 
 const SHOWCASE_IMAGES = [
@@ -137,6 +138,24 @@ export default function Home() {
             </h2>
           </div>
           <GeneratorTabs />
+        </div>
+      </section>
+
+      {/* Product styles - Dê um upgrade no seu produto */}
+      <section className="relative py-16 overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-radial from-primary-600/10 via-transparent to-transparent rounded-full blur-3xl -z-10" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-10">
+            <p className="text-sm font-semibold text-primary-400 uppercase tracking-wider mb-3">Para vender mais</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              Dê um <span className="gradient-text">upgrade</span> na foto do seu produto
+            </h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Descreva seu produto no gerador e clique num estilo para criar um anúncio impactante — como os que aparecem nos marketplaces. Perfeito para a sua loja e seus clientes.
+            </p>
+          </div>
+          <ProductStyleChips />
+          <p className="text-center text-xs text-gray-600 mt-6">Clique em um estilo e ele é adicionado automaticamente à sua descrição no gerador ⬇</p>
         </div>
       </section>
 
