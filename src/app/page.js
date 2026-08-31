@@ -3,6 +3,7 @@ import GeneratorTabs from '@/components/GeneratorTabs';
 import Logo from '@/components/Logo';
 import AnimatedTitle from '@/components/AnimatedTitle';
 import StyleChips from '@/components/StyleChips';
+import ShowcaseCarousel from '@/components/ShowcaseCarousel';
 
 const SHOWCASE_IMAGES = [
   { url: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?w=600&h=600&fit=crop', prompt: 'Fogos de artificio neon sobre cidade cinematografica' },
@@ -101,6 +102,14 @@ export default function Home() {
               <p className="mt-1">avaliação média</p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Showcase Carousel - animated hero images */}
+      <section className="relative py-10 sm:py-14 overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-radial from-primary-600/15 via-transparent to-transparent rounded-full blur-3xl -z-10" />
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
+          <ShowcaseCarousel />
         </div>
       </section>
 
