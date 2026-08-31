@@ -1,3 +1,5 @@
+import './globals.css';
+
 export const metadata = {
   title: 'Criai - Crie imagens e vídeos com IA',
   description: 'Gere imagens e vídeos incríveis com inteligência artificial. Grátis para começar.',
