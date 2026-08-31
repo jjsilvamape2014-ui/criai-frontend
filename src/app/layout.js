@@ -1,4 +1,17 @@
+import { Inter, Sora } from 'next/font/google';
 import './globals.css';
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
+const sora = Sora({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-sora',
+});
 
 export const metadata = {
   title: 'Criai - Crie imagens e vídeos com IA',
@@ -9,7 +22,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="pt-BR" className="dark">
-      <body className="antialiased min-h-screen">
+      <body className={`${inter.variable} ${sora.variable} antialiased min-h-screen font-sans`}>
         {children}
       </body>
     </html>

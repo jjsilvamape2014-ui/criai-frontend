@@ -9,6 +9,9 @@
   ::selection {
     @apply bg-primary-600/40 text-white;
   }
+  h1, h2, h3, h4 {
+    @apply font-display;
+  }
 }
 
 @layer components {
@@ -27,10 +30,10 @@
     @apply text-gray-400 hover:text-white hover:bg-white/5 px-4 py-2 rounded-lg transition-all duration-200;
   }
   .card {
-    @apply bg-white/5 rounded-2xl border border-white/10 p-6 backdrop-blur-sm;
+    @apply bg-white/[0.04] rounded-2xl border border-white/10 p-6 backdrop-blur-sm;
   }
   .card-glow {
-    @apply bg-white/5 rounded-2xl border border-primary-500/20 p-6 backdrop-blur-sm 
+    @apply bg-white/[0.04] rounded-2xl border border-primary-500/20 p-6 backdrop-blur-md 
            shadow-lg shadow-primary-500/5 hover:border-primary-500/40 hover:shadow-primary-500/10 transition-all duration-300;
   }
   .input {
@@ -49,9 +52,15 @@
   }
 }
 
-/* Gradient text */
+/* Gradient text - mais ousado */
 .gradient-text {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-400 via-primary-300 to-blue-400;
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-300 via-primary-400 to-blue-400;
+}
+
+/* Gradient text com brilho para o hero */
+.gradient-text-hero {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-300 via-fuchsia-300 to-blue-300;
+  filter: drop-shadow(0 0 24px rgba(124,58,237,0.35));
 }
 
 /* Glass morphism */
@@ -69,7 +78,7 @@
   inset: -1px;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, #7c3aed, #6366f1, #3b82f6, #7c3aed);
+  background: linear-gradient(135deg, #7c3aed, #6366f1, #3b82f6, #8b5cf6);
   background-size: 300% 300%;
   animation: gradientShift 4s ease infinite;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -91,6 +100,32 @@
   opacity: 0.03;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   pointer-events: none;
+}
+
+/* Dots/mesh background grid - premium look */
+.mesh-dots {
+  background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.mesh-grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+/* Botão com shimmer */
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2.5s linear infinite;
 }
 
 /* Smooth scroll */

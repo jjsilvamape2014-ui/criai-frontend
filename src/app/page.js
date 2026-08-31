@@ -40,10 +40,12 @@ export default function Home() {
 
       {/* Hero */}
       <section className="relative overflow-hidden">
-        {/* Gradient background */}
+        {/* Mesh + aurora background */}
+        <div className="absolute inset-0 mesh-grid opacity-60" />
         <div className="absolute inset-0 bg-gradient-to-b from-primary-900/20 via-dark-950 to-dark-950" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-gradient-radial from-primary-600/20 via-transparent to-transparent rounded-full blur-3xl" />
-        <div className="absolute top-20 right-0 w-[400px] h-[400px] bg-gradient-radial from-blue-600/10 via-transparent to-transparent rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-gradient-radial from-primary-600/25 via-transparent to-transparent rounded-full blur-3xl animate-aurora" />
+        <div className="absolute top-40 right-0 w-[400px] h-[400px] bg-gradient-radial from-blue-600/20 via-transparent to-transparent rounded-full blur-3xl animate-aurora" style={{ animationDelay: '4s' }} />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-radial from-fuchsia-600/10 via-transparent to-transparent rounded-full blur-3xl animate-aurora" style={{ animationDelay: '8s' }} />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 pt-20 pb-24 text-center">
           {/* Badge */}
@@ -58,7 +60,7 @@ export default function Home() {
           {/* Heading - with Dreamina-style letter animation */}
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 leading-[1.1] tracking-tight animate-fade-up" style={{ animationDelay: '0.1s' }}>
             Crie imagens<br />
-            <AnimatedTitle /> com IA
+            <span className="gradient-text-hero"><AnimatedTitle /></span> com IA
           </h1>
 
           <p className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-up" style={{ animationDelay: '0.2s' }}>
@@ -67,7 +69,7 @@ export default function Home() {
 
           {/* CTA buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14 animate-fade-up" style={{ animationDelay: '0.3s' }}>
-            <a href="#gerador" className="btn-primary text-base px-8 py-3.5 flex items-center gap-2">
+            <a href="#gerador" className="btn-primary btn-shimmer text-base px-8 py-3.5 flex items-center gap-2">
               Começar grátis
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
             </a>
@@ -77,26 +79,26 @@ export default function Home() {
           </div>
 
           {/* Styles ready to use - Dreamina inspired */}
-          <div className="mb-14 animate-fade-up" style={{ animationDelay: '0.4s' }}>
+          <div className="mb-16 animate-fade-up" style={{ animationDelay: '0.4s' }}>
             <p className="text-xs text-gray-500 uppercase tracking-widest mb-4">Não sabe o que criar? Escolha um estilo</p>
             <StyleChips />
           </div>
 
-          {/* Stats */}
-          <div className="flex items-center justify-center gap-8 sm:gap-12 text-sm text-gray-500 animate-fade-up" style={{ animationDelay: '0.5s' }}>
+          {/* Social proof - premium numbers */}
+          <div className="flex items-center justify-center gap-8 sm:gap-14 text-sm text-gray-500 animate-fade-up" style={{ animationDelay: '0.5s' }}>
             <div className="text-center">
-              <p className="text-2xl font-bold text-white">10</p>
-              <p>imagens grátis/mês</p>
+              <p className="text-3xl font-bold font-display text-white">+2.500</p>
+              <p className="mt-1">criadores ativos</p>
             </div>
-            <div className="w-px h-10 bg-white/10" />
+            <div className="w-px h-12 bg-white/10" />
             <div className="text-center">
-              <p className="text-2xl font-bold text-white">4K</p>
-              <p>resolução máxima</p>
+              <p className="text-3xl font-bold font-display text-white">+50 mil</p>
+              <p className="mt-1">imagens geradas</p>
             </div>
-            <div className="w-px h-10 bg-white/10" />
+            <div className="w-px h-12 bg-white/10" />
             <div className="text-center">
-              <p className="text-2xl font-bold text-white">PT</p>
-              <p>texto perfeito</p>
+              <p className="text-3xl font-bold font-display text-white">4.9<span className="text-primary-400">★</span></p>
+              <p className="mt-1">avaliação média</p>
             </div>
           </div>
         </div>
@@ -111,9 +113,9 @@ export default function Home() {
               Imagens geradas por <span className="gradient-text">nossos usuários</span>
             </h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 auto-rows-[160px] sm:auto-rows-[200px] gap-3 sm:gap-4">
             {SHOWCASE_IMAGES.map((img, i) => (
-              <a href="#gerador" key={i} className="group relative aspect-square rounded-2xl overflow-hidden border border-white/5 hover:border-primary-500/40 transition-all duration-500">
+              <a href="#gerador" key={i} className={`group relative rounded-2xl overflow-hidden border border-white/5 hover:border-primary-500/40 transition-all duration-500 ${i === 0 ? 'row-span-2 col-span-2' : ''}`}>
                 <img
                   src={img.url}
                   alt={img.prompt}

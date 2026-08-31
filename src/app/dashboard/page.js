@@ -34,6 +34,14 @@ export default function DashboardPage() {
     document.body.appendChild(link); link.click(); document.body.removeChild(link);
   };
 
+  const handleEdit = (item) => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('criai_ref_image', item.imageUrl);
+      sessionStorage.setItem('criai_ref_prompt', item.prompt);
+      window.location.href = '/'; // generator na home lê sessionStorage
+    }
+  };
+
   if (loading) {
     return (
       <>
@@ -108,7 +116,11 @@ export default function DashboardPage() {
                 <img src={item.imageUrl} alt={item.prompt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-200 flex flex-col justify-end p-3">
                   <p className="text-white text-xs mb-2 line-clamp-2">{item.prompt}</p>
-                  <button onClick={() => handleDownload(item.imageUrl, i)} className="text-white text-sm font-medium">Baixar</button>
+                  <button onClick={() => handleEdit(item)} className="text-white text-xs font-semibold mb-1 text-left flex items-center gap-1.5">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                    Editar/Refinar
+                  </button>
+                  <button onClick={() => handleDownload(item.imageUrl, i)} className="text-white text-xs font-medium text-left">Baixar</button>
                 </div>
                 <div className="absolute top-2 right-2">
                   <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${item.status === 'COMPLETED' ? 'bg-green-500/20 text-green-400' : item.status === 'FAILED' ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'}`}>

@@ -7,6 +7,10 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-sora)', 'var(--font-inter)', 'sans-serif'],
+      },
       colors: {
         primary: {
           50: '#f5f3ff', 100: '#ede9fe', 200: '#ddd6fe', 300: '#c4b5fd',
@@ -29,6 +33,8 @@ module.exports = {
         'fade-up': 'fadeUp 0.6s ease-out',
         'slide-in': 'slideIn 0.4s ease-out',
         'letter': 'letterPop 0.5s ease-out both',
+        'aurora': 'aurora 12s ease-in-out infinite',
+        'shimmer': 'shimmer 2.5s linear infinite',
       },
       keyframes: {
         float: { '0%, 100%': { transform: 'translateY(0px)' }, '50%': { transform: 'translateY(-20px)' } },
@@ -36,6 +42,8 @@ module.exports = {
         fadeUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
         slideIn: { '0%': { opacity: '0', transform: 'translateX(-10px)' }, '100%': { opacity: '1', transform: 'translateX(0)' } },
         letterPop: { '0%': { opacity: '0', transform: 'translateY(15px) scale(0.5)', filter: 'blur(4px)' }, '100%': { opacity: '1', transform: 'translateY(0) scale(1)', filter: 'blur(0)' } },
+        aurora: { '0%, 100%': { transform: 'translate(0,0) scale(1)' }, '33%': { transform: 'translate(40px,-30px) scale(1.1)' }, '66%': { transform: 'translate(-30px,20px) scale(0.95)' } },
+        shimmer: { '0%': { backgroundPosition: '200% 0' }, '100%': { backgroundPosition: '-200% 0' } },
       },
     },
   },
