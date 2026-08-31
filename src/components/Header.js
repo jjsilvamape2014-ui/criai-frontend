@@ -28,61 +28,65 @@ export default function Header() {
   };
 
   return (
-    <header className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'glass shadow-xl shadow-black/20' : 'bg-transparent'}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        <Logo size="md" />
+    <header className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? 'py-2' : 'py-4'}`}>
+      <div className={`max-w-7xl mx-auto px-4 sm:px-6 transition-all duration-300 ${scrolled ? 'px-2 sm:px-6' : ''}`}>
+        <div className={`flex items-center justify-between transition-all duration-300 rounded-2xl px-4 sm:px-5 ${scrolled ? 'glass shadow-xl shadow-black/20 border border-white/10' : 'bg-transparent'}`}>
+          <div className="h-14 flex items-center">
+            <Logo size="md" />
+          </div>
 
-        <nav className="hidden md:flex items-center gap-1">
-          <a href="/" className="btn-ghost text-sm">Gerador</a>
-          <a href="/dashboard" className="btn-ghost text-sm">Dashboard</a>
-          <a href="/plans" className="btn-ghost text-sm">Planos</a>
-        </nav>
+          <nav className="hidden md:flex items-center gap-1">
+            <a href="/" className="btn-ghost text-sm">Gerador</a>
+            <a href="/dashboard" className="btn-ghost text-sm">Dashboard</a>
+            <a href="/plans" className="btn-ghost text-sm">Planos</a>
+          </nav>
 
-        <div className="flex items-center gap-3">
-          {user ? (
-            <div className="relative">
-              <button
-                onClick={() => setMenuOpen(!menuOpen)}
-                className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-xl glass hover:bg-white/10 transition-all duration-200"
-              >
-                <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-blue-500 rounded-lg flex items-center justify-center font-bold text-sm text-white shadow-lg shadow-primary-500/20">
-                  {user.name?.[0]?.toUpperCase() || 'U'}
-                </div>
-                <span className="text-sm font-medium text-white hidden sm:block">{user.name}</span>
-                {user.plan === 'PREMIUM' && <span className="text-xs">⭐</span>}
-                <svg className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${menuOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              {menuOpen && (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
-                  <div className="absolute right-0 top-full mt-2 w-60 glass rounded-2xl border border-white/10 shadow-2xl shadow-black/40 py-2 z-50 animate-slide-in">
-                    <div className="px-4 py-3 border-b border-white/10">
-                      <p className="text-sm font-semibold text-white">{user.name}</p>
-                      <p className="text-xs text-gray-400 mt-0.5">{user.email}</p>
-                      <span className={user.plan === 'PREMIUM' ? 'badge-premium mt-2' : 'badge-free mt-2'}>
-                        {user.plan === 'PREMIUM' ? '⭐ Premium' : 'Free'}
-                      </span>
-                    </div>
-                    <a href="/dashboard" className="block px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">Dashboard</a>
-                    <a href="/plans" className="block px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">Planos & Assinatura</a>
-                    <div className="border-t border-white/10 mt-1 pt-1">
-                      <button onClick={handleLogout} className="block w-full text-left px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors">
-                        Sair
-                      </button>
-                    </div>
+          <div className="flex items-center gap-3">
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setMenuOpen(!menuOpen)}
+                  className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-xl glass hover:bg-white/10 transition-all duration-200"
+                >
+                  <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-blue-500 rounded-lg flex items-center justify-center font-bold text-sm text-white shadow-lg shadow-primary-500/20">
+                    {user.name?.[0]?.toUpperCase() || 'U'}
                   </div>
-                </>
-              )}
-            </div>
-          ) : (
-            <div className="flex items-center gap-3">
-              <a href="/login" className="btn-ghost text-sm">Entrar</a>
-              <a href="/register" className="btn-primary text-sm py-2 px-5">Criar conta</a>
-            </div>
-          )}
+                  <span className="text-sm font-medium text-white hidden sm:block">{user.name}</span>
+                  {user.plan === 'PREMIUM' && <span className="text-xs">⭐</span>}
+                  <svg className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${menuOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {menuOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
+                    <div className="absolute right-0 top-full mt-2 w-60 glass rounded-2xl border border-white/10 shadow-2xl shadow-black/40 py-2 z-50 animate-slide-in">
+                      <div className="px-4 py-3 border-b border-white/10">
+                        <p className="text-sm font-semibold text-white">{user.name}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">{user.email}</p>
+                        <span className={user.plan === 'PREMIUM' ? 'badge-premium mt-2' : 'badge-free mt-2'}>
+                          {user.plan === 'PREMIUM' ? '⭐ Premium' : 'Free'}
+                        </span>
+                      </div>
+                      <a href="/dashboard" className="block px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">Dashboard</a>
+                      <a href="/plans" className="block px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">Planos & Assinatura</a>
+                      <div className="border-t border-white/10 mt-1 pt-1">
+                        <button onClick={handleLogout} className="block w-full text-left px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors">
+                          Sair
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <a href="/login" className="btn-ghost text-sm">Entrar</a>
+                <a href="/register" className="btn-primary text-sm py-2 px-5">Criar conta</a>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>
