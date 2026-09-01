@@ -7,6 +7,7 @@ export default function CerebroEditor() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [baseImage, setBaseImage] = useState(null);
+  const [refImages, setRefImages] = useState([]);
   const [sessionId, setSessionId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -19,6 +20,7 @@ export default function CerebroEditor() {
     const refImg = sessionStorage.getItem('criai_ref_image');
     if (refImg) {
       setBaseImage(refImg);
+      setRefImages([refImg]);
       sessionStorage.removeItem('criai_ref_image');
     }
     const sid = sessionStorage.getItem('criai_cerebro_session');
@@ -27,7 +29,13 @@ export default function CerebroEditor() {
       api.cerebroMemory(sid)
         .then((mem) => {
           setMessages(mem.history || []);
-          if (mem.memory.baseImage) setBaseImage(mem.memory.baseImage);
+          if (mem.memory?.refImages?.length) {
+            setRefImages(mem.memory.refImages);
+            setBaseImage(mem.memory.refImages[0]);
+          } else if (mem.memory.baseImage) {
+            setBaseImage(mem.memory.baseImage);
+            setRefImages([mem.memory.baseImage]);
+          }
         })
         .catch(() => {});
     }
@@ -38,17 +46,43 @@ export default function CerebroEditor() {
   }, [messages, loading]);
 
   const handleUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) { setError({ type: 'GENERIC', message: 'Envie um arquivo de imagem válido.' }); return; }
-    const reader = new FileReader();
-    reader.onload = () => { setBaseImage(reader.result); e.target.value = ''; };
-    reader.readAsDataURL(file);
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    if (!files.length) return;
+    setError(null);
+    const pending = refImages.slice(0, 4 - files.length);
+    if (pending.length + files.length > 4) {
+      setError({ type: 'GENERIC', message: 'Voce pode adicionar ate 4 imagens. Remova alguma para trocar.' });
+      e.target.value = '';
+      return;
+    }
+    let loaded = 0;
+    const next = [...pending];
+    files.forEach((file) => {
+      if (!file.type.startsWith('image/')) { setError({ type: 'GENERIC', message: 'Envie apenas arquivos de imagem.' }); return; }
+      const reader = new FileReader();
+      reader.onload = () => {
+        next.push(reader.result);
+        loaded++;
+        if (loaded === files.length) {
+          setRefImages(next);
+          if (!baseImage) setBaseImage(next[0]);
+          e.target.value = '';
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeImage = (idx) => {
+    const next = refImages.filter((_, i) => i !== idx);
+    setRefImages(next);
+    if (baseImage === refImages[idx]) setBaseImage(next[0] || null);
   };
 
   const handleSend = async () => {
     const msg = input.trim();
     if (!msg || loading) return;
+    if (!refImages.length) { setError({ type: 'GENERIC', message: 'Adicione ao menos 1 imagem para editar.' }); return; }
     const token = localStorage.getItem('token');
     if (!token) { setShowLoginModal(true); return; }
 
@@ -59,12 +93,13 @@ export default function CerebroEditor() {
     try {
       const data = await api.cerebroChat(msg, {
         ...(sessionId ? { sessionId } : {}),
-        ...(baseImage ? { image: baseImage } : {}),
+        images: refImages,
       });
       setSessionId(data.sessionId);
       if (typeof window !== 'undefined') sessionStorage.setItem('criai_cerebro_session', data.sessionId);
       setMessages([...newMessages, { role: 'assistant', message: data.reply, imageUrl: data.imageUrl }]);
       setBaseImage(data.imageUrl);
+      setRefImages((prev) => (prev.length ? [data.imageUrl, ...prev.slice(1)] : [data.imageUrl]));
       setCredits(data.credits || null);
     } catch (err) {
       if (err.data?.code === 'NO_CREDITS') {
@@ -84,7 +119,7 @@ export default function CerebroEditor() {
     if (sessionId) {
       try { await api.cerebroReset(sessionId); } catch {}
     }
-    setMessages([]); setSessionId(null); setBaseImage(null); setInput(''); setError(null); setCredits(null);
+    setMessages([]); setSessionId(null); setBaseImage(null); setRefImages([]); setInput(''); setError(null); setCredits(null);
     if (typeof window !== 'undefined') sessionStorage.removeItem('criai_cerebro_session');
   };
 
@@ -99,7 +134,7 @@ export default function CerebroEditor() {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
   };
 
-  const examples = ['Trocar a cor para azul', 'Deixar o fundo branco', 'Remover a pessoa da foto', 'Trocar o texto para OFERTA 50%'];
+  const examples = ['Trocar a cor da caneca para azul', 'Deixar o fundo branco', 'Colocar minha logo na imagem', 'Remover os nomes/textos da embalagem', 'Remover a pessoa da foto', 'Limpar ruido da imagem'];
 
   return (
     <div id="cerebro" className="card mb-8">
@@ -110,33 +145,51 @@ export default function CerebroEditor() {
             <span className="text-lg">🧠</span> Cerebro Visual
             {sessionId && <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 font-medium">Sessao ativa</span>}
           </h3>
-          <p className="text-xs text-gray-500 mt-1">Converse e edite sua imagem: trocar cor, remover pessoa, deixar o fundo branco... (1 credito por edicao)</p>
+          <p className="text-xs text-gray-500 mt-1">Converse e edite: adicione ate 4 imagens e peca para trocar cor, remover pessoa/nomes/ruido, colocar sua logo... (1 credito por edicao)</p>
         </div>
         {sessionId && (
           <button onClick={handleReset} className="text-xs text-red-400 hover:text-red-300 font-medium shrink-0">Nova conversa</button>
         )}
       </div>
 
-      {/* Base image / upload */}
-      <div className={`mb-4 rounded-xl border border-white/10 bg-white/[0.03] p-3 ${baseImage ? 'flex items-center gap-3' : ''}`}>
-        {baseImage ? (
+      {/* Base images / upload (até 4 referências) */}
+      <div className="mb-4 rounded-xl border border-white/10 bg-white/[0.03] p-3">
+        {refImages.length > 0 ? (
           <>
-            <div className="w-20 h-20 rounded-lg overflow-hidden border border-white/10 shrink-0">
-              <img src={baseImage} alt="Base" className="w-full h-full object-cover" />
+            <div className="flex flex-wrap items-center gap-3">
+              {refImages.map((img, i) => (
+                <div key={i} className="w-20 h-20 rounded-lg overflow-hidden border border-white/10 relative group shrink-0">
+                  <img src={img} alt={`Ref ${i + 1}`} className="w-full h-full object-cover" />
+                  <button
+                    onClick={() => removeImage(i)}
+                    className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/70 text-white text-[10px] font-bold opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-opacity flex items-center justify-center"
+                    title="Remover"
+                  >✕</button>
+                  {i === 0 && <span className="absolute bottom-1 left-1 text-[9px] px-1.5 py-0.5 rounded bg-primary-500/80 text-white font-bold">base</span>}
+                </div>
+              ))}
+              {refImages.length < 4 && (
+                <label className="w-20 h-20 rounded-lg border border-dashed border-white/20 hover:border-primary-500/40 flex items-center justify-center text-gray-500 hover:text-primary-300 cursor-pointer transition-colors shrink-0 text-2xl">
+                  +
+                  <input type="file" accept="image/*" multiple onChange={handleUpload} className="hidden" />
+                </label>
+              )}
             </div>
-            <div className="flex-1">
-              <p className="text-xs text-gray-400 mb-1 font-medium">Imagem que estamos editando</p>
+            <div className="mt-2 flex items-center justify-between flex-wrap gap-2">
+              <p className="text-xs text-gray-400 font-medium">
+                {refImages.length} de 4 imagens de {refImages.length === 1 ? 'referencia' : 'referencias'} na conversa
+              </p>
               <label className="text-xs text-primary-400 hover:text-primary-300 font-medium cursor-pointer">
                 Trocar por outra imagem
-                <input type="file" accept="image/*" onChange={handleUpload} className="hidden" />
+                <input type="file" accept="image/*" multiple onChange={handleUpload} className="hidden" />
               </label>
             </div>
           </>
         ) : (
           <label className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-primary-500/40 bg-primary-500/10 text-primary-300 text-sm font-semibold hover:bg-primary-500/20 transition-colors cursor-pointer w-full">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-            Envie a imagem que quer editar
-            <input type="file" accept="image/*" onChange={handleUpload} className="hidden" />
+            Envie ate 4 imagens para editar (igual ao ChatGPT)
+            <input type="file" accept="image/*" multiple onChange={handleUpload} className="hidden" />
           </label>
         )}
       </div>
