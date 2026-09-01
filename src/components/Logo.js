@@ -1,8 +1,8 @@
 export default function Logo({ size = 'md', showText = true, className = '' }) {
   const heights = {
-    sm: 26,
-    md: 34,
-    lg: 44,
+    sm: 32,
+    md: 42,
+    lg: 52,
   };
   const h = heights[size] || heights.md;
 

@@ -31,7 +31,7 @@ export const metadata = {
     url: SITE_URL,
     title: 'Criativa AI - Gere imagens incríveis com IA',
     description: 'Crie imagens profissionais com IA. Texto em português, resolução 4K, estilos prontos para anúncio de produto. Grátis para começar.',
-    images: [{ url: '/criativa-logo.png', width: 2000, height: 460, alt: 'Criativa AI' }],
+    images: [{ url: '/criativa-logo.png', width: 1672, height: 941, alt: 'Criativa AI' }],
   },
   twitter: {
     card: 'summary_large_image',
