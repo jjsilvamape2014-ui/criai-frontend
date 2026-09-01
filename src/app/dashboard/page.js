@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import Header from '@/components/Header';
+import CerebroEditor from '@/components/CerebroEditor';
 
 export default function DashboardPage() {
   const [user, setUser] = useState(null);
@@ -39,6 +40,14 @@ export default function DashboardPage() {
       sessionStorage.setItem('criai_ref_image', item.imageUrl);
       sessionStorage.setItem('criai_ref_prompt', item.prompt);
       window.location.href = '/'; // generator na home lê sessionStorage
+    }
+  };
+
+  const handleChatEdit = (item) => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('criai_ref_image', item.imageUrl);
+      sessionStorage.setItem('criai_ref_prompt', item.prompt);
+      window.location.href = '/dashboard?chat=1#cerebro'; // recarrega e abre o Cérebro Visual
     }
   };
 
@@ -100,6 +109,9 @@ export default function DashboardPage() {
           )}
         </div>
 
+        {/* Cerebro Visual - chat de edição */}
+        <CerebroEditor />
+
         {/* History */}
         <h2 className="text-lg font-semibold text-white mb-4">Suas criacoes</h2>
         {history.length === 0 ? (
@@ -119,6 +131,9 @@ export default function DashboardPage() {
                   <button onClick={() => handleEdit(item)} className="text-white text-xs font-semibold mb-1 text-left flex items-center gap-1.5">
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                     Editar/Refinar
+                  </button>
+                  <button onClick={() => handleChatEdit(item)} className="text-white text-xs mb-1 text-left flex items-center gap-1.5">
+                    <span className="text-sm">🧠</span> Editar na conversa
                   </button>
                   <button onClick={() => handleDownload(item.imageUrl, i)} className="text-white text-xs font-medium text-left">Baixar</button>
                 </div>

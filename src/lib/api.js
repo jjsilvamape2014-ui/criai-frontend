@@ -103,6 +103,26 @@ class ApiClient {
   async getRecentSession() {
     return this.request('/payment/recent');
   }
+
+  // Cérebro Visual (chat de edição de imagem)
+  async cerebroChat(message, options = {}) {
+    return this.request('/cerebro/chat', {
+      method: 'POST',
+      body: JSON.stringify({ message, ...options }),
+    });
+  }
+
+  async cerebroMemory(sessionId) {
+    return this.request(`/cerebro/memoria/${sessionId}`);
+  }
+
+  async cerebroReset(sessionId) {
+    return this.request(`/cerebro/reset/${sessionId}`, { method: 'POST' });
+  }
+
+  async cerebroSessions() {
+    return this.request('/cerebro/sessions');
+  }
 }
 
 export const api = new ApiClient();
