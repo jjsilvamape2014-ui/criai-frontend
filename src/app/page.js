@@ -72,7 +72,7 @@ export default function Home() {
             <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10 flex items-end justify-between gap-4">
               <div className="text-white">
                 <span className="inline-block px-3 py-1 rounded-full bg-white/15 border border-white/20 text-xs font-semibold backdrop-blur mb-3">
-                  ✨ Criado com Criai
+                  ✨ Criado com Criativa AI
                 </span>
                 <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold leading-[1.1] tracking-tight">
                   Transforme suas ideias
@@ -275,7 +275,7 @@ export default function Home() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-14">
-            <p className="text-sm font-semibold text-primary-400 uppercase tracking-wider mb-3">Por que a Criai?</p>
+            <p className="text-sm font-semibold text-primary-400 uppercase tracking-wider mb-3">Por que a Criativa?</p>
             <h2 className="text-3xl sm:text-4xl font-bold text-white">
               Tudo que você precisa para <span className="gradient-text">criar com IA</span>
             </h2>
@@ -392,7 +392,7 @@ export default function Home() {
               <Logo size="sm" />
             </div>
             <div className="text-center md:text-right">
-              <p className="text-sm text-gray-500">© 2026 Criai. Todos os direitos reservados.</p>
+              <p className="text-sm text-gray-500">© 2026 Criativa AI. Todos os direitos reservados.</p>
               <p className="text-xs text-gray-600 mt-1">Desenvolvido por <span className="text-gray-400">João Gomes</span> · (91) 99987-9932</p>
             </div>
           </div>

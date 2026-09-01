@@ -18,33 +18,33 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://criai-frontend-pro
 export const metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Criai - Gere imagens incríveis com IA',
-    template: '%s | Criai',
+    default: 'Criativa AI - Gere imagens incríveis com IA',
+    template: '%s | Criativa AI',
   },
   description: 'Crie imagens profissionais com inteligência artificial. Texto em português nítido, resolução 4K, sem watermark e com estilos prontos para anúncio de produto. Grátis para começar.',
   keywords: ['criar imagens com IA', 'inteligência artificial', 'gerar imagem', 'anúncio de produto', 'ia de imagens', 'texto em português ia'],
   alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
-    siteName: 'Criai',
+    siteName: 'Criativa AI',
     locale: 'pt_BR',
     url: SITE_URL,
-    title: 'Criai - Gere imagens incríveis com IA',
+    title: 'Criativa AI - Gere imagens incríveis com IA',
     description: 'Crie imagens profissionais com IA. Texto em português, resolução 4K, estilos prontos para anúncio de produto. Grátis para começar.',
-    images: [{ url: '/criai-logo.png', width: 2172, height: 724, alt: 'Criai' }],
+    images: [{ url: '/criativa-logo.png', width: 2000, height: 460, alt: 'Criativa AI' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Criai - Gere imagens incríveis com IA',
+    title: 'Criativa AI - Gere imagens incríveis com IA',
     description: 'Crie imagens profissionais com IA. Texto em português, resolução 4K, estilos prontos para anúncio.',
-    images: ['/criai-logo.png'],
+    images: ['/criativa-logo.png'],
   },
   robots: {
     index: true,
     follow: true,
     googleBot: { index: true, follow: true },
   },
-  icons: { icon: '/criai-logo.png' },
+  icons: { icon: '/criativa-logo.png' },
 };
 
 export default function RootLayout({ children }) {
@@ -58,7 +58,7 @@ export default function RootLayout({ children }) {
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'SoftwareApplication',
-              name: 'Criai',
+              name: 'Criativa AI',
               applicationCategory: 'DesignApplication',
               operatingSystem: 'Web',
               description: 'Plataforma para criar imagens profissionais com inteligência artificial, com texto em português e estilos prontos para anúncio de produto.',

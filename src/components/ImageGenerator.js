@@ -109,7 +109,7 @@ export default function ImageGenerator() {
   const handleDownload = (imageUrl) => {
     const link = document.createElement('a');
     link.href = imageUrl;
-    link.download = `criai-imagem-${Date.now()}.jpg`;
+    link.download = `criativa-imagem-${Date.now()}.jpg`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

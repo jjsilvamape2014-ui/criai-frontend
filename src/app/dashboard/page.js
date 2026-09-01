@@ -30,7 +30,7 @@ export default function DashboardPage() {
   const handleDownload = (imageUrl, index) => {
     const link = document.createElement('a');
     link.href = imageUrl;
-    link.download = `criai-imagem-${index + 1}.png`;
+    link.download = `criativa-imagem-${index + 1}.png`;
     document.body.appendChild(link); link.click(); document.body.removeChild(link);
   };
 
