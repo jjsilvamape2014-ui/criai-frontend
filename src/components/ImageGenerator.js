@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { api } from '@/lib/api';
 import TextOnImage from '@/components/TextOnImage';
 
@@ -15,6 +15,7 @@ export default function ImageGenerator() {
   const [showTextTool, setShowTextTool] = useState(false);
   const [finalImage, setFinalImage] = useState(null);
   const [referenceImage, setReferenceImage] = useState(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -25,39 +26,24 @@ export default function ImageGenerator() {
     if (typeof window !== 'undefined') {
       const refImg = sessionStorage.getItem('criai_ref_image');
       const refPrompt = sessionStorage.getItem('criai_ref_prompt');
-      if (refImg) {
-        setReferenceImage(refImg);
-        sessionStorage.removeItem('criai_ref_image');
-      }
-      if (refPrompt) {
-        setPrompt(refPrompt);
-        sessionStorage.removeItem('criai_ref_prompt');
-      }
+      if (refImg) { setReferenceImage(refImg); sessionStorage.removeItem('criai_ref_image'); }
+      if (refPrompt) { setPrompt(refPrompt); sessionStorage.removeItem('criai_ref_prompt'); }
     }
   }, []);
 
   useEffect(() => {
-    const handler = (e) => {
-      const p = e.detail?.prompt;
-      if (p) setPrompt(p);
-    };
-    const appendHandler = (e) => {
-      const p = e.detail?.prompt;
-      if (p) setPrompt(prev => (prev ? prev + ', ' + p : p));
-    };
-    const refHandler = (e) => {
-      const ref = e.detail?.image;
-      if (ref) setReferenceImage(ref);
-    };
+    const handler = (e) => { const p = e.detail?.prompt; if (p) setPrompt(p); };
+    const refHandler = (e) => { const ref = e.detail?.image; if (ref) setReferenceImage(ref); };
     window.addEventListener('criai:set-prompt', handler);
-    window.addEventListener('criai:append-prompt', appendHandler);
     window.addEventListener('criai:set-reference', refHandler);
     return () => {
       window.removeEventListener('criai:set-prompt', handler);
-      window.removeEventListener('criai:append-prompt', appendHandler);
       window.removeEventListener('criai:set-reference', refHandler);
     };
   }, []);
+
+  // Foca o campo quando a página carrega (estilo Kimi/Gemini)
+  useEffect(() => { inputRef.current?.focus(); }, []);
 
   const handleUpload = (e) => {
     const file = e.target.files?.[0];
@@ -98,6 +84,10 @@ export default function ImageGenerator() {
     }
   };
 
+  const handleKey = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleGenerate(); }
+  };
+
   const handleDownload = (imageUrl) => {
     const link = document.createElement('a');
     link.href = imageUrl;
@@ -108,78 +98,72 @@ export default function ImageGenerator() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Prompt area */}
-      <div className="card mb-6">
-        <label className="block text-sm font-semibold text-gray-300 mb-2">Descreva sua imagem</label>
+    <div className="mx-auto w-full max-w-3xl">
+      {/* Caixa de prompt central estilo Kimi */}
+      <div className="relative rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur shadow-2xl shadow-primary-900/20 overflow-hidden">
         <textarea
+          ref={inputRef}
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Ex: Um gato astronauta flutuando no espaco, estilo pixel art, cores vibrantes..."
-          className="input min-h-[100px] resize-none mb-3"
+          onKeyDown={handleKey}
+          placeholder="Descreva a imagem que você quer criar..."
+          className="w-full bg-transparent text-white placeholder-gray-500 px-5 pt-5 pb-4 text-base sm:text-lg outline-none resize-none min-h-[90px] leading-relaxed"
           maxLength={500}
         />
-        <div className="flex justify-between text-xs text-gray-500 mb-4">
-          <span>{prompt.length}/500</span>
-          <span>Quanto mais detalhes, melhor o resultado</span>
-        </div>
 
-        {/* Reference image */}
-        <div className="mb-4 rounded-xl border border-white/10 bg-white/[0.03] p-3">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-semibold text-gray-300">
-              {referenceImage ? 'Imagem de referência (modificar/incluir algo)' : 'Quer mudar ou adicionar algo numa imagem que já tem?'}
-            </p>
-            {referenceImage && (
-              <button onClick={() => setReferenceImage(null)} className="text-xs text-red-400 hover:text-red-300 font-medium">Remover</button>
-            )}
-          </div>
-          {referenceImage ? (
-            <div className="flex items-center gap-3">
-              <div className="w-16 h-16 rounded-lg overflow-hidden border border-white/10 shrink-0">
-                <img src={referenceImage} alt="Referencia" className="w-full h-full object-cover" />
-              </div>
-              <div className="flex-1">
-                <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
-                  <input type="file" accept="image/*" onChange={handleUpload} className="hidden" />
-                  <span className="text-primary-400 hover:text-primary-300 font-medium">Trocar imagem</span>
-                </label>
-                <p className="text-[10px] text-gray-600">Descreva no prompt acima o que quer adicionar ou mudar.</p>
-              </div>
-            </div>
-          ) : (
-            <label className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-primary-500/30 bg-primary-500/10 text-primary-300 text-xs font-semibold hover:bg-primary-500/20 transition-colors cursor-pointer">
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-              Enviar minha imagem
+        {/* Barra inferior: anexar + gerar */}
+        <div className="flex items-center justify-between px-4 pb-4 gap-3">
+          <div className="flex items-center gap-1">
+            {/* Anexar imagem */}
+            <label className="p-2 rounded-lg text-gray-400 hover:text-primary-300 hover:bg-white/5 cursor-pointer transition-colors" title="Anexar imagem (opcional)">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
               <input type="file" accept="image/*" onChange={handleUpload} className="hidden" />
             </label>
-          )}
-        </div>
+            {referenceImage && (
+              <button onClick={() => setReferenceImage(null)} className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-primary-500/15 border border-primary-500/25 text-primary-300 text-xs font-medium hover:bg-primary-500/25 transition-colors">
+                <span className="w-4 h-4 rounded overflow-hidden border border-white/20"><img src={referenceImage} alt="" className="w-full h-full object-cover" /></span>
+                imagem
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            )}
+          </div>
 
-        {/* Generate button + credits */}
-        <div className="flex items-center justify-between">
-          <button onClick={handleGenerate} disabled={loading || !prompt.trim()} className="btn-primary flex items-center gap-2">
+          <button
+            onClick={handleGenerate}
+            disabled={loading || !prompt.trim()}
+            className="bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium px-6 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-primary-600/25"
+          >
             {loading ? (
               <>
                 <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
                 Gerando...
               </>
-            ) : 'Gerar Imagem (1 credito)'}
+            ) : (
+              <>
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M3.478 2.404a.75.75 0 00-.926.941l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.404z" /></svg>
+                Gerar
+              </>
+            )}
           </button>
-          {user && (
-            <div className="flex items-center gap-3 text-sm">
-              <span className="text-gray-400">
-                <b className="text-white">{user.creditsImages + user.creditsPurchased}</b> creditos
-              </span>
-              <a href="/plans" className="text-primary-400 hover:text-primary-300 font-medium">+ Recarregar</a>
-            </div>
-          )}
         </div>
       </div>
 
-      {/* Errors */}
+      {/* Créditos */}
+      <div className="flex items-center justify-center gap-3 mt-4 text-sm">
+        {user && (
+          <span className="text-gray-400">
+            <b className="text-white">{user.creditsImages + user.creditsPurchased}</b> creditos
+          </span>
+        )}
+        <a href={user ? "/plans" : "/login"} className="text-primary-400 hover:text-primary-300 font-medium text-xs">
+          {user ? '+ Recarregar' : 'Entrar para gerar'}
+        </a>
+        <span className="text-gray-600 text-xs">Enter para gerar · Anexe imagem para editar</span>
+      </div>
+
+      {/* Erros */}
       {error && (
-        <div className={`rounded-xl p-4 mb-6 border ${error.type === 'NO_CREDITS' ? 'bg-amber-500/10 border-amber-500/20' : 'bg-red-500/10 border-red-500/20'}`}>
+        <div className={`rounded-xl p-4 mt-5 border ${error.type === 'NO_CREDITS' ? 'bg-amber-500/10 border-amber-500/20' : 'bg-red-500/10 border-red-500/20'}`}>
           <p className={`text-sm font-medium ${error.type === 'NO_CREDITS' ? 'text-amber-300' : 'text-red-300'}`}>{error.message}</p>
           {error.type === 'NO_CREDITS' && (
             <a href="/plans" className="inline-block mt-2 text-sm text-primary-400 font-semibold hover:underline">Ver planos e recargas</a>
@@ -187,26 +171,23 @@ export default function ImageGenerator() {
         </div>
       )}
 
-      {/* Result */}
+      {/* Resultado */}
       {result?.imageUrl && (
-        <div className="card mb-8 animate-fade-up">
+        <div className="mt-8 card animate-fade-up">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-white">Resultado</h3>
             <div className="flex items-center gap-3">
               {!showTextTool && (
                 <button onClick={() => setShowTextTool(true)} className="text-sm bg-primary-500/10 text-primary-300 hover:bg-primary-500/20 font-medium px-3 py-1.5 rounded-lg transition-colors">
-                  Adicionar texto em portugues
+                  Adicionar texto
                 </button>
               )}
-              <button onClick={() => handleDownload(finalImage || result.imageUrl)} className="text-sm text-primary-400 hover:text-primary-300 font-medium flex items-center gap-1">
-                Baixar
-              </button>
+              <button onClick={() => handleDownload(finalImage || result.imageUrl)} className="text-sm text-primary-400 hover:text-primary-300 font-medium flex items-center gap-1">Baixar</button>
             </div>
           </div>
           <div className="rounded-xl overflow-hidden border border-white/10 bg-white/5">
             <img src={finalImage || result.imageUrl} alt="Imagem gerada" className="w-full h-auto max-h-[600px] object-contain" />
           </div>
-          <p className="mt-3 text-sm text-gray-500 italic">"{prompt}"</p>
           {showTextTool && (
             <div className="mt-4">
               <TextOnImage baseImageUrl={result.imageUrl} onExport={(dataUrl) => { setFinalImage(dataUrl); setShowTextTool(false); }} />
@@ -215,20 +196,17 @@ export default function ImageGenerator() {
         </div>
       )}
 
-      {/* History */}
+      {/* Histórico */}
       {history.length > 0 && (
-        <div className="mb-8">
-          <h3 className="font-semibold text-white mb-4">Suas criacoes recentes</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="mt-10">
+          <h3 className="font-semibold text-white mb-4 text-sm text-gray-400">Suas criacoes recentes</h3>
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
             {history.map((item, i) => (
-              <div key={item.id || i} className="group relative rounded-xl overflow-hidden border border-white/10 bg-white/5 aspect-square hover:border-primary-500/30 transition-all duration-300">
+              <div key={item.id || i} className="group relative rounded-lg overflow-hidden border border-white/10 bg-white/5 aspect-square hover:border-primary-500/30 transition-all duration-300">
                 <img src={item.imageUrl} alt={item.prompt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/70 transition-all duration-200 flex items-end justify-center p-3 opacity-0 group-hover:opacity-100 flex-col gap-1">
-                  <button onClick={() => { setReferenceImage(item.imageUrl); window.dispatchEvent(new CustomEvent('criai:set-reference', { detail: { image: item.imageUrl } })); document.getElementById('gerador')?.scrollIntoView({ behavior: 'smooth' }); }} className="w-full text-left text-white text-xs font-semibold flex items-center gap-1.5 hover:text-primary-300">
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                    Usar como referência
-                  </button>
-                  <button onClick={() => handleDownload(item.imageUrl)} className="w-full text-left text-white text-xs flex items-center gap-1.5">Baixar</button>
+                <div className="absolute inset-0 bg-black/70 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                  <button onClick={() => { setReferenceImage(item.imageUrl); }} className="text-white text-[10px] font-semibold hover:text-primary-300 p-1 rounded" title="Usar como referência">✎</button>
+                  <button onClick={() => handleDownload(item.imageUrl)} className="text-white text-[10px] font-semibold hover:text-primary-300 p-1 rounded" title="Baixar">⬇</button>
                 </div>
               </div>
             ))}

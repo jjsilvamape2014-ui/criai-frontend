@@ -1,9 +1,7 @@
 import Header from '@/components/Header';
 import GeneratorTabs from '@/components/GeneratorTabs';
 import Logo from '@/components/Logo';
-import AnimatedTitle from '@/components/AnimatedTitle';
 import StyleChips from '@/components/StyleChips';
-import ProductStyleChips from '@/components/ProductStyleChips';
 import ShowcaseCarousel from '@/components/ShowcaseCarousel';
 
 const SHOWCASE_IMAGES = [
@@ -49,112 +47,27 @@ export default function Home() {
         <div className="absolute top-40 right-0 w-[400px] h-[400px] bg-gradient-radial from-blue-600/20 via-transparent to-transparent rounded-full blur-3xl animate-aurora" style={{ animationDelay: '4s' }} />
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-radial from-fuchsia-600/10 via-transparent to-transparent rounded-full blur-3xl animate-aurora" style={{ animationDelay: '8s' }} />
 
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-32 pb-16">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm text-gray-300 mb-8 animate-fade-up">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
-            </span>
-            Comece grátis — quando acabar, é só R$ 39,99/mês
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 pt-28 pb-16">
+          {/* Título */}
+          <div className="text-center mb-10 animate-fade-up">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.05] tracking-tight text-white">
+              O que quer <span className="gradient-text-hero">criar</span>?
+            </h1>
+            <p className="mt-4 text-base sm:text-lg text-gray-400">
+              Descreva a imagem — nossa IA transforma em <span className="text-gray-200 font-medium">4K profissional</span> em segundos.
+            </p>
           </div>
 
-          {/* Big beautiful cinematic image */}
-          <div className="relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl shadow-primary-600/20 animate-fade-up mb-14" style={{ animationDelay: '0.1s' }}>
-            <img
-              src="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1600&h=900&fit=crop"
-              alt="Criação de imagens com IA"
-              className="w-full h-[40vh] sm:h-[58vh] lg:h-[64vh] object-cover"
-              loading="eager"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/30 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-r from-primary-900/30 via-transparent to-blue-900/30" />
-            <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10 flex items-end justify-between gap-4">
-              <div className="text-white">
-                <span className="inline-block px-3 py-1 rounded-full bg-white/15 border border-white/20 text-xs font-semibold backdrop-blur mb-3">
-                  ✨ Criado com Criativa AI
-                </span>
-                <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold leading-[1.1] tracking-tight">
-                  Transforme suas ideias
-                  <span className="block mt-1"><span className="gradient-text-hero"><AnimatedTitle /></span></span>
-                </h1>
-              </div>
-            </div>
+          {/* Caixa central estilo Kimi */}
+          <div className="animate-fade-up" style={{ animationDelay: '0.1s' }}>
+            <GeneratorTabs />
           </div>
 
-          {/* Texto embaixo da imagem */}
-          <p className="text-center text-base sm:text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-loose sm:leading-relaxed animate-fade-up" style={{ animationDelay: '0.2s' }}>
-            Descreva o que você imagina e veja nossa inteligência artificial transformar
-            em <span className="text-gray-200 font-medium">imagens 4K profissionais</span> em poucos segundos.
-            Do zero ou editando uma imagem que você já tem.
-          </p>
-
-          {/* CTA buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14 animate-fade-up" style={{ animationDelay: '0.3s' }}>
-            <a href="#gerador" className="btn-primary btn-shimmer text-base px-8 py-3.5 flex items-center gap-2">
-              Começar grátis
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
-            </a>
-            <a href="#como-funciona" className="btn-secondary text-base px-8 py-3.5">
-              Como funciona
-            </a>
-          </div>
-
-          {/* Styles ready to use - Dreamina inspired */}
-          <div className="mb-16 animate-fade-up" style={{ animationDelay: '0.4s' }}>
+          {/* Estilos prontos */}
+          <div className="mt-12 animate-fade-up" style={{ animationDelay: '0.2s' }}>
             <p className="text-xs text-gray-500 uppercase tracking-widest mb-4 text-center">Não sabe o que criar? Escolha um estilo</p>
             <StyleChips />
           </div>
-
-          {/* Social proof - premium numbers */}
-          <div className="flex items-center justify-center gap-8 sm:gap-14 text-sm text-gray-500 animate-fade-up" style={{ animationDelay: '0.5s' }}>
-            <div className="text-center">
-              <p className="text-3xl font-bold font-display text-white">+2.500</p>
-              <p className="mt-1">criadores ativos</p>
-            </div>
-            <div className="w-px h-12 bg-white/10" />
-            <div className="text-center">
-              <p className="text-3xl font-bold font-display text-white">+50 mil</p>
-              <p className="mt-1">imagens geradas</p>
-            </div>
-            <div className="w-px h-12 bg-white/10" />
-            <div className="text-center">
-              <p className="text-3xl font-bold font-display text-white">4.9<span className="text-primary-400">★</span></p>
-              <p className="mt-1">avaliação média</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Generator - logo na parte inicial */}
-      <section id="gerador" className="relative py-14 scroll-mt-20">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary-900/5 to-transparent" />
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-10">
-            <p className="text-sm font-semibold text-primary-400 uppercase tracking-wider mb-3">Experimente agora</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white">
-              Gere sua primeira imagem <span className="gradient-text">grátis</span>
-            </h2>
-          </div>
-          <GeneratorTabs />
-        </div>
-      </section>
-
-      {/* Product styles - Dê um upgrade no seu produto */}
-      <section className="relative py-16 overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-radial from-primary-600/10 via-transparent to-transparent rounded-full blur-3xl -z-10" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-10">
-            <p className="text-sm font-semibold text-primary-400 uppercase tracking-wider mb-3">Para vender mais</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-              Dê um <span className="gradient-text">upgrade</span> na foto do seu produto
-            </h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">
-              Descreva seu produto no gerador e clique num estilo para criar um anúncio impactante — como os que aparecem nos marketplaces. Perfeito para a sua loja e seus clientes.
-            </p>
-          </div>
-          <ProductStyleChips />
-          <p className="text-center text-xs text-gray-600 mt-6">Clique em um estilo e ele é adicionado automaticamente à sua descrição no gerador ⬇</p>
         </div>
       </section>
 
