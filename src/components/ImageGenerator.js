@@ -3,14 +3,9 @@
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import TextOnImage from '@/components/TextOnImage';
-import ProductStyleChips from '@/components/ProductStyleChips';
 
 export default function ImageGenerator() {
   const [prompt, setPrompt] = useState('');
-  const [negativePrompt, setNegativePrompt] = useState('');
-  const [model, setModel] = useState('ideogram4');
-  const [resolution, setResolution] = useState('2k');
-  const [upscale, setUpscale] = useState(true);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
@@ -20,9 +15,6 @@ export default function ImageGenerator() {
   const [showTextTool, setShowTextTool] = useState(false);
   const [finalImage, setFinalImage] = useState(null);
   const [referenceImage, setReferenceImage] = useState(null);
-  const [referenceStrength, setReferenceStrength] = useState(0.6);
-  const [showGallery, setShowGallery] = useState(false);
-  const [showProductStyles, setShowProductStyles] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -86,10 +78,10 @@ export default function ImageGenerator() {
     setResult(null);
 
     try {
-      const dims = resolution === '4k' ? { width: 2048, height: 2048 } : resolution === '1k' ? { width: 1024, height: 1024 } : { width: 1536, height: 1536 };
       const data = await api.generateImage(prompt, {
-        negativePrompt, model, ...dims, upscale,
-        ...(referenceImage ? { referenceImage, strength: referenceStrength } : {}),
+        model: 'flux2pro',
+        width: 1536, height: 1536,
+        ...(referenceImage ? { referenceImage, strength: 0.6 } : {}),
       });
       setResult(data);
       setUser(prev => prev ? { ...prev, ...data.credits } : null);
@@ -115,19 +107,6 @@ export default function ImageGenerator() {
     document.body.removeChild(link);
   };
 
-  const models = [
-    { id: 'ideogram4', name: 'Ideogram 4', desc: 'Melhor para design e texto', premium: true },
-    { id: 'flux2pro', name: 'FLUX 2 Pro', desc: 'Fotorrealismo maximo', premium: true },
-    { id: 'flux', name: 'FLUX Schnell', desc: 'Rapido (gratis)', premium: false },
-    { id: 'sdxl', name: 'SDXL', desc: 'Versatil (gratis)', premium: false },
-  ];
-
-  const resolutions = [
-    { id: '1k', name: '1K', desc: 'Rapido' },
-    { id: '2k', name: '2K', desc: 'Alta' },
-    { id: '4k', name: '4K', desc: 'Maxima' },
-  ];
-
   return (
     <div className="max-w-4xl mx-auto">
       {/* Prompt area */}
@@ -145,27 +124,7 @@ export default function ImageGenerator() {
           <span>Quanto mais detalhes, melhor o resultado</span>
         </div>
 
-        {/* Product styles - quick shortcuts */}
-        <div className="mb-4 rounded-xl border border-white/10 bg-white/[0.03] p-3">
-          <button
-            onClick={() => setShowProductStyles(!showProductStyles)}
-            className="flex items-center justify-between w-full text-left"
-          >
-            <span className="text-xs font-semibold text-gray-300 flex items-center gap-2">
-              <span className="text-sm">✨</span> Estilos para anúncio de produto
-              <span className="text-[10px] text-primary-400 font-medium">({showProductStyles ? 'fechar' : 'ver 27 estilos'})</span>
-            </span>
-            <svg className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${showProductStyles ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-          </button>
-          {showProductStyles && (
-            <div className="mt-3">
-              <p className="text-[11px] text-gray-500 mb-3">Descreva seu produto e clique num estilo — ele é adicionado à sua descrição para criar um anúncio impactante.</p>
-              <ProductStyleChips />
-            </div>
-          )}
-        </div>
-
-        {/* Reference image - use someone from gallery or upload */}
+        {/* Reference image */}
         <div className="mb-4 rounded-xl border border-white/10 bg-white/[0.03] p-3">
           <div className="flex items-center justify-between mb-2">
             <p className="text-xs font-semibold text-gray-300">
@@ -185,92 +144,17 @@ export default function ImageGenerator() {
                   <input type="file" accept="image/*" onChange={handleUpload} className="hidden" />
                   <span className="text-primary-400 hover:text-primary-300 font-medium">Trocar imagem</span>
                 </label>
-                <p className="text-xs text-gray-500 mt-2">Força da mudança: <b className="text-white">{Math.round(referenceStrength * 100)}%</b></p>
-                <input type="range" min={0.2} max={1} step={0.05} value={referenceStrength} onChange={(e) => setReferenceStrength(Number(e.target.value))} className="w-full mt-1" />
                 <p className="text-[10px] text-gray-600">Descreva no prompt acima o que quer adicionar ou mudar.</p>
               </div>
             </div>
           ) : (
-            <div className="flex flex-wrap gap-2">
-              <label className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-primary-500/30 bg-primary-500/10 text-primary-300 text-xs font-semibold hover:bg-primary-500/20 transition-colors cursor-pointer">
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                Enviar minha imagem
-                <input type="file" accept="image/*" onChange={handleUpload} className="hidden" />
-              </label>
-              <button onClick={() => setShowGallery(true)} className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-white/10 text-gray-300 text-xs font-semibold hover:bg-white/5 transition-colors">
-                📁 Da minha galeria
-              </button>
-            </div>
+            <label className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-primary-500/30 bg-primary-500/10 text-primary-300 text-xs font-semibold hover:bg-primary-500/20 transition-colors cursor-pointer">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+              Enviar minha imagem
+              <input type="file" accept="image/*" onChange={handleUpload} className="hidden" />
+            </label>
           )}
         </div>
-
-        {/* Gallery picker modal */}
-        {showGallery && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div className="glass rounded-2xl p-6 max-w-2xl w-full border border-white/10 shadow-2xl">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-white">Escolha uma imagem da sua galeria</h3>
-                <button onClick={() => setShowGallery(false)} className="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
-              </div>
-              {history.length === 0 ? (
-                <p className="text-gray-400 text-center py-8">Você ainda não tem criações na galeria.</p>
-              ) : (
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 max-h-[60vh] overflow-y-auto">
-                  {history.map((item, i) => (
-                    <button key={i} onClick={() => { setReferenceImage(item.imageUrl); setShowGallery(false); }} className="group relative aspect-square rounded-xl overflow-hidden border border-white/10 hover:border-primary-500/50 transition-all">
-                      <img src={item.imageUrl} alt={item.prompt} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-primary-600/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <span className="text-white text-xs font-semibold">Usar</span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Advanced options */}
-        <details className="mb-4">
-          <summary className="text-sm text-gray-400 cursor-pointer hover:text-white transition-colors">Opcoes avancadas</summary>
-          <div className="mt-3 space-y-3">
-            <div>
-              <label className="block text-xs font-medium text-gray-400 mb-1">Prompt negativo (o que evitar)</label>
-              <input type="text" value={negativePrompt} onChange={(e) => setNegativePrompt(e.target.value)} placeholder="Ex: blurry, low quality, deformed" className="input text-sm" />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-400 mb-2">Modelo</label>
-              <div className="flex gap-2 flex-wrap">
-                {models.map(m => (
-                  <button key={m.id} onClick={() => setModel(m.id)} title={m.premium ? 'Modelo premium (qualidade superior)' : 'Modelo gratuito'}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium border transition-all ${
-                      model === m.id ? 'border-primary-500 bg-primary-500/10 text-primary-300' : 'border-white/10 text-gray-400 hover:border-white/20 hover:text-white'
-                    }`}>
-                    {m.name} {m.premium && <span className="text-[9px] align-middle">⭐</span>}
-                    <span className="block text-xs font-normal opacity-60">{m.desc}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-400 mb-2">Resolucao</label>
-              <div className="flex gap-2 flex-wrap">
-                {resolutions.map(r => (
-                  <button key={r.id} onClick={() => setResolution(r.id)}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-all ${
-                      resolution === r.id ? 'border-primary-500 bg-primary-500/10 text-primary-300' : 'border-white/10 text-gray-400 hover:border-white/20 hover:text-white'
-                    }`}>
-                    {r.name} <span className="text-[10px] font-normal opacity-60">({r.desc})</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-            <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
-              <input type="checkbox" checked={upscale} onChange={(e) => setUpscale(e.target.checked)} className="accent-primary-500 w-4 h-4" />
-              Upscale 4K (nitidez maxima)
-            </label>
-          </div>
-        </details>
 
         {/* Generate button + credits */}
         <div className="flex items-center justify-between">

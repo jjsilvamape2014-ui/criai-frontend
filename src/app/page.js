@@ -334,7 +334,7 @@ export default function Home() {
             <div className="card text-center">
               <h3 className="text-lg font-bold text-white mb-1">Gratuito</h3>
               <p className="text-4xl font-bold text-white mb-1">R$ 0</p>
-              <p className="text-sm text-gray-500 mb-6">para sempre</p>
+              <p className="text-sm text-gray-500 mb-6">Limitado</p>
               <ul className="space-y-3 text-sm text-gray-300 mb-8 text-left max-w-xs mx-auto">
                 <li className="flex items-center gap-2"><span className="text-green-400">✓</span> 10 imagens/mês em 4K</li>
                 <li className="flex items-center gap-2"><span className="text-green-400">✓</span> Resolução 4K</li>
