@@ -97,9 +97,15 @@ export default function CerebroEditor() {
       });
       setSessionId(data.sessionId);
       if (typeof window !== 'undefined') sessionStorage.setItem('criai_cerebro_session', data.sessionId);
-      setMessages([...newMessages, { role: 'assistant', message: data.reply, imageUrl: data.imageUrl }]);
-      setBaseImage(data.imageUrl);
-      setRefImages((prev) => (prev.length ? [data.imageUrl, ...prev.slice(1)] : [data.imageUrl]));
+      const isVideo = !!data.videoUrl;
+      setMessages([...newMessages, { role: 'assistant', message: data.reply, imageUrl: data.imageUrl, videoUrl: data.videoUrl || (isVideo ? data.videoUrl : null) }]);
+      if (isVideo) {
+        setBaseImage(data.videoUrl);
+        setRefImages((prev) => (prev.length ? [data.videoUrl, ...prev.slice(1)] : [data.videoUrl]));
+      } else if (data.imageUrl) {
+        setBaseImage(data.imageUrl);
+        setRefImages((prev) => (prev.length ? [data.imageUrl, ...prev.slice(1)] : [data.imageUrl]));
+      }
       setCredits(data.credits || null);
     } catch (err) {
       if (err.data?.code === 'NO_CREDITS') {
@@ -134,7 +140,7 @@ export default function CerebroEditor() {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
   };
 
-  const examples = ['Trocar a cor da caneca para azul', 'Deixar o fundo branco', 'Colocar minha logo na imagem', 'Remover os nomes/textos da embalagem', 'Remover a pessoa da foto', 'Limpar ruido da imagem'];
+  const examples = ['Trocar a cor da caneca para azul', 'Deixar o fundo branco', 'Colocar minha logo na imagem', 'Remover os nomes/textos da embalagem', 'Transformar esta foto em vídeo', 'Colocar um chapéu na pessoa'];
 
   return (
     <div id="cerebro" className="card mb-8">
@@ -145,7 +151,7 @@ export default function CerebroEditor() {
             <span className="text-lg">🧠</span> Cerebro Visual
             {sessionId && <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 font-medium">Sessao ativa</span>}
           </h3>
-          <p className="text-xs text-gray-500 mt-1">Converse e edite: adicione ate 4 imagens e peca para trocar cor, remover pessoa/nomes/ruido, colocar sua logo... (1 credito por edicao)</p>
+          <p className="text-xs text-gray-500 mt-1">Agente de criação estilo ChatGPT: envie uma foto e peça o que quiser — colocar chapéu, trocar cor, remover pessoa, adicionar texto/logo, ou transformar em vídeo. (1 crédito por ação)</p>
         </div>
         {sessionId && (
           <button onClick={handleReset} className="text-xs text-red-400 hover:text-red-300 font-medium shrink-0">Nova conversa</button>
@@ -210,7 +216,13 @@ export default function CerebroEditor() {
           <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[85%] rounded-2xl px-4 py-3 ${m.role === 'user' ? 'bg-primary-500/20 border border-primary-500/30 text-white' : 'bg-white/5 border border-white/10 text-gray-200'}`}>
               <p className="text-sm whitespace-pre-wrap">{m.message}</p>
-              {m.imageUrl && (
+              {m.videoUrl && (
+                <div className="mt-3 rounded-xl overflow-hidden border border-white/10 relative group max-w-[420px]">
+                  <video src={m.videoUrl} controls className="w-full max-h-[320px] object-contain bg-black" />
+                  <a href={m.videoUrl} download target="_blank" rel="noreferrer" className="absolute bottom-2 right-2 text-xs bg-black/70 text-white px-3 py-1.5 rounded-lg font-medium hover:bg-black/90">Baixar</a>
+                </div>
+              )}
+              {m.imageUrl && !m.videoUrl && (
                 <div className="mt-3 rounded-xl overflow-hidden border border-white/10 relative group max-w-[420px]">
                   <img src={m.imageUrl} alt="Resultado" className="w-full max-h-[320px] object-contain" />
                   <button onClick={() => handleDownload(m.imageUrl)} className="absolute bottom-2 right-2 text-xs bg-black/70 text-white px-3 py-1.5 rounded-lg font-medium hover:bg-black/90">Baixar</button>
