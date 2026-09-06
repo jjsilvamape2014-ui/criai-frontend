@@ -191,14 +191,16 @@ export default function CerebroEditor() {
             </div>
           </>
         ) : (
-          <label className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-primary-500/40 bg-primary-500/10 text-primary-300 text-sm font-semibold hover:bg-primary-500/20 transition-colors cursor-pointer w-full">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-            Enviar imagem para editar (ate 4 imagens)
-            <input type="file" accept="image/*" multiple onChange={handleUpload} className="hidden" />
-          </label>
-          <p className="mt-2 text-[11px] text-gray-500 text-center">
-            Sem imagem? Também posso <b className="text-primary-300">criar do zero</b> — é só digitar o pedido abaixo (ex: "criar um flyer de promoção").
-          </p>
+          <>
+            <label className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-primary-500/40 bg-primary-500/10 text-primary-300 text-sm font-semibold hover:bg-primary-500/20 transition-colors cursor-pointer w-full">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+              Enviar imagem para editar (ate 4 imagens)
+              <input type="file" accept="image/*" multiple onChange={handleUpload} className="hidden" />
+            </label>
+            <p className="mt-2 text-[11px] text-gray-500 text-center">
+              Sem imagem? Também posso <b className="text-primary-300">criar do zero</b> — é só digitar o pedido abaixo (ex: "criar um flyer de promoção").
+            </p>
+          </>
         )}
       </div>
 
