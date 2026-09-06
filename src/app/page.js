@@ -85,7 +85,7 @@ export default function Home() {
           <div>
             <div className="inline-flex items-center gap-2.5 rounded-full border border-brand-borderStrong py-1.5 pr-4 pl-1.5">
               <span className="w-[6px] h-[6px] rounded-full bg-brand-accent" />
-              <span className="text-[12px] text-brand-tert">Ideogram 4.0 e FLUX 2 Pro</span>
+              <span className="text-[12px] text-brand-tert">Ideogram e FLUX Pro</span>
             </div>
 
             <h1

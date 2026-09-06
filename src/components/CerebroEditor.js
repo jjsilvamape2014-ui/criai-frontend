@@ -82,7 +82,6 @@ export default function CerebroEditor() {
   const handleSend = async () => {
     const msg = input.trim();
     if (!msg || loading) return;
-    if (!refImages.length) { setError({ type: 'GENERIC', message: 'Adicione ao menos 1 imagem para editar.' }); return; }
     const token = localStorage.getItem('token');
     if (!token) { setShowLoginModal(true); return; }
 
@@ -151,7 +150,7 @@ export default function CerebroEditor() {
             <span className="text-lg">🧠</span> Cerebro Visual
             {sessionId && <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 font-medium">Sessao ativa</span>}
           </h3>
-          <p className="text-xs text-gray-500 mt-1">Agente de criação estilo ChatGPT: envie uma foto e peça o que quiser — colocar chapéu, trocar cor, remover pessoa, adicionar texto/logo, ou transformar em vídeo. (1 crédito por ação)</p>
+          <p className="text-xs text-gray-500 mt-1">Agente de criação por conversa: envie uma foto e peça o que quiser — colocar chapéu, trocar cor, remover pessoa, adicionar texto/logo, juntar imagens ou transformar em vídeo. Também cria peças do zero (flyer, banner, logo...) só digitando o pedido. (1 crédito por ação)</p>
         </div>
         {sessionId && (
           <button onClick={handleReset} className="text-xs text-red-400 hover:text-red-300 font-medium shrink-0">Nova conversa</button>
@@ -194,9 +193,12 @@ export default function CerebroEditor() {
         ) : (
           <label className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-primary-500/40 bg-primary-500/10 text-primary-300 text-sm font-semibold hover:bg-primary-500/20 transition-colors cursor-pointer w-full">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-            Envie ate 4 imagens para editar (igual ao ChatGPT)
+            Enviar imagem para editar (ate 4 imagens)
             <input type="file" accept="image/*" multiple onChange={handleUpload} className="hidden" />
           </label>
+          <p className="mt-2 text-[11px] text-gray-500 text-center">
+            Sem imagem? Também posso <b className="text-primary-300">criar do zero</b> — é só digitar o pedido abaixo (ex: "criar um flyer de promoção").
+          </p>
         )}
       </div>
 
