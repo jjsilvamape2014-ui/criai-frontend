@@ -1,16 +1,20 @@
-import { Inter, Sora } from 'next/font/google';
+import { Bricolage_Grotesque, Instrument_Sans } from 'next/font/google';
 import './globals.css';
 
-const inter = Inter({
+const bricolage = Bricolage_Grotesque({
   subsets: ['latin'],
+  weight: ['500', '700', '800'],
   display: 'swap',
-  variable: '--font-inter',
+  adjustFontFallback: false,
+  variable: '--font-bricolage',
 });
 
-const sora = Sora({
+const instrument = Instrument_Sans({
   subsets: ['latin'],
+  weight: ['400', '500', '600'],
   display: 'swap',
-  variable: '--font-sora',
+  adjustFontFallback: false,
+  variable: '--font-instrument',
 });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://criai-frontend-production.up.railway.app';
@@ -50,7 +54,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="pt-BR" className="dark">
-      <body className={`${inter.variable} ${sora.variable} antialiased min-h-screen font-sans`}>
+      <body className={`${bricolage.variable} ${instrument.variable} antialiased min-h-screen font-sans`}>
         {children}
         <script
           type="application/ld+json"

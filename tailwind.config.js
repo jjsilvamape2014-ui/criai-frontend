@@ -8,10 +8,24 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-sora)', 'var(--font-inter)', 'sans-serif'],
+        sans: ['var(--font-instrument)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-bricolage)', 'var(--font-instrument)', 'sans-serif'],
       },
       colors: {
+        brand: {
+          bg: '#0B0A0C',
+          surface: '#131114',
+          border: '#1E1B1F',
+          borderStrong: '#2A2529',
+          text: '#F5F2ED',
+          sub: '#B5ADA6',
+          tert: '#9A938C',
+          dim: '#6B6560',
+          accent: '#FF5A2B',
+          accentHover: '#FF7A52',
+          green: '#7A9A4E',
+          red: '#4A4348',
+        },
         primary: {
           50: '#f5f3ff', 100: '#ede9fe', 200: '#ddd6fe', 300: '#c4b5fd',
           400: '#a78bfa', 500: '#8b5cf6', 600: '#7c3aed', 700: '#6d28d9',
