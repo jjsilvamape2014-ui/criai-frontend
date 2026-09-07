@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import LandingGenerator from '@/components/LandingGenerator';
 import ImageSlot from '@/components/ImageSlot';
 
@@ -50,7 +50,14 @@ function SectionHead({ label, title, right }) {
 
 export default function Home() {
   const [heroPrompt, setHeroPrompt] = useState('');
+  const [logged, setLogged] = useState(false);
   const genWrapRef = useRef(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setLogged(!!localStorage.getItem('token'));
+    }
+  }, []);
 
   const pickStyle = useCallback((prompt) => {
     setHeroPrompt(prompt);
@@ -71,10 +78,18 @@ export default function Home() {
         </a>
         <div className="flex items-center gap-[26px]">
           <a href="/plans" className="text-[14px] text-brand-tert hover:text-brand-text transition-colors">Planos</a>
-          <a href="/login" className="text-[14px] text-brand-tert hover:text-brand-text transition-colors">Entrar</a>
-          <a href="/register" className="rounded-[8px] bg-brand-text px-[18px] py-[9px] text-[14px] font-semibold text-brand-bg hover:opacity-90 transition-opacity">
-            Criar conta
-          </a>
+          {logged ? (
+            <a href="/dashboard" className="rounded-[8px] bg-brand-text px-[18px] py-[9px] text-[14px] font-semibold text-brand-bg hover:opacity-90 transition-opacity">
+              Criar imagem
+            </a>
+          ) : (
+            <>
+              <a href="/login" className="text-[14px] text-brand-tert hover:text-brand-text transition-colors">Entrar</a>
+              <a href="/register" className="rounded-[8px] bg-brand-text px-[18px] py-[9px] text-[14px] font-semibold text-brand-bg hover:opacity-90 transition-opacity">
+                Criar conta
+              </a>
+            </>
+          )}
         </div>
       </nav>
 

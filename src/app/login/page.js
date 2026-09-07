@@ -16,7 +16,7 @@ export default function LoginPage() {
     try {
       const data = await api.login(email, password);
       localStorage.setItem('token', data.token);
-      window.location.href = '/';
+      window.location.href = '/dashboard';
     } catch (err) {
       setError(err.message || 'Email ou senha incorretos');
     } finally { setLoading(false); }

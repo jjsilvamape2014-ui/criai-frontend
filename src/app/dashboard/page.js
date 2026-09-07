@@ -3,7 +3,23 @@
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import Header from '@/components/Header';
+import LandingGenerator from '@/components/LandingGenerator';
 import CerebroEditor from '@/components/CerebroEditor';
+
+const IDEIAS = [
+  { cat: 'Anúncio de produto', prompt: 'Anúncio de hambúrguer artesanal com o preço R$ 29,90 e a chamada Peça já', src: '/showcase/anuncio-hamburguer.webp' },
+  { cat: 'Post para feed', prompt: 'Post quadrado com a frase Promoção de Setembro, fundo laranja', src: '/showcase/post-feed.webp' },
+  { cat: 'Logotipo', prompt: 'Logotipo para a marca Padaria São João, traço minimalista', src: '/showcase/logo-padaria.webp' },
+  { cat: 'Capa de vídeo', prompt: 'Thumbnail com o título Como Vender Mais no Instagram', src: '/showcase/capa-video.webp' },
+  { cat: 'Foto de perfil', prompt: 'Retrato profissional, fundo neutro, luz suave de estúdio', src: '/showcase/foto-perfil.webp' },
+  { cat: 'Arte de parede', prompt: 'Composição abstrata em tons terrosos, formato retrato', src: '/showcase/arte-parede.webp' },
+  { cat: 'Anúncio', prompt: 'Anúncio de açaí com o preço R$ 12,90 em destaque, fundo roxo', src: '/showcase/estilo-anuncio.webp' },
+  { cat: 'Logotipo', prompt: 'Logotipo minimalista para a marca Açaí do Norte, traço limpo', src: '/showcase/estilo-logo.webp' },
+  { cat: 'Promoção', prompt: 'Post quadrado com a chamada Promoção de Setembro, tipografia forte', src: '/showcase/estilo-post.webp' },
+  { cat: 'Capa de vídeo', prompt: 'Capa de vídeo com o título Como Abrir Sua Loja, alto contraste', src: '/showcase/estilo-capa.webp' },
+  { cat: 'Foto de perfil', prompt: 'Retrato profissional em fundo neutro, luz suave de estúdio', src: '/showcase/estilo-perfil.webp' },
+  { cat: 'Arte decorativa', prompt: 'Arte abstrata em tons terrosos para quadro decorativo grande', src: '/showcase/estilo-arte.webp' },
+];
 
 export default function DashboardPage() {
   const [user, setUser] = useState(null);
@@ -28,18 +44,9 @@ export default function DashboardPage() {
       .catch(() => { localStorage.removeItem('token'); window.location.href = '/login'; });
   }, []);
 
-  const handleDownload = (imageUrl, index) => {
-    const link = document.createElement('a');
-    link.href = imageUrl;
-    link.download = `criativa-imagem-${index + 1}.png`;
-    document.body.appendChild(link); link.click(); document.body.removeChild(link);
-  };
-
-  const handleEdit = (item) => {
+  const pickIdea = (prompt) => {
     if (typeof window !== 'undefined') {
-      sessionStorage.setItem('criai_ref_image', item.imageUrl);
-      sessionStorage.setItem('criai_ref_prompt', item.prompt);
-      window.location.href = '/'; // generator na home lê sessionStorage
+      window.dispatchEvent(new CustomEvent('criai:set-prompt', { detail: { prompt } }));
     }
   };
 
@@ -47,8 +54,15 @@ export default function DashboardPage() {
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('criai_ref_image', item.imageUrl);
       sessionStorage.setItem('criai_ref_prompt', item.prompt);
-      window.location.href = '/dashboard?chat=1#cerebro'; // recarrega e abre o Cérebro Visual
+      window.location.href = '/dashboard?chat=1#cerebro';
     }
+  };
+
+  const handleDownload = (imageUrl, index) => {
+    const link = document.createElement('a');
+    link.href = imageUrl;
+    link.download = `criativa-imagem-${index + 1}.png`;
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
   };
 
   if (loading) {
@@ -70,69 +84,73 @@ export default function DashboardPage() {
   return (
     <>
       <Header />
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 pt-36">
-        <h1 className="text-2xl font-bold text-white mb-6">Dashboard</h1>
-
-        {/* Summary cards */}
-        <div className="grid md:grid-cols-3 gap-4 mb-8">
-          <div className="card-glow">
-            <p className="text-sm text-gray-400 mb-1">Plano atual</p>
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-32 pb-20">
+        {/* Status compacto */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-white">O que você quer criar?</h1>
+            <p className="text-sm text-gray-400 mt-1.5">Escreva com as suas palavras. Abaixo tem exemplos prontos para copiar.</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
             <span className={user?.plan === 'PREMIUM' ? 'badge-premium' : 'badge-free'}>
-              {user?.plan === 'PREMIUM' ? 'Premium' : 'Free'}
+              {user?.plan === 'PREMIUM' ? '⭐ Premium' : 'Grátis'}
             </span>
-          </div>
-          <div className="card-glow">
-            <p className="text-sm text-gray-400 mb-1">Creditos de imagem</p>
-            <p className="text-2xl font-bold text-white">{totalCredits}</p>
-            <p className="text-xs text-gray-500">
-              {user?.plan === 'PREMIUM' ? 'Premium — sem limite' : `${user?.creditsImages || 0} gratuitos`}
-            </p>
-          </div>
-          <div className="card-glow">
-            <p className="text-sm text-gray-400 mb-1">Creditos de video</p>
-            <p className="text-2xl font-bold text-white">{user?.creditsVideos || 0}</p>
-            <p className="text-xs text-gray-500">
-              {user?.plan === 'PREMIUM' ? 'Premium — sem limite' : 'gratis para comecar'}
-            </p>
+            {user?.plan === 'PREMIUM' ? (
+              <span className="badge-premium">imagens sem limite</span>
+            ) : totalCredits > 0 ? (
+              <span className="badge-free">{totalCredits} imagens este mês</span>
+            ) : (
+              <a href="/plans" className="btn-secondary text-sm">Quero mais imagens</a>
+            )}
           </div>
         </div>
 
-        {/* Quick actions */}
-        <div className="flex flex-wrap gap-3 mb-8">
-          <a href="/" className="btn-primary text-sm">Gerar nova imagem</a>
-          {user?.plan === 'PREMIUM' ? (
-            <span className="badge-premium">Premium — crie sem limites</span>
-          ) : totalCredits > 0 ? (
-            <span className="badge-free">Usando creditos gratuitos</span>
-          ) : (
-            <a href="/plans" className="btn-secondary text-sm">Assinar Premium — R$ 39,99/mes</a>
-          )}
+        {/* Gerador - o coração do app */}
+        <div className="mb-12">
+          <LandingGenerator initialPrompt="" scrollOnSet />
         </div>
 
-        {/* Cerebro Visual - chat de edição */}
+        {/* Artes prontas para copiar */}
+        <div className="mb-12">
+          <h2 className="text-lg font-semibold text-white mb-1">Comece por um exemplo</h2>
+          <p className="text-sm text-gray-400 mb-5">Toque em uma imagem — a descrição dela já entra no campo lá em cima.</p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {IDEIAS.map((it, i) => (
+              <button
+                key={i}
+                onClick={() => pickIdea(it.prompt)}
+                className="group rounded-xl overflow-hidden border border-white/10 bg-white/5 text-left hover:border-primary-500/40 transition-all duration-300"
+              >
+                <div className="aspect-square overflow-hidden">
+                  <img src={it.src} alt={it.prompt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                </div>
+                <div className="p-3">
+                  <p className="text-[11px] font-semibold uppercase text-primary-400 mb-1">{it.cat}</p>
+                  <p className="text-[13px] text-gray-300 line-clamp-3" style={{ textWrap: 'pretty' }}>“{it.prompt}”</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Cérebro Visual - editar com conversa */}
         <CerebroEditor />
 
-        {/* History */}
-        <h2 className="text-lg font-semibold text-white mb-4">Suas criacoes</h2>
+        {/* Histórico do usuário */}
+        <h2 className="text-lg font-semibold text-white mb-4">Suas criações</h2>
         {history.length === 0 ? (
           <div className="card text-center py-12">
             <p className="text-gray-400 text-lg mb-2">Nenhuma imagem ainda</p>
-            <a href="/" className="text-primary-400 font-medium text-sm mt-2 inline-block hover:underline">
-              Criar primeira imagem
-            </a>
+            <p className="text-gray-500 text-sm">Escreva sua ideia no campo de cima e toque em Gerar.</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {history.map((item, i) => (
               <div key={item.id || i} className="group relative rounded-xl overflow-hidden border border-white/10 bg-white/5 aspect-square hover:border-primary-500/30 transition-all duration-300">
                 <img src={item.imageUrl} alt={item.prompt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-200 flex flex-col justify-end p-3">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-200 flex flex-col justify-end p-3">
                   <p className="text-white text-xs mb-2 line-clamp-2">{item.prompt}</p>
-                  <button onClick={() => handleEdit(item)} className="text-white text-xs font-semibold mb-1 text-left flex items-center gap-1.5">
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                    Editar/Refinar
-                  </button>
-                  <button onClick={() => handleChatEdit(item)} className="text-white text-xs mb-1 text-left flex items-center gap-1.5">
+                  <button onClick={() => handleChatEdit(item)} className="text-white text-xs mb-1.5 text-left flex items-center gap-1.5">
                     <span className="text-sm">🧠</span> Editar na conversa
                   </button>
                   <button onClick={() => handleDownload(item.imageUrl, i)} className="text-white text-xs font-medium text-left">Baixar</button>
@@ -146,7 +164,7 @@ export default function DashboardPage() {
             ))}
           </div>
         )}
-      </div>
+      </main>
     </>
   );
 }

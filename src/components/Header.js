@@ -33,7 +33,9 @@ export default function Header() {
         <div className={`flex flex-col gap-2 transition-all duration-300 rounded-2xl ${scrolled ? 'glass shadow-xl shadow-black/20 border border-white/10 px-4 py-2' : 'bg-transparent'}`}>
           {/* Top row: logo + auth */}
           <div className="flex items-center justify-between">
-            <Logo size="md" />
+            <a href={user ? '/dashboard' : '/'}>
+              <Logo size="md" />
+            </a>
 
             <div className="flex items-center gap-3">
               {user ? (
@@ -63,7 +65,7 @@ export default function Header() {
                             {user.plan === 'PREMIUM' ? '⭐ Premium' : 'Free'}
                           </span>
                         </div>
-                        <a href="/dashboard" className="block px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">Dashboard</a>
+                        <a href="/dashboard" className="block px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">Minha área</a>
                         <a href="/plans" className="block px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">Planos & Assinatura</a>
                         <div className="border-t border-white/10 mt-1 pt-1">
                           <button onClick={handleLogout} className="block w-full text-left px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors">
@@ -85,8 +87,7 @@ export default function Header() {
 
           {/* Floating nav bar below the logo */}
           <nav className="flex items-center justify-center gap-1 bg-white/5 border border-white/10 rounded-xl px-1.5 py-1 backdrop-blur-md">
-            <a href="/" className="btn-ghost text-sm px-4 py-1.5">Gerador</a>
-            <a href="/dashboard" className="btn-ghost text-sm px-4 py-1.5">Dashboard</a>
+            <a href="/dashboard" className="btn-ghost text-sm px-4 py-1.5">Criar imagem</a>
             <a href="/plans" className="btn-ghost text-sm px-4 py-1.5">Planos</a>
           </nav>
         </div>
