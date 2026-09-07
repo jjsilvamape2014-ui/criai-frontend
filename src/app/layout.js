@@ -48,6 +48,9 @@ export const metadata = {
     follow: true,
     googleBot: { index: true, follow: true },
   },
+  other: {
+    'google-site-verification': 'Oke-oVcZAkOPXT6B45TJfDMgst5Pw4LdhV919SbcTYY',
+  },
   icons: { icon: '/criativa-logo.png' },
 };
 
