@@ -8,7 +8,7 @@ const PLACEHOLDER = 'Pôster de açaí com o preço R$ 12,90 em destaque';
 export default function LandingGenerator({ initialPrompt = '', scrollOnSet = false }) {
   const [prompt, setPrompt] = useState(initialPrompt);
   const [loading, setLoading] = useState(false);
-  const [imageUrl, setImageUrl] = useState(null);
+  const [result, setResult] = useState(null); // { url, prompt } — imagem pronta, fora do campo
   const [error, setError] = useState(null);
   const [size, setSize] = useState({ width: 1216, height: 1520 });
   const inputRef = useRef(null);
@@ -41,10 +41,13 @@ export default function LandingGenerator({ initialPrompt = '', scrollOnSet = fal
     }
     setLoading(true);
     setError(null);
-    setImageUrl(null);
+    setResult(null);
     try {
       const data = await api.generateImage(msg, { model: 'flux2pro', width: size.width, height: size.height });
-      setImageUrl(data.imageUrl);
+      // A imagem PRONTA sai do campo gerador: vira um cartão de resultado abaixo,
+      // e o campo limpa para a próxima descrição.
+      setResult({ url: data.imageUrl, prompt: msg });
+      setPrompt('');
     } catch (err) {
       if (err.data?.code === 'NO_CREDITS') {
         window.location.href = '/plans';
@@ -91,21 +94,50 @@ export default function LandingGenerator({ initialPrompt = '', scrollOnSet = fal
         </div>
       )}
 
-      {imageUrl && (
-        <div className="mt-6 rounded-lg overflow-hidden border border-brand-border max-w-[520px]">
+      {/* Resultado — fora do campo gerador, num card próprio */}
+      {result && (
+        <div className="mt-6 rounded-xl border border-brand-border bg-brand-surface max-w-[520px] overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-brand-border">
+            <p className="text-sm font-medium text-brand-text">Pronto!</p>
+            <button
+              onClick={() => { setResult(null); inputRef.current?.focus(); }}
+              className="text-brand-dim hover:text-brand-text text-sm"
+              aria-label="Fechar resultado"
+            >
+              ✕
+            </button>
+          </div>
           <img
-            src={imageUrl}
+            src={result.url}
             alt="Resultado da geração"
             className="w-full max-h-[460px] object-contain bg-brand-surface"
           />
-          <a
-            href={imageUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="block text-center text-sm py-3 text-brand-accent hover:text-brand-accentHover font-medium bg-brand-surface"
-          >
-            Abrir em alta resolução
-          </a>
+          <div className="flex flex-col gap-2 p-3 border-t border-brand-border">
+            <a
+              href={result.url}
+              download={`criativa-imagem.png`}
+              className="block text-center text-sm py-2.5 rounded-lg bg-brand-accent text-brand-bg font-semibold hover:bg-brand-accentHover transition-colors"
+            >
+              Baixar imagem
+            </a>
+            <button
+              onClick={() => {
+                if (typeof window === 'undefined') return;
+                sessionStorage.setItem('criai_ref_image', result.url);
+                sessionStorage.setItem('criai_ref_prompt', result.prompt || '');
+                window.location.href = '/dashboard?chat=1#cerebro';
+              }}
+              className="block text-center text-sm py-2.5 rounded-lg border border-brand-border text-brand-accent hover:text-brand-accentHover transition-colors"
+            >
+              Editar na conversa (Cérebro)
+            </button>
+            <button
+              onClick={() => { setResult(null); inputRef.current?.focus(); }}
+              className="block text-center text-sm py-1 text-brand-dim hover:text-brand-text transition-colors"
+            >
+              Gerar outra
+            </button>
+          </div>
         </div>
       )}
     </div>
