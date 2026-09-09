@@ -13,6 +13,7 @@ export default function CerebroEditor() {
   const [error, setError] = useState(null);
   const [credits, setCredits] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [portraitMode, setPortraitMode] = useState(false);
   const endRef = useRef(null);
 
   useEffect(() => {
@@ -22,6 +23,15 @@ export default function CerebroEditor() {
       setBaseImage(refImg);
       setRefImages([refImg]);
       sessionStorage.removeItem('criai_ref_image');
+    }
+    const refPrompt = sessionStorage.getItem('criai_ref_prompt');
+    if (refPrompt) {
+      setInput(refPrompt);
+      sessionStorage.removeItem('criai_ref_prompt');
+    }
+    if (sessionStorage.getItem('criai_retrato') === '1') {
+      setPortraitMode(true);
+      sessionStorage.removeItem('criai_retrato');
     }
     const sid = sessionStorage.getItem('criai_cerebro_session');
     if (sid) {
@@ -93,8 +103,10 @@ export default function CerebroEditor() {
       const data = await api.cerebroChat(msg, {
         ...(sessionId ? { sessionId } : {}),
         images: refImages,
+        ...(portraitMode ? { portrait: true } : {}),
       });
       setSessionId(data.sessionId);
+      setPortraitMode(false);
       if (typeof window !== 'undefined') sessionStorage.setItem('criai_cerebro_session', data.sessionId);
       const isVideo = !!data.videoUrl;
       setMessages([...newMessages, { role: 'assistant', message: data.reply, imageUrl: data.imageUrl, videoUrl: data.videoUrl || (isVideo ? data.videoUrl : null) }]);

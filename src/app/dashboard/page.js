@@ -30,6 +30,34 @@ const FORMATOS = [
   { label: 'Logotipo', prompt: 'Logotipo minimalista da sua marca, traço limpo, fundo branco', size: { width: 1024, height: 1024 } },
 ];
 
+const RETRATOS = [
+  {
+    label: '🎬 Neo-noir neon',
+    desc: 'Cinematográfico, luz azul + vermelha',
+    prompt: `Create a dramatic, ultra-sharp close-up portrait in the style of a 35mm film photograph. The subject is lit with bold neon lighting: an intense blue glow on one side of the face, and a deep red neon hue on the other, creating a striking dual-color composition. The facial expression is fearless and focused, full of character and presence. Preserve the exact face angle, lighting direction, and body posture from the original reference image — no alterations. The face should appear gritty and raw, with visible beads of sweat, slightly wet hair, and a few realistic small cuts for a rugged, hardened look. The subject wears a black suit jacket over a white shirt and black tie, blending into a black shadowy background where only the face and front profile are clearly visible. The lighting sculpts the jawline and cheekbones. Cinematic neo-noir style, film grain, shallow depth of field, realistic skin texture — no smoothing or stylization. Close-up vertical portrait, rich in mood, color contrast and filmic atmosphere.`
+  },
+  {
+    label: '🎧 Capa de álbum',
+    desc: 'Produtor musical imerso no próprio mundo',
+    prompt: `Maintain the facial features and hair exactly from the uploaded selfie. Ensure the result is ultra-realistic, sharp, and visually striking - like a music producer lost in their own world. This should look like a professional cinematic portrait in 4K quality, perfect for an album cover or promotional content.`
+  },
+  {
+    label: '🌘 Eclipse divino',
+    desc: 'Perfil em halo de luz alaranjada',
+    prompt: `A cinematic side-profile portrait of me standing in front of a glowing circular orange red halo light, resembling a solar eclipse. The subject wears a dark black oversized hoodie. The rim lighting outlines the profile. The lighting is dramatic and moody, creating a golden rim light that outlines his silhouette against a deep, reddish-purple background. The atmosphere is mysterious and elegant, evoking celestial or divine.`
+  },
+  {
+    label: '📸 Famoso na foto',
+    desc: 'Selfie casual de madrugada com um ídolo',
+    prompt: `Take an extremely ordinary and unremarkable iPhone selfie, with no clear subject or sense of composition—just a quick accidental snapshot. The photo should have slight motion blur and uneven lighting from streetlights and nearby lamps at night near the Baiterek Tower in Astana, Kazakhstan, causing mild overexposure in some areas. The angle should be awkward and the framing messy, giving the picture a deliberately mediocre and casual feel, as if it was taken absentmindedly while pulling the phone from a pocket. The main character is the uploaded person's face, and a famous sports star stands next to them, dressed in casual clothes with a relaxed smile, both caught in a casual, imperfect nighttime moment. The background shows the iconic illuminated monument, parts of the modern city skyline, and blurry silhouettes of passing pedestrians. The overall look should feel intentionally plain, spontaneous and random, capturing the authentic vibe of a poorly composed, spontaneous night-time iPhone selfie.`
+  },
+  {
+    label: '🌧️ Dupla exposição',
+    desc: 'Floresta e chuva sobre o retrato',
+    prompt: `Create a double exposure using the picture provided. The main image should be a man walking through a woodland holding a camera with a long lens. Small amounts of rain falling with reflections on the puddles on the dirt path. The double exposure should blend seamlessly with the trees using natural light. The whole image should use cool tones.`
+  },
+];
+
 export default function DashboardPage() {
   const [user, setUser] = useState(null);
   const [history, setHistory] = useState([]);
@@ -90,6 +118,14 @@ export default function DashboardPage() {
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('criai_ref_image', thumb);
       sessionStorage.setItem('criai_ref_prompt', 'Modelo do Freepik');
+      window.location.href = '/dashboard?chat=1#cerebro';
+    }
+  };
+
+  const useRetrato = (r) => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('criai_ref_prompt', r.prompt);
+      sessionStorage.setItem('criai_retrato', '1');
       window.location.href = '/dashboard?chat=1#cerebro';
     }
   };
@@ -167,6 +203,24 @@ export default function DashboardPage() {
               >
                 <p className="text-sm font-semibold text-white mb-0.5">{f.label}</p>
                 <p className="text-[11px] text-gray-400">{f.size.width}×{f.size.height}px</p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Estilos de retrato - selfie + estilo profissional */}
+        <div className="mb-12">
+          <h2 className="text-lg font-semibold text-white mb-1">Retrato de impacto a partir da selfie</h2>
+          <p className="text-sm text-gray-400 mb-4">Toque num estilo, suba sua selfie no Cérebro e mande enviar — o rosto é mantido.</p>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            {RETRATOS.map((r, i) => (
+              <button
+                key={i}
+                onClick={() => useRetrato(r)}
+                className="rounded-xl border border-white/10 bg-white/5 px-4 py-4 text-left hover:border-primary-500/40 transition-all duration-300"
+              >
+                <p className="text-sm font-semibold text-white mb-0.5">{r.label}</p>
+                <p className="text-[11px] text-gray-400">{r.desc}</p>
               </button>
             ))}
           </div>
