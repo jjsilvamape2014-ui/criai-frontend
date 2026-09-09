@@ -129,7 +129,8 @@ export default function VideoGenerator() {
         if (err.data?.code === 'NO_CREDITS') {
           setError({ type: 'NO_CREDITS', message: 'Seus créditos de vídeo acabaram! Assine o plano por R$ 39,99/mês.' });
         } else {
-          setError({ type: 'GENERIC', message: err.message || 'Erro ao gerar o anúncio falado. Tente novamente.' });
+          const detail = err.data?.details || err.message;
+          setError({ type: 'GENERIC', message: `Não consegui gerar o anúncio falado. ${detail ? 'Detalhe: ' + detail : 'Tente novamente.'}` });
         }
       } finally {
         setLoading(false);
