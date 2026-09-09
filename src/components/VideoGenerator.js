@@ -45,6 +45,23 @@ export default function VideoGenerator() {
     }
   }, []);
 
+  // Recebe a imagem vinda do "Criar anúncio em vídeo" (card da imagem gerada)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const vidImg = sessionStorage.getItem('criai_video_image');
+    const vidName = sessionStorage.getItem('criai_video_name');
+    if (vidImg) {
+      setImageData('');
+      setImageUrl(vidImg);
+      setPreview(vidImg);
+      sessionStorage.removeItem('criai_video_image');
+    }
+    if (vidName) {
+      setProductName(String(vidName).slice(0, 60));
+      sessionStorage.removeItem('criai_video_name');
+    }
+  }, []);
+
   const recentImages = (history || []).filter(g => g.type === 'IMAGE' && g.imageUrl);
 
   const handleFileUpload = (file) => {

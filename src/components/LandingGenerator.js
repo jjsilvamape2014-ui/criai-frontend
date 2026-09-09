@@ -190,6 +190,17 @@ export default function LandingGenerator({ initialPrompt = '', scrollOnSet = fal
               Editar na conversa (Cérebro)
             </button>
             <button
+              onClick={() => {
+                if (typeof window === 'undefined') return;
+                sessionStorage.setItem('criai_video_image', result.url);
+                sessionStorage.setItem('criai_video_name', result.prompt || '');
+                window.location.href = '/transformar-foto-em-video';
+              }}
+              className="block text-center text-sm py-2.5 rounded-lg border border-brand-border text-brand-accent hover:text-brand-accentHover transition-colors"
+            >
+              🎬 Criar anúncio em vídeo
+            </button>
+            <button
               onClick={() => { setResult(null); inputRef.current?.focus(); }}
               className="block text-center text-sm py-1 text-brand-dim hover:text-brand-text transition-colors"
             >
