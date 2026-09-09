@@ -10,6 +10,7 @@ export default function LandingGenerator({ initialPrompt = '', scrollOnSet = fal
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
   const [error, setError] = useState(null);
+  const [size, setSize] = useState({ width: 1216, height: 1520 });
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -20,6 +21,7 @@ export default function LandingGenerator({ initialPrompt = '', scrollOnSet = fal
     const handler = (e) => {
       const p = e.detail?.prompt;
       if (p) setPrompt(p);
+      if (e.detail?.width && e.detail?.height) setSize({ width: e.detail.width, height: e.detail.height });
       if (scrollOnSet && inputRef.current) {
         inputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
         inputRef.current.focus();
@@ -41,7 +43,7 @@ export default function LandingGenerator({ initialPrompt = '', scrollOnSet = fal
     setError(null);
     setImageUrl(null);
     try {
-      const data = await api.generateImage(msg, { model: 'flux2pro', width: 1216, height: 1520 });
+      const data = await api.generateImage(msg, { model: 'flux2pro', width: size.width, height: size.height });
       setImageUrl(data.imageUrl);
     } catch (err) {
       if (err.data?.code === 'NO_CREDITS') {

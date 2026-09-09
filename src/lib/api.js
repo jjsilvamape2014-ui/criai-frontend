@@ -123,6 +123,11 @@ class ApiClient {
   async cerebroSessions() {
     return this.request('/cerebro/sessions');
   }
+
+  // Modelos de design (Freepik)
+  async freepikTemplates(q) {
+    return this.request(`/templates/freepik?q=${encodeURIComponent(q)}`);
+  }
 }
 
 export const api = new ApiClient();

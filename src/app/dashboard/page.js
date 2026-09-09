@@ -10,9 +10,10 @@ const IDEIAS = [
   { cat: 'Anúncio de produto', prompt: 'Anúncio de hambúrguer artesanal com o preço R$ 29,90 e a chamada Peça já', src: '/showcase/anuncio-hamburguer.webp' },
   { cat: 'Post para feed', prompt: 'Post quadrado com a frase Promoção de Setembro, fundo laranja', src: '/showcase/post-feed.webp' },
   { cat: 'Logotipo', prompt: 'Logotipo para a marca Padaria São João, traço minimalista', src: '/showcase/logo-padaria.webp' },
-  { cat: 'Capa de vídeo', prompt: 'Thumbnail com o título Como Vender Mais no Instagram', src: '/showcase/capa-video.webp' },
+  { cat: 'Anúncio Instagram', prompt: 'Anúncio vertical para o Instagram de uma faculdade, chamada Vestibular 2027, cores azul e branco', src: '/showcase/capa-video.webp' },
+  { cat: 'Story/Reels', prompt: 'Story vertical 9:16 de promoção de açaí com o preço R$ 12,90 em destaque', src: '/showcase/estilo-anuncio.webp' },
   { cat: 'Foto de perfil', prompt: 'Retrato profissional, fundo neutro, luz suave de estúdio', src: '/showcase/foto-perfil.webp' },
-  { cat: 'Arte de parede', prompt: 'Composição abstrata em tons terrosos, formato retrato', src: '/showcase/arte-parede.webp' },
+  { cat: 'Capa de vídeo', prompt: 'Thumbnail com o título Como Vender Mais no Instagram', src: '/showcase/capa-video.webp' },
   { cat: 'Anúncio', prompt: 'Anúncio de açaí com o preço R$ 12,90 em destaque, fundo roxo', src: '/showcase/estilo-anuncio.webp' },
   { cat: 'Logotipo', prompt: 'Logotipo minimalista para a marca Açaí do Norte, traço limpo', src: '/showcase/estilo-logo.webp' },
   { cat: 'Promoção', prompt: 'Post quadrado com a chamada Promoção de Setembro, tipografia forte', src: '/showcase/estilo-post.webp' },
@@ -21,10 +22,21 @@ const IDEIAS = [
   { cat: 'Arte decorativa', prompt: 'Arte abstrata em tons terrosos para quadro decorativo grande', src: '/showcase/estilo-arte.webp' },
 ];
 
+// Formatos de peça com formato pronto — toque, descreva o resto e gere.
+const FORMATOS = [
+  { label: 'Anúncio Instagram', prompt: 'Anúncio para o feed do Instagram (formato vertical), oferta em destaque, chamada clara e CTA, cores da sua marca', size: { width: 1216, height: 1520 } },
+  { label: 'Post quadrado', prompt: 'Post quadrado para Instagram com chamada de promoção e preço em destaque', size: { width: 1024, height: 1024 } },
+  { label: 'Story/Reels', prompt: 'Story vertical para Instagram (9:16) com mensagem curta e chamada clara', size: { width: 1200, height: 1920 } },
+  { label: 'Logotipo', prompt: 'Logotipo minimalista da sua marca, traço limpo, fundo branco', size: { width: 1024, height: 1024 } },
+];
+
 export default function DashboardPage() {
   const [user, setUser] = useState(null);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [fpResults, setFpResults] = useState([]);
+  const [fpLoading, setFpLoading] = useState(false);
+  const [fpError, setFpError] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -47,6 +59,38 @@ export default function DashboardPage() {
   const pickIdea = (prompt) => {
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('criai:set-prompt', { detail: { prompt } }));
+    }
+  };
+
+  const pickFormat = (f) => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('criai:set-prompt', { detail: { prompt: f.prompt, ...f.size } }));
+    }
+  };
+
+  const searchFreepik = async () => {
+    const t = window.prompt('Qual modelo de design você quer? Ex: flyer de pizza, anúncio de faculdade, post de promoção');
+    if (!t) return;
+    setFpLoading(true); setFpError(null); setFpResults([]);
+    try {
+      const data = await api.freepikTemplates(t);
+      setFpResults(data.templates || []);
+    } catch (err) {
+      if (err.status === 501) {
+        setFpError('A busca de modelos do Freepik ainda não foi ativada neste servidor (falta a chave gratuita).');
+      } else {
+        setFpError('Não foi possível buscar modelos agora. Tente novamente.');
+      }
+    } finally {
+      setFpLoading(false);
+    }
+  };
+
+  const useTemplate = (thumb) => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('criai_ref_image', thumb);
+      sessionStorage.setItem('criai_ref_prompt', 'Modelo do Freepik');
+      window.location.href = '/dashboard?chat=1#cerebro';
     }
   };
 
@@ -108,6 +152,61 @@ export default function DashboardPage() {
         {/* Gerador - o coração do app */}
         <div className="mb-12">
           <LandingGenerator initialPrompt="" scrollOnSet />
+        </div>
+
+        {/* Formatos rápidos - anúncio Instagram, post, story, logo */}
+        <div className="mb-12">
+          <h2 className="text-lg font-semibold text-white mb-1">Peça pronta para rede social</h2>
+          <p className="text-sm text-gray-400 mb-4">Toque no formato certo para o Instagram/Facebook — o campo de cima já monta o começo da descrição.</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {FORMATOS.map((f, i) => (
+              <button
+                key={i}
+                onClick={() => pickFormat(f)}
+                className="rounded-xl border border-white/10 bg-white/5 px-4 py-4 text-left hover:border-primary-500/40 transition-all duration-300"
+              >
+                <p className="text-sm font-semibold text-white mb-0.5">{f.label}</p>
+                <p className="text-[11px] text-gray-400">{f.size.width}×{f.size.height}px</p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Modelos do Freepik - o Cérebro busca designs prontos */}
+        <div className="mb-12">
+          <h2 className="text-lg font-semibold text-white mb-1">Modelos prontos (Freepik)</h2>
+          <p className="text-sm text-gray-400 mb-4">Busco modelos de design gratuitos, você escolhe um e edita com a sua marca no Cérebro.</p>
+          <button
+            onClick={searchFreepik}
+            disabled={fpLoading}
+            className="btn-secondary text-sm"
+          >
+            {fpLoading ? 'Buscando...' : '🔎 Buscar modelos no Freepik'}
+          </button>
+          {fpError && (
+            <div className="mt-3 rounded-xl border border-red-500/20 bg-red-500/10 p-4">
+              <p className="text-sm text-red-300">{fpError}</p>
+            </div>
+          )}
+          {fpResults.length > 0 && (
+            <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {fpResults.map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => useTemplate(t.thumb)}
+                  className="group rounded-xl overflow-hidden border border-white/10 bg-white/5 text-left hover:border-primary-500/40 transition-all duration-300"
+                >
+                  <div className="aspect-square overflow-hidden">
+                    <img src={t.thumb} alt={t.title || 'Modelo'} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  </div>
+                  <div className="p-2.5">
+                    <p className="text-[11px] text-gray-300 line-clamp-2">{t.title || 'Modelo gratuito'}</p>
+                    <p className="text-[10px] text-primary-400 mt-1">Usar como base →</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Artes prontas para copiar */}
