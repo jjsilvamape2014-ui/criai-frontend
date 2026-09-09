@@ -11,6 +11,8 @@ export default function LandingGenerator({ initialPrompt = '', scrollOnSet = fal
   const [result, setResult] = useState(null); // { url, prompt } — imagem pronta, fora do campo
   const [error, setError] = useState(null);
   const [size, setSize] = useState({ width: 1216, height: 1520 });
+  const [liveStatus, setLiveStatus] = useState(null); // etapa atual da IA ("onde ela está pesquisando")
+  const [research, setResearch] = useState(null); // modelos de referência + fontes achadas na pesquisa
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -42,8 +44,15 @@ export default function LandingGenerator({ initialPrompt = '', scrollOnSet = fal
     setLoading(true);
     setError(null);
     setResult(null);
+    setResearch(null);
+    setLiveStatus('Conectando…');
     try {
-      const data = await api.generateImage(msg, { model: 'flux2pro', width: size.width, height: size.height });
+      const data = await api.generateImageLive(
+        msg,
+        { model: 'flux2pro', width: size.width, height: size.height },
+        setLiveStatus, // mostra onde a IA está "pesquisando", etapa por etapa
+        setResearch   // recebe os modelos de referência que ela encontrou
+      );
       // A imagem PRONTA sai do campo gerador: vira um cartão de resultado abaixo,
       // e o campo limpa para a próxima descrição.
       setResult({ url: data.imageUrl, prompt: msg });
@@ -56,6 +65,7 @@ export default function LandingGenerator({ initialPrompt = '', scrollOnSet = fal
       setError('Não foi possível gerar agora. Tente novamente.');
     } finally {
       setLoading(false);
+      setLiveStatus(null);
     }
   };
 
@@ -86,7 +96,55 @@ export default function LandingGenerator({ initialPrompt = '', scrollOnSet = fal
           {loading ? 'Gerando…' : 'Gerar'}
         </button>
       </div>
-      <p className="mt-2 text-[13px] text-brand-dim">Descreva em português. Sem cartão para começar.</p>
+      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-brand-dim">
+        <p>Descreva em português. Sem cartão para começar.</p>
+        <a
+          href={`https://www.pinterest.com/search/pins/?q=${encodeURIComponent(prompt.trim() || 'design criativo')}`}
+          target="_blank"
+          rel="noreferrer"
+          className="text-brand-accent hover:text-brand-accentHover underline underline-offset-2"
+        >
+          Ver ideias no Pinterest
+        </a>
+      </div>
+
+      {/* Onde a IA está "pesquisando" — status ao vivo, igual ChatGPT */}
+      {loading && (
+        <div className="mt-4 rounded-xl border border-brand-border bg-brand-surface p-4 max-w-[520px]">
+          <p className="text-[13px] text-brand-sub">
+            {liveStatus || 'Preparando…'}
+            <span className="inline-block ml-0.5 animate-pulse">…</span>
+          </p>
+        </div>
+      )}
+
+      {/* Modelos de referência encontrados na pesquisa (Freepik) + fontes */}
+      {research && research.inspiration && research.inspiration.length > 0 && (
+        <div className="mt-4 max-w-[520px]">
+          <p className="mb-2 text-[12px] text-brand-dim">Modelos de referência que encontrei na pesquisa:</p>
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {research.inspiration.map((m, i) => (
+              <a
+                key={i}
+                href={m.page || m.thumb}
+                target="_blank"
+                rel="noreferrer"
+                className="shrink-0"
+                title={m.title || 'Modelo de referência'}
+              >
+                <img
+                  src={m.thumb}
+                  alt={m.title || 'Modelo de referência'}
+                  className="h-16 w-16 object-cover rounded-lg border border-brand-border"
+                />
+              </a>
+            ))}
+          </div>
+          {research.fonts && research.fonts.length > 0 && (
+            <p className="mt-2 text-[12px] text-brand-dim">Fontes ideais para a peça: {research.fonts.join(' · ')}</p>
+          )}
+        </div>
+      )}
 
       {error && (
         <div className="mt-4 rounded-xl border border-brand-border bg-brand-surface p-4">

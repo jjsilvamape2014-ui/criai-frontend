@@ -65,6 +65,86 @@ class ApiClient {
     });
   }
 
+  // Geração com status em tempo real ("onde a IA está pesquisando"). Consome SSE.
+  // onStatus(text) é chamado a cada etapa; resolve com o resultado final (event done).
+  async generateImageLive(prompt, options = {}, onStatus, onResearch) {
+    const url = `${this.baseURL}/generate/live-image`;
+    const token = this.getToken();
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: JSON.stringify({ prompt, ...options }),
+    });
+
+    const ctype = res.headers.get('content-type') || '';
+    if (!res.ok && !ctype.includes('text/event-stream')) {
+      const errData = await res.json().catch(() => null);
+      const error = new Error(errData?.error || 'Erro na geração');
+      error.status = res.status;
+      error.data = errData;
+      throw error;
+    }
+    if (!res.body) {
+      const errData = await res.json().catch(() => null);
+      const error = new Error(errData?.error || 'Erro na geração');
+      error.data = errData;
+      throw error;
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let result = null;
+
+    const parseEvents = () => {
+      let idx;
+      while ((idx = buffer.indexOf('\n\n')) !== -1) {
+        const block = buffer.slice(0, idx);
+        buffer = buffer.slice(idx + 2);
+        let event = 'message';
+        let data = '';
+        for (const line of block.split('\n')) {
+          if (line.startsWith('event:')) event = line.slice(6).trim();
+          else if (line.startsWith('data:')) data += line.slice(5).trim();
+        }
+        if (!data) continue;
+        let payload = {};
+        try {
+          payload = JSON.parse(data);
+        } catch {
+          continue;
+        }
+        if (event === 'status' && onStatus) onStatus(payload.text || '');
+        else if (event === 'research' && payload.inspiration && onResearch) onResearch(payload);
+        else if (event === 'done') result = payload;
+        else if (event === 'error') {
+          const error = new Error(payload.error || 'Erro na geração');
+          error.status = payload.code === 'NO_CREDITS' ? 403 : 500;
+          error.data = payload;
+          throw error;
+        }
+      }
+    };
+
+    while (true) {
+      const { value, done: streamDone } = await reader.read();
+      if (streamDone) break;
+      buffer += decoder.decode(value, { stream: true });
+      try {
+        parseEvents();
+      } catch (e) {
+        throw e;
+      }
+      if (result) break;
+    }
+
+    if (!result) throw new Error('Stream encerrou sem resultado');
+    return { ...result, research: result.research || null };
+  }
+
   async generateVideo(imageUrl, options = {}) {
     return this.request('/generate/video', {
       method: 'POST',
