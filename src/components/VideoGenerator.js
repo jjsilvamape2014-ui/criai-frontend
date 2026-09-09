@@ -17,6 +17,12 @@ const AD_STYLES = [
   { key: 'elegant', label: '💎 Elegante' },
 ];
 
+const MODES = [
+  { key: 'product', icon: '📦', label: 'Anúncio de produto', tip: 'Vídeo vendendo no marketplace' },
+  { key: 'talking', icon: '🎤', label: 'Anúncio falado', tip: 'Apresentadora fala do produto', hot: true },
+  { key: 'animate', icon: '🎞️', label: 'Animar imagem', tip: 'Move a sua imagem' },
+];
+
 export default function VideoGenerator() {
   const [mode, setMode] = useState('product');
   const [prompt, setPrompt] = useState('');
@@ -168,111 +174,66 @@ export default function VideoGenerator() {
 
   const credits = user ? (user.creditsVideos || 0) + (user.creditsPurchased || 0) : 0;
 
+  const fieldLabel = 'block text-sm font-semibold text-gray-200 mb-2';
+
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto space-y-5">
       {/* Guia didático: o usuário sabe exatamente o que fazer */}
-      <div className="card mb-6 p-4 !bg-primary-50/60 border-primary-200">
-        <p className="text-sm font-bold text-primary-800 mb-2.5">Como criar o seu anúncio em 3 passos</p>
-        <ol className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0 text-[13px] text-gray-700">
-          <li className="flex items-start gap-1.5 sm:pr-10"><b className="text-primary-600">1.</b> Envie a foto do produto</li>
-          <li className="flex items-start gap-1.5 sm:pr-10 border-t sm:border-t-0 sm:border-l border-primary-200 sm:pl-10"><b className="text-primary-600">2.</b> Diga nome, preço e vantagens</li>
-          <li className="flex items-start gap-1.5"><b className="text-primary-600">3.</b> Escolha o tipo abaixo e toque em criar</li>
+      <div className="card p-4 border-primary-500/25 bg-gradient-to-br from-primary-600/10 to-transparent">
+        <p className="text-sm font-bold text-white mb-2.5">Como criar o seu anúncio em 3 passos</p>
+        <ol className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-0 text-[13px] text-gray-300">
+          <li className="flex items-start gap-1.5 sm:pr-12">
+            <span className="w-5 h-5 shrink-0 rounded-full bg-primary-600 text-white text-[11px] font-bold flex items-center justify-center">1</span>
+            Envie a foto do produto
+          </li>
+          <li className="flex items-start gap-1.5 sm:px-6 border-t sm:border-t-0 sm:border-l border-white/10 sm:ml-12 sm:pl-12 sm:border-l-white/10">
+            <span className="w-5 h-5 shrink-0 rounded-full bg-primary-600 text-white text-[11px] font-bold flex items-center justify-center">2</span>
+            Diga nome, preço e vantagens
+          </li>
+          <li className="flex items-start gap-1.5 border-t sm:border-t-0 sm:border-l border-white/10 mt-2 sm:mt-0 sm:ml-12 sm:pl-12 pt-2 sm:pt-0">
+            <span className="w-5 h-5 shrink-0 rounded-full bg-primary-600 text-white text-[11px] font-bold flex items-center justify-center">3</span>
+            Escolha o tipo e toque em criar
+          </li>
         </ol>
       </div>
 
-      <div className="card mb-6">
-        <p className="text-sm font-bold text-primary-800 mb-2.5">Qual tipo de vídeo você quer?</p>
-        <div className="flex flex-col sm:flex-row gap-2 mb-5">
-          <button
-            onClick={() => setMode('product')}
-            className={`flex-1 rounded-xl px-4 py-3 text-sm font-semibold transition-all border ${
-              mode === 'product'
-                ? 'bg-primary-600 text-white border-primary-600 shadow-lg shadow-primary-500/30'
-                : 'bg-gray-100 text-gray-600 border-gray-200 hover:border-primary-300'
-            }`}
-          >
-            📦 Anúncio de produto
-          </button>
-          <button
-            onClick={() => setMode('animate')}
-            className={`flex-1 rounded-xl px-4 py-3 text-sm font-semibold transition-all border ${
-              mode === 'animate'
-                ? 'bg-primary-600 text-white border-primary-600 shadow-lg shadow-primary-500/30'
-                : 'bg-gray-100 text-gray-600 border-gray-200 hover:border-primary-300'
-            }`}
-          >
-            🎞️ Animar imagem
-          </button>
-          <button
-            onClick={() => setMode('talking')}
-            className={`flex-1 rounded-xl px-4 py-3 text-sm font-semibold transition-all border ${
-              mode === 'talking'
-                ? 'bg-primary-600 text-white border-primary-600 shadow-lg shadow-primary-500/30'
-                : 'bg-gray-100 text-gray-600 border-gray-200 hover:border-primary-300'
-            }`}
-          >
-            🎤 Anúncio falado
-          </button>
+      <div className="card">
+        <p className="text-sm font-bold text-white mb-3">Qual tipo de vídeo você quer?</p>
+
+        {/* Tipos de vídeo */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-8">
+          {MODES.map((m) => (
+            <button
+              key={m.key}
+              onClick={() => setMode(m.key)}
+              className={`relative text-left rounded-xl border-2 px-4 py-3.5 transition-all duration-300 ${
+                mode === m.key
+                  ? 'border-primary-500 bg-primary-600/10 shadow-lg shadow-primary-500/20'
+                  : 'border-white/10 bg-white/5 hover:border-white/20'
+              }`}
+            >
+              {m.hot && (
+                <span className="absolute -top-2 -right-1 rounded-full bg-gradient-to-r from-fuchsia-500 to-primary-500 px-2 py-0.5 text-[10px] font-bold text-white shadow-lg">
+                  ✨ Nosso diferencial
+                </span>
+              )}
+              <p className="text-xl mb-1">{m.icon}</p>
+              <p className={`text-sm font-bold ${mode === m.key ? 'text-white' : 'text-gray-200'}`}>{m.label}</p>
+              <p className={`text-[11px] mt-0.5 ${mode === m.key ? 'text-primary-300' : 'text-gray-500'}`}>{m.tip}</p>
+            </button>
+          ))}
         </div>
 
-        {mode === 'product' && (
-          <p className="text-sm text-primary-700 font-medium mb-4">
-            Envie a foto do seu produto e crie um <b>anúncio em vídeo</b> para vender — igual aos vídeos de apresentação de produtos em marketplaces. Perfeito pra sua loja ou pra divulgar como <b>afiliado</b> no Shopee/Mercado Livre!
-          </p>
-        )}
-        {mode === 'animate' && (
-          <p className="text-sm text-gray-500 mb-4">Envie uma imagem ou escolha uma das suas criações, e a IA anima com movimento natural.</p>
-        )}
-        {mode === 'talking' && (
-          <p className="text-sm text-primary-700 font-medium mb-4">
-            Envie a foto do seu produto e crie um <b>anúncio falado</b>: uma apresentadora IA segura o produto,
-            olha pra câmera e <b>fala o roteiro em português</b> — igual aos vídeos dos afiliados do Shopee.
-            A IA escreve o roteiro, gera a voz e anima os lábios. Você também pode escrever o roteiro.
-          </p>
-        )}
-
-        {mode !== 'talking' && (
-          <div className="mb-5">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-sm font-semibold text-gray-700">
-                {mode === 'product' ? '🎬 Estilo do anúncio em vídeo' : '🎬 Estilo do vídeo'}
-              </p>
-              <a
-                href={`https://www.pinterest.com/search/videos/?q=${encodeURIComponent(AD_STYLES.find((s) => s.key === preset)?.label.replace(' ', '') || 'anuncio de produto')}`}
-                target="_blank"
-                rel="noreferrer"
-                className="text-xs text-primary-600 hover:text-primary-700 font-medium underline underline-offset-2"
-              >
-                Ver exemplos no Pinterest →
-              </a>
-            </div>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {AD_STYLES.map((st) => (
-                <button
-                  key={st.key}
-                  onClick={() => setPreset(st.key)}
-                  className={`rounded-xl px-3 py-2 text-xs font-semibold transition-all border ${
-                    preset === st.key
-                      ? 'bg-primary-600 text-white border-primary-600 shadow'
-                      : 'bg-gray-100 text-gray-600 border-gray-200 hover:border-primary-300'
-                  }`}
-                >
-                  {st.label}
-                </button>
-              ))}
-            </div>
-            <p className="text-xs text-gray-400 mt-2">
-              O "Afiliado Shopee" é o estilo dos anúncios que os afiliados usam pra apresentar o produto e vender
-              no marketplace. "Empresa" e "Logo" criam vídeos de apresentação da sua marca. Se escrever um
-              movimento próprio abaixo, ele vale mais que o estilo.
-            </p>
+        <div className="mb-6">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+            <label className="block text-sm font-semibold text-gray-200">
+              {mode === 'product' ? '📷 Foto do produto' : '🖼️ Imagem de origem'}
+            </label>
+            <span className="text-[11px] text-gray-500">
+              {mode === 'talking' ? 'A IA usa essa foto pra criar a apresentadora segurando o produto' : 'Sem marca d’água · PNG/JPG' }
+            </span>
           </div>
-        )}
-
-        {/* Upload / origem */}
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
-          {mode === 'product' ? '📷 Foto do produto' : '🖼️ Imagem de origem'}
-        </label>
+        </div>
 
         <input
           ref={fileRef}
@@ -286,20 +247,20 @@ export default function VideoGenerator() {
           {preview ? (
             <button
               onClick={() => fileRef.current?.click()}
-              className="relative w-36 h-36 rounded-xl overflow-hidden border-2 border-primary-400 group shrink-0"
+              className="relative w-40 h-40 rounded-2xl overflow-hidden border-2 border-primary-400 group shrink-0"
             >
               <img src={preview} alt="Preview" className="w-full h-full object-cover" />
-              <span className="absolute inset-0 flex items-center justify-center bg-black/50 text-white text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="absolute inset-0 flex items-center justify-center bg-black/60 text-white text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
                 Trocar foto
               </span>
             </button>
           ) : (
             <button
               onClick={() => fileRef.current?.click()}
-              className="w-36 h-36 rounded-xl border-2 border-dashed border-gray-300 hover:border-primary-400 flex flex-col items-center justify-center gap-2 text-gray-400 hover:text-primary-500 transition-all shrink-0"
+              className="w-40 h-40 rounded-2xl border-2 border-dashed border-white/15 bg-white/[0.03] hover:border-primary-500/60 hover:bg-primary-600/5 flex flex-col items-center justify-center gap-2 text-gray-400 hover:text-primary-300 transition-all shrink-0"
             >
-              <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-              <span className="text-xs">Enviar foto</span>
+              <svg className="w-9 h-9" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              <span className="text-xs font-semibold">Enviar foto</span>
             </button>
           )}
 
@@ -312,8 +273,8 @@ export default function VideoGenerator() {
                     <button
                       key={img.id || i}
                       onClick={() => handleSelectRecent(img.imageUrl)}
-                      className={`w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${
-                        preview === img.imageUrl ? 'border-primary-500' : 'border-gray-200 hover:border-gray-300'
+                      className={`w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${
+                        preview === img.imageUrl ? 'border-primary-500' : 'border-white/10 hover:border-white/30'
                       }`}
                     >
                       <img src={img.imageUrl} alt="" className="w-full h-full object-cover" />
@@ -325,7 +286,7 @@ export default function VideoGenerator() {
             {preview && (
               <button
                 onClick={() => { setPreview(''); setImageData(''); setImageUrl(''); }}
-                className="text-xs text-gray-400 hover:text-red-500 font-medium mt-1"
+                className="text-xs text-gray-400 hover:text-red-400 font-medium mt-1"
               >
                 ✕ Remover imagem
               </button>
@@ -333,11 +294,49 @@ export default function VideoGenerator() {
           </div>
         </div>
 
+        {/* Estilos de anúncio */}
+        {mode !== 'talking' && (
+          <div className="mt-7">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <label className={fieldLabel}>
+                {mode === 'product' ? '🎬 Estilo do anúncio em vídeo' : '🎬 Estilo do vídeo'}
+              </label>
+              <a
+                href={`https://www.pinterest.com/search/videos/?q=${encodeURIComponent(AD_STYLES.find((s) => s.key === preset)?.label.replace(' ', '') || 'anuncio de produto')}`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs text-primary-300 hover:text-primary-200 font-medium underline underline-offset-2"
+              >
+                Ver exemplos no Pinterest →
+              </a>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-2.5">
+              {AD_STYLES.map((st) => (
+                <button
+                  key={st.key}
+                  onClick={() => setPreset(st.key)}
+                  className={`rounded-xl px-3.5 py-2 text-xs font-semibold transition-all border ${
+                    preset === st.key
+                      ? 'bg-primary-600 text-white border-primary-600 shadow'
+                      : 'bg-white/5 text-gray-300 border-white/10 hover:border-primary-500/40'
+                  }`}
+                >
+                  {st.label}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-gray-500 mt-2.5 leading-relaxed">
+              O "Afiliado Shopee" é o estilo dos vídeos dos afiliados que vendem no marketplace. Se escrever um
+              movimento próprio abaixo, ele vale mais que o estilo.
+            </p>
+          </div>
+        )}
+
         {/* Campos do modo produto */}
         {mode === 'product' && (
-          <div className="grid sm:grid-cols-3 gap-4 mt-5">
+          <div className="grid sm:grid-cols-3 gap-4 mt-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">🏷️ Nome do produto</label>
+              <label className={fieldLabel}>🏷️ Nome do produto</label>
               <input
                 type="text"
                 value={productName}
@@ -347,7 +346,7 @@ export default function VideoGenerator() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">💸 Preço (opcional)</label>
+              <label className={fieldLabel}>💸 Preço (opcional)</label>
               <input
                 type="text"
                 value={productPrice}
@@ -357,12 +356,12 @@ export default function VideoGenerator() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">✨ Destaques / vantagens (opcional)</label>
+              <label className={fieldLabel}>✨ Vantagens (opcional)</label>
               <input
                 type="text"
                 value={productDesc}
                 onChange={(e) => setProductDesc(e.target.value)}
-                placeholder='Ex: "frita sem óleo, painel digital, 10 tamanhos"'
+                placeholder='Ex: "frita sem óleo, painel digital"'
                 className="input"
               />
             </div>
@@ -371,10 +370,10 @@ export default function VideoGenerator() {
 
         {/* Campos do anúncio falado */}
         {mode === 'talking' && (
-          <div className="mt-5">
+          <div className="mt-6">
             <div className="grid sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">🏷️ Nome do produto</label>
+                <label className={fieldLabel}>🏷️ Nome do produto</label>
                 <input
                   type="text"
                   value={productName}
@@ -384,7 +383,7 @@ export default function VideoGenerator() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">💸 Preço (opcional)</label>
+                <label className={fieldLabel}>💸 Preço (opcional)</label>
                 <input
                   type="text"
                   value={productPrice}
@@ -394,7 +393,7 @@ export default function VideoGenerator() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">✨ Vantagens (opcional)</label>
+                <label className={fieldLabel}>✨ Vantagens (opcional)</label>
                 <input
                   type="text"
                   value={productDesc}
@@ -405,7 +404,7 @@ export default function VideoGenerator() {
               </div>
             </div>
             <div className="mt-4">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">🎙️ Roteiro (opcional — a IA escreve se deixar em branco)</label>
+              <label className={fieldLabel}>🎙️ Roteiro (opcional — a IA escreve se deixar em branco)</label>
               <textarea
                 value={script}
                 onChange={(e) => setScript(e.target.value)}
@@ -419,8 +418,8 @@ export default function VideoGenerator() {
 
         {/* Movimento personalizado */}
         {mode === 'animate' && (
-          <div className="mt-5">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Movimento desejado (opcional)</label>
+          <div className="mt-6">
+            <label className={fieldLabel}>Movimento desejado (opcional)</label>
             <input
               type="text"
               value={prompt}
@@ -431,8 +430,8 @@ export default function VideoGenerator() {
           </div>
         )}
         {mode === 'product' && (
-          <div className="mt-4">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">🎥 Movimento próprio (opcional, vale mais que o estilo)</label>
+          <div className="mt-5">
+            <label className={fieldLabel}>🎥 Movimento próprio (opcional, vale mais que o estilo)</label>
             <input
               type="text"
               value={prompt}
@@ -443,7 +442,7 @@ export default function VideoGenerator() {
           </div>
         )}
 
-        <div className="flex items-center justify-between mt-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 mt-8 pt-6 border-t border-white/10">
           <button
             onClick={handleGenerate}
             disabled={loading}
@@ -455,35 +454,41 @@ export default function VideoGenerator() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                 </svg>
-                {mode === 'product' ? 'Criando seu anúncio (pode demorar)...' : mode === 'talking' ? 'Criando o anúncio falado (leva ~1 min)...' : 'Gerando vídeo (pode demorar)...'}
+                {mode === 'talking' ? 'Criando o anúncio falado (leva ~1 min)...' : 'Gerando (pode demorar)...'}
               </>
             ) : (
-              <>🎬 {mode === 'talking' ? '🎤 Criar anúncio falado (1 crédito)' : mode === 'product' ? 'Criar anúncio (1 crédito)' : 'Gerar vídeo (1 crédito)'}</>
+              <>
+                {mode === 'talking'
+                  ? <span>🎤 Criar anúncio falado (1 crédito)</span>
+                  : mode === 'product'
+                    ? <span>🎬 Criar anúncio (1 crédito)</span>
+                    : <span>🎞️ Gerar vídeo (1 crédito)</span>}
+              </>
             )}
           </button>
 
           {user && (
-            <span className="text-sm text-gray-500">
-              🎬 <b className="text-gray-900">{credits}</b> créditos
+            <span className="text-sm text-gray-400">
+              🎬 <b className="text-gray-200">{credits}</b> créditos
             </span>
           )}
         </div>
 
         {loading && liveStatus && (
-          <p className="mt-4 text-sm text-primary-700 font-medium animate-pulse flex items-center gap-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-primary-500 animate-ping" />
+          <p className="mt-4 text-sm text-primary-300 font-medium animate-pulse flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-primary-400 animate-ping" />
             ✨ {liveStatus}
           </p>
         )}
       </div>
 
       {error && (
-        <div className={`rounded-xl p-4 mb-6 ${error.type === 'NO_CREDITS' ? 'bg-amber-50 border border-amber-200' : 'bg-red-50 border border-red-200'}`}>
-          <p className={`text-sm font-medium ${error.type === 'NO_CREDITS' ? 'text-amber-800' : 'text-red-800'}`}>
+        <div className={`rounded-xl p-4 border ${error.type === 'NO_CREDITS' ? 'bg-amber-500/10 border-amber-500/30' : 'bg-red-500/10 border-red-500/30'}`}>
+          <p className={`text-sm font-medium ${error.type === 'NO_CREDITS' ? 'text-amber-300' : 'text-red-300'}`}>
             {error.message}
           </p>
           {error.type === 'NO_CREDITS' && (
-            <a href="/plans" className="inline-block mt-2 text-sm text-primary-600 font-semibold hover:underline">
+            <a href="/plans" className="inline-block mt-2 text-sm text-primary-300 font-semibold hover:underline">
               Ver planos e recargas →
             </a>
           )}
@@ -491,39 +496,39 @@ export default function VideoGenerator() {
       )}
 
       {result?.videoUrl && (
-        <div className="card mb-8">
+        <div className="card card-glow">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-gray-900">
+            <h3 className="font-bold text-white">
               {mode === 'product' ? '🎬 Anúncio do produto criado!' : mode === 'talking' ? '🎤 Anúncio falado criado!' : 'Vídeo gerado'}
             </h3>
-            <button onClick={handleDownload} className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1">
+            <button onClick={handleDownload} className="text-sm text-primary-300 hover:text-primary-200 font-medium flex items-center gap-1">
               ⬇️ Baixar
             </button>
           </div>
-          <div className="rounded-xl overflow-hidden border border-gray-200 bg-gray-100">
+          <div className="rounded-xl overflow-hidden border border-white/10 bg-black/40">
             <video src={result.videoUrl} controls className="w-full h-auto max-h-[500px]" />
           </div>
           {result?.script && (
-            <p className="mt-3 text-sm text-gray-500">🎙️ Roteiro: <b className="text-gray-700">&quot;{result.script}&quot;</b></p>
+            <p className="mt-3 text-sm text-gray-400">🎙️ Roteiro: <b className="text-gray-200">&quot;{result.script}&quot;</b></p>
           )}
-          {productName && <p className="mt-3 text-sm text-gray-500">📦 Anúncio para: <b className="text-gray-700">{productName}</b></p>}
-          {preset && mode !== 'talking' && !prompt.trim() && (
-            <p className="mt-1 text-sm text-gray-500">🎬 Estilo: <b className="text-gray-700">{AD_STYLES.find((s) => s.key === preset)?.label || preset}</b></p>
+          {productName && <p className="mt-2 text-sm text-gray-400">📦 Anúncio para: <b className="text-gray-200">{productName}</b></p>}
+          {preset && mode === 'product' && !prompt.trim() && (
+            <p className="mt-1 text-sm text-gray-400">🎬 Estilo: <b className="text-gray-200">{AD_STYLES.find((s) => s.key === preset)?.label || preset}</b></p>
           )}
-          {prompt && <p className="mt-1 text-sm text-gray-500 italic">&quot;{prompt}&quot;</p>}
+          {prompt && mode !== 'talking' && <p className="mt-1 text-sm text-gray-400 italic">&quot;{prompt}&quot;</p>}
         </div>
       )}
 
       {showLoginModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Crie sua conta gratuita</h3>
-            <p className="text-gray-500 mb-6">Ganhe 2 vídeos grátis todo mês. Sem cartão de crédito.</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="bg-dark-900 rounded-2xl p-8 max-w-md w-full border border-white/10 shadow-2xl">
+            <h3 className="text-xl font-bold text-white mb-2">Crie sua conta gratuita</h3>
+            <p className="text-gray-400 mb-6">Ganhe 2 vídeos grátis todo mês. Sem cartão de crédito.</p>
             <div className="space-y-3">
               <a href="/register" className="btn-primary block text-center">Criar conta grátis</a>
               <a href="/login" className="btn-secondary block text-center">Já tenho conta</a>
             </div>
-            <button onClick={() => setShowLoginModal(false)} className="mt-4 text-sm text-gray-400 hover:text-gray-600 w-full">
+            <button onClick={() => setShowLoginModal(false)} className="mt-4 text-sm text-gray-500 hover:text-gray-300 w-full">
               Fechar
             </button>
           </div>

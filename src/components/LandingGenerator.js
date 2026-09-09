@@ -84,27 +84,56 @@ export default function LandingGenerator({ initialPrompt = '', scrollOnSet = fal
       <div className="grid sm:grid-cols-2 gap-3 mb-5 max-w-[560px]">
         <button
           onClick={() => setMode('image')}
-          className={`group text-left rounded-[16px] border-2 p-4 transition-all ${
+          className={`group relative text-left rounded-[18px] border-2 p-4 transition-all duration-300 overflow-hidden ${
             mode === 'image'
-              ? 'border-brand-accent bg-brand-accent/10 shadow-lg shadow-brand-accent/20'
+              ? 'border-brand-accent bg-gradient-to-br from-brand-accent/15 to-transparent shadow-xl shadow-brand-accent/20'
               : 'border-brand-border bg-brand-surface hover:border-brand-borderStrong'
           }`}
         >
-          <p className={`text-2xl mb-1 ${mode === 'image' ? '' : 'opacity-80'}`}>🖼️</p>
-          <p className={`text-[15px] font-bold ${mode === 'image' ? 'text-brand-accent' : 'text-brand-text'}`}>Criar imagem</p>
-          <p className="text-[12px] text-brand-dim mt-0.5">Pôster, logo, anúncio, post, arte</p>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className={`text-2xl mb-1 ${mode === 'image' ? '' : 'opacity-80'}`}>🖼️</p>
+              <p className={`text-[15px] font-bold ${mode === 'image' ? 'text-brand-accent' : 'text-brand-text'}`}>Criar imagem</p>
+              <p className="text-[12px] text-brand-dim mt-0.5">Pôster, logo, post, arte</p>
+            </div>
+            <span className={`w-5 h-5 rounded-full border-2 mt-1 ${mode === 'image' ? 'bg-brand-accent border-brand-accent' : 'border-brand-borderStrong'}`}>
+              {mode === 'image' && <span className="block w-3 h-3 rounded-full bg-brand-bg m-[2px]" />}
+            </span>
+          </div>
+          <div className="flex mt-3 -space-x-2">
+            <img src="/showcase/hero-acai.webp" alt="" className="w-11 h-11 rounded-lg object-cover border-2 border-brand-surface" />
+            <img src="/showcase/post-feed.webp" alt="" className="w-11 h-11 rounded-lg object-cover border-2 border-brand-surface" />
+            <img src="/showcase/logo-padaria.webp" alt="" className="w-11 h-11 rounded-lg object-cover border-2 border-brand-surface" />
+          </div>
         </button>
         <button
           onClick={() => setMode('video')}
-          className={`group text-left rounded-[16px] border-2 p-4 transition-all ${
+          className={`group relative text-left rounded-[18px] border-2 p-4 transition-all duration-300 overflow-hidden ${
             mode === 'video'
-              ? 'border-brand-accent bg-brand-accent/10 shadow-lg shadow-brand-accent/20'
+              ? 'border-brand-accent bg-gradient-to-br from-brand-accent/15 to-transparent shadow-xl shadow-brand-accent/20'
               : 'border-brand-border bg-brand-surface hover:border-brand-borderStrong'
           }`}
         >
-          <p className={`text-2xl mb-1 ${mode === 'video' ? '' : 'opacity-80'}`}>🎬</p>
-          <p className={`text-[15px] font-bold ${mode === 'video' ? 'text-brand-accent' : 'text-brand-text'}`}>Vídeo / Anúncio falado</p>
-          <p className="text-[12px] text-brand-dim mt-0.5">Apresentadora apresenta o seu produto falando</p>
+          <span className={`absolute -top-2 -right-2 rounded-full px-2.5 py-1 text-[10px] font-bold shadow-lg ${
+            mode === 'video' ? 'bg-brand-accent text-brand-bg' : 'bg-brand-red text-brand-text'
+          }`}>
+            ✨ Nenhuma IA faz igual
+          </span>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className={`text-2xl mb-1 ${mode === 'video' ? '' : 'opacity-80'}`}>🎬</p>
+              <p className={`text-[15px] font-bold ${mode === 'video' ? 'text-brand-accent' : 'text-brand-text'}`}>Vídeo / Anúncio falado</p>
+              <p className="text-[12px] text-brand-dim mt-0.5">Apresentadora fala do seu produto</p>
+            </div>
+            <span className={`w-5 h-5 rounded-full border-2 mt-1 ${mode === 'video' ? 'bg-brand-accent border-brand-accent' : 'border-brand-borderStrong'}`}>
+              {mode === 'video' && <span className="block w-3 h-3 rounded-full bg-brand-bg m-[2px]" />}
+            </span>
+          </div>
+          <div className="flex mt-3 -space-x-2">
+            <img src="/showcase/capa-video.webp" alt="" className="w-11 h-11 rounded-lg object-cover border-2 border-brand-surface" />
+            <img src="/showcase/estilo-anuncio.webp" alt="" className="w-11 h-11 rounded-lg object-cover border-2 border-brand-surface" />
+            <img src="/showcase/estilo-capa.webp" alt="" className="w-11 h-11 rounded-lg object-cover border-2 border-brand-surface" />
+          </div>
         </button>
       </div>
 
