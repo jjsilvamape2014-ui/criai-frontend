@@ -132,6 +132,71 @@ export default function Home() {
         </div>
       </section>
 
+      {/* DIFERENCIAL: ANÚNCIO FALADO */}
+      <section className="px-10 max-w-[1180px] mx-auto pt-20">
+        <SectionHead
+          label="Nosso diferencial"
+          title="Uma apresentadora IA vende o seu produto falando"
+          right="Nenhuma outra ferramenta faz isso: você manda a foto do produto e recebe um vídeo com voz, roteiro e lábios sincronizados em português."
+        />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 items-center">
+          {/* Vídeo de demonstração */}
+          <div className="relative rounded-[18px] border border-brand-border overflow-hidden bg-black">
+            <video
+              src="/showcase/talking-demo.mp4"
+              poster="/showcase/capa-video.webp"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              className="w-full aspect-[4/5] object-cover"
+            />
+            <span className="absolute top-3 left-3 rounded-full bg-black/60 backdrop-blur px-3 py-1.5 text-[11px] font-semibold text-white">
+              ▶ Exemplo do Anúncio Falado
+            </span>
+            <span className="absolute bottom-3 left-3 rounded-full bg-brand-accent px-3 py-1.5 text-[11px] font-bold text-brand-bg">
+              A voz fala o roteiro em português
+            </span>
+          </div>
+
+          {/* Lado a lado do que a ferramenta faz */}
+          <div className="flex flex-col gap-4">
+            <div className="rounded-[14px] border border-brand-border bg-brand-surface p-5 flex gap-4 items-start">
+              <span className="text-2xl">📸</span>
+              <div>
+                <p className="text-[15px] font-semibold text-brand-text">Você envia a foto do produto</p>
+                <p className="mt-1 text-[13px] text-brand-tert leading-relaxed">Tênis, fritadeira, moda, eletrônico — o que você vende, a IA mostra na mão da apresentadora.</p>
+              </div>
+            </div>
+            <div className="rounded-[14px] border border-brand-border bg-brand-surface p-5 flex gap-4 items-start">
+              <span className="text-2xl">🎙️</span>
+              <div>
+                <p className="text-[15px] font-semibold text-brand-text">A IA escreve o roteiro e gera a voz</p>
+                <p className="mt-1 text-[13px] text-brand-tert leading-relaxed">Nome, preço e vantagens do anúncio viram uma narração animada em português. Você também pode escrever do seu jeito.</p>
+              </div>
+            </div>
+            <div className="rounded-[14px] border border-brand-border bg-brand-surface p-5 flex gap-4 items-start">
+              <span className="text-2xl">🎬</span>
+              <div>
+                <p className="text-[15px] font-semibold text-brand-text">Pronto pra postar no Shopee e TikTok</p>
+                <p className="mt-1 text-[13px] text-brand-tert leading-relaxed">Vídeo vertical, com a apresentadora olhando pra câmera e falando o roteiro — igual ao dos grandes afiliados.</p>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                if (typeof window === 'undefined') return;
+                window.dispatchEvent(new CustomEvent('criai:open-video'));
+                genWrapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }}
+              className="mt-1 rounded-[12px] bg-brand-accent w-full py-[14px] text-[14px] font-bold text-brand-bg hover:bg-brand-accentHover transition-colors"
+            >
+              Criar o meu anúncio falado →
+            </button>
+          </div>
+        </div>
+      </section>
+
       {/* COMPARATIVO */}
       <section className="px-10 max-w-[1180px] mx-auto pt-20">
         <SectionHead

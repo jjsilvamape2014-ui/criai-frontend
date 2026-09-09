@@ -35,6 +35,13 @@ export default function LandingGenerator({ initialPrompt = '', scrollOnSet = fal
     return () => window.removeEventListener('criai:set-prompt', handler);
   }, [scrollOnSet]);
 
+  // Botões externos ("Criar meu anúncio", home) podem abrir direto o modo vídeo
+  useEffect(() => {
+    const handler = () => setMode('video');
+    window.addEventListener('criai:open-video', handler);
+    return () => window.removeEventListener('criai:open-video', handler);
+  }, []);
+
   const handleGenerate = async () => {
     const msg = prompt.trim();
     if (!msg) return;
