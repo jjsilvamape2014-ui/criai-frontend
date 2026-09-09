@@ -2,10 +2,12 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { api } from '@/lib/api';
+import VideoGenerator from '@/components/VideoGenerator';
 
 const PLACEHOLDER = 'Pôster de açaí com o preço R$ 12,90 em destaque';
 
 export default function LandingGenerator({ initialPrompt = '', scrollOnSet = false }) {
+  const [mode, setMode] = useState('image'); // 'image' | 'video' — tudo na mesma caixa
   const [prompt, setPrompt] = useState(initialPrompt);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null); // { url, prompt } — imagem pronta, fora do campo
@@ -78,6 +80,36 @@ export default function LandingGenerator({ initialPrompt = '', scrollOnSet = fal
 
   return (
     <div>
+      {/* Escolha o formato — dois cartões grandes, impossível errar */}
+      <div className="grid sm:grid-cols-2 gap-3 mb-5 max-w-[560px]">
+        <button
+          onClick={() => setMode('image')}
+          className={`group text-left rounded-[16px] border-2 p-4 transition-all ${
+            mode === 'image'
+              ? 'border-brand-accent bg-brand-accent/10 shadow-lg shadow-brand-accent/20'
+              : 'border-brand-border bg-brand-surface hover:border-brand-borderStrong'
+          }`}
+        >
+          <p className={`text-2xl mb-1 ${mode === 'image' ? '' : 'opacity-80'}`}>🖼️</p>
+          <p className={`text-[15px] font-bold ${mode === 'image' ? 'text-brand-accent' : 'text-brand-text'}`}>Criar imagem</p>
+          <p className="text-[12px] text-brand-dim mt-0.5">Pôster, logo, anúncio, post, arte</p>
+        </button>
+        <button
+          onClick={() => setMode('video')}
+          className={`group text-left rounded-[16px] border-2 p-4 transition-all ${
+            mode === 'video'
+              ? 'border-brand-accent bg-brand-accent/10 shadow-lg shadow-brand-accent/20'
+              : 'border-brand-border bg-brand-surface hover:border-brand-borderStrong'
+          }`}
+        >
+          <p className={`text-2xl mb-1 ${mode === 'video' ? '' : 'opacity-80'}`}>🎬</p>
+          <p className={`text-[15px] font-bold ${mode === 'video' ? 'text-brand-accent' : 'text-brand-text'}`}>Vídeo / Anúncio falado</p>
+          <p className="text-[12px] text-brand-dim mt-0.5">Apresentadora apresenta o seu produto falando</p>
+        </button>
+      </div>
+
+      {mode === 'image' ? (
+        <>
       <div className="flex items-center gap-3 rounded-[14px] border border-brand-borderStrong bg-brand-surface p-[14px] pl-[18px] max-w-[520px]">
         <input
           ref={inputRef}
@@ -193,7 +225,7 @@ export default function LandingGenerator({ initialPrompt = '', scrollOnSet = fal
                 if (typeof window === 'undefined') return;
                 sessionStorage.setItem('criai_video_image', result.url);
                 sessionStorage.setItem('criai_video_name', result.prompt || '');
-                window.location.href = '/transformar-foto-em-video';
+                setMode('video');
               }}
               className="block text-center text-sm py-2.5 rounded-lg border border-brand-border text-brand-accent hover:text-brand-accentHover transition-colors"
             >
@@ -207,6 +239,10 @@ export default function LandingGenerator({ initialPrompt = '', scrollOnSet = fal
             </button>
           </div>
         </div>
+      )}
+        </>
+      ) : (
+        <VideoGenerator />
       )}
     </div>
   );

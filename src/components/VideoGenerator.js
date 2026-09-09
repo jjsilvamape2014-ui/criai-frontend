@@ -170,8 +170,19 @@ export default function VideoGenerator() {
 
   return (
     <div className="max-w-4xl mx-auto">
+      {/* Guia didático: o usuário sabe exatamente o que fazer */}
+      <div className="card mb-6 p-4 !bg-primary-50/60 border-primary-200">
+        <p className="text-sm font-bold text-primary-800 mb-2.5">Como criar o seu anúncio em 3 passos</p>
+        <ol className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0 text-[13px] text-gray-700">
+          <li className="flex items-start gap-1.5 sm:pr-10"><b className="text-primary-600">1.</b> Envie a foto do produto</li>
+          <li className="flex items-start gap-1.5 sm:pr-10 border-t sm:border-t-0 sm:border-l border-primary-200 sm:pl-10"><b className="text-primary-600">2.</b> Diga nome, preço e vantagens</li>
+          <li className="flex items-start gap-1.5"><b className="text-primary-600">3.</b> Escolha o tipo abaixo e toque em criar</li>
+        </ol>
+      </div>
+
       <div className="card mb-6">
-        <div className="flex gap-2 mb-5">
+        <p className="text-sm font-bold text-primary-800 mb-2.5">Qual tipo de vídeo você quer?</p>
+        <div className="flex flex-col sm:flex-row gap-2 mb-5">
           <button
             onClick={() => setMode('product')}
             className={`flex-1 rounded-xl px-4 py-3 text-sm font-semibold transition-all border ${
