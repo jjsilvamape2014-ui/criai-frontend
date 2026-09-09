@@ -86,7 +86,6 @@ export default function LandingGenerator({ initialPrompt = '', scrollOnSet = fal
           onKeyDown={handleKey}
           placeholder={PLACEHOLDER}
           className="flex-1 min-w-0 bg-transparent text-[15px] text-brand-text placeholder-brand-dim outline-none"
-          maxLength={300}
         />
         <button
           onClick={handleGenerate}

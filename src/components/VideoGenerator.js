@@ -24,6 +24,8 @@ export default function VideoGenerator() {
   const [productDesc, setProductDesc] = useState('');
   const [productPrice, setProductPrice] = useState('');
   const [preset, setPreset] = useState('afiliado');
+  const [script, setScript] = useState('');
+  const [liveStatus, setLiveStatus] = useState('');
 
   const [imageUrl, setImageUrl] = useState('');
   const [imageData, setImageData] = useState('');
@@ -102,6 +104,31 @@ export default function VideoGenerator() {
     setLoading(true);
     setError(null);
     setResult(null);
+    setLiveStatus('');
+
+    if (mode === 'talking') {
+      const payload = { productName, productDesc, script };
+      if (productPrice.trim()) payload.productPrice = productPrice.trim();
+      if (imageData) {
+        payload.imageData = imageData;
+      } else {
+        payload.imageUrl = imageUrl.trim();
+      }
+      try {
+        const data = await api.generateTalkingAd(payload, setLiveStatus);
+        setResult(data);
+        setUser(prev => prev ? { ...prev, ...data.credits } : null);
+      } catch (err) {
+        if (err.data?.code === 'NO_CREDITS') {
+          setError({ type: 'NO_CREDITS', message: 'Seus créditos de vídeo acabaram! Assine o plano por R$ 39,99/mês.' });
+        } else {
+          setError({ type: 'GENERIC', message: err.message || 'Erro ao gerar o anúncio falado. Tente novamente.' });
+        }
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
 
     const options = { mode, preset };
     if (imageData) options.imageData = imageData;
@@ -165,6 +192,16 @@ export default function VideoGenerator() {
           >
             🎞️ Animar imagem
           </button>
+          <button
+            onClick={() => setMode('talking')}
+            className={`flex-1 rounded-xl px-4 py-3 text-sm font-semibold transition-all border ${
+              mode === 'talking'
+                ? 'bg-primary-600 text-white border-primary-600 shadow-lg shadow-primary-500/30'
+                : 'bg-gray-100 text-gray-600 border-gray-200 hover:border-primary-300'
+            }`}
+          >
+            🎤 Anúncio falado
+          </button>
         </div>
 
         {mode === 'product' && (
@@ -175,42 +212,51 @@ export default function VideoGenerator() {
         {mode === 'animate' && (
           <p className="text-sm text-gray-500 mb-4">Envie uma imagem ou escolha uma das suas criações, e a IA anima com movimento natural.</p>
         )}
-
-        <div className="mb-5">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-gray-700">
-              {mode === 'product' ? '🎬 Estilo do anúncio em vídeo' : '🎬 Estilo do vídeo'}
-            </p>
-            <a
-              href={`https://www.pinterest.com/search/videos/?q=${encodeURIComponent(AD_STYLES.find((s) => s.key === preset)?.label.replace(' ', '') || 'anuncio de produto')}`}
-              target="_blank"
-              rel="noreferrer"
-              className="text-xs text-primary-600 hover:text-primary-700 font-medium underline underline-offset-2"
-            >
-              Ver exemplos no Pinterest →
-            </a>
-          </div>
-          <div className="flex flex-wrap gap-2 mt-2">
-            {AD_STYLES.map((st) => (
-              <button
-                key={st.key}
-                onClick={() => setPreset(st.key)}
-                className={`rounded-xl px-3 py-2 text-xs font-semibold transition-all border ${
-                  preset === st.key
-                    ? 'bg-primary-600 text-white border-primary-600 shadow'
-                    : 'bg-gray-100 text-gray-600 border-gray-200 hover:border-primary-300'
-                }`}
-              >
-                {st.label}
-              </button>
-            ))}
-          </div>
-          <p className="text-xs text-gray-400 mt-2">
-            O "Afiliado Shopee" é o estilo dos anúncios que os afiliados usam pra apresentar o produto e vender
-            no marketplace. "Empresa" e "Logo" criam vídeos de apresentação da sua marca. Se escrever um
-            movimento próprio abaixo, ele vale mais que o estilo.
+        {mode === 'talking' && (
+          <p className="text-sm text-primary-700 font-medium mb-4">
+            Envie a foto do seu produto e crie um <b>anúncio falado</b>: uma apresentadora IA segura o produto,
+            olha pra câmera e <b>fala o roteiro em português</b> — igual aos vídeos dos afiliados do Shopee.
+            A IA escreve o roteiro, gera a voz e anima os lábios. Você também pode escrever o roteiro.
           </p>
-        </div>
+        )}
+
+        {mode !== 'talking' && (
+          <div className="mb-5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-sm font-semibold text-gray-700">
+                {mode === 'product' ? '🎬 Estilo do anúncio em vídeo' : '🎬 Estilo do vídeo'}
+              </p>
+              <a
+                href={`https://www.pinterest.com/search/videos/?q=${encodeURIComponent(AD_STYLES.find((s) => s.key === preset)?.label.replace(' ', '') || 'anuncio de produto')}`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs text-primary-600 hover:text-primary-700 font-medium underline underline-offset-2"
+              >
+                Ver exemplos no Pinterest →
+              </a>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {AD_STYLES.map((st) => (
+                <button
+                  key={st.key}
+                  onClick={() => setPreset(st.key)}
+                  className={`rounded-xl px-3 py-2 text-xs font-semibold transition-all border ${
+                    preset === st.key
+                      ? 'bg-primary-600 text-white border-primary-600 shadow'
+                      : 'bg-gray-100 text-gray-600 border-gray-200 hover:border-primary-300'
+                  }`}
+                >
+                  {st.label}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-gray-400 mt-2">
+              O "Afiliado Shopee" é o estilo dos anúncios que os afiliados usam pra apresentar o produto e vender
+              no marketplace. "Empresa" e "Logo" criam vídeos de apresentação da sua marca. Se escrever um
+              movimento próprio abaixo, ele vale mais que o estilo.
+            </p>
+          </div>
+        )}
 
         {/* Upload / origem */}
         <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -312,6 +358,54 @@ export default function VideoGenerator() {
           </div>
         )}
 
+        {/* Campos do anúncio falado */}
+        {mode === 'talking' && (
+          <div className="mt-5">
+            <div className="grid sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">🏷️ Nome do produto</label>
+                <input
+                  type="text"
+                  value={productName}
+                  onChange={(e) => setProductName(e.target.value)}
+                  placeholder='Ex: "Tênis Runner Plus"'
+                  className="input"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">💸 Preço (opcional)</label>
+                <input
+                  type="text"
+                  value={productPrice}
+                  onChange={(e) => setProductPrice(e.target.value)}
+                  placeholder='Ex: "89,90"'
+                  className="input"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">✨ Vantagens (opcional)</label>
+                <input
+                  type="text"
+                  value={productDesc}
+                  onChange={(e) => setProductDesc(e.target.value)}
+                  placeholder='Ex: "leve, confortável, ideal pra corrida"'
+                  className="input"
+                />
+              </div>
+            </div>
+            <div className="mt-4">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">🎙️ Roteiro (opcional — a IA escreve se deixar em branco)</label>
+              <textarea
+                value={script}
+                onChange={(e) => setScript(e.target.value)}
+                rows={3}
+                placeholder="Ex: Olha só que achado! Esse tênis é leve, confortável e por só R$ 89,90. Corre que é por tempo limitado!"
+                className="input resize-none"
+              />
+            </div>
+          </div>
+        )}
+
         {/* Movimento personalizado */}
         {mode === 'animate' && (
           <div className="mt-5">
@@ -350,10 +444,10 @@ export default function VideoGenerator() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                 </svg>
-                {mode === 'product' ? 'Criando seu anúncio (pode demorar)...' : 'Gerando vídeo (pode demorar)...'}
+                {mode === 'product' ? 'Criando seu anúncio (pode demorar)...' : mode === 'talking' ? 'Criando o anúncio falado (leva ~1 min)...' : 'Gerando vídeo (pode demorar)...'}
               </>
             ) : (
-              <>🎬 {mode === 'product' ? 'Criar anúncio (1 crédito)' : 'Gerar vídeo (1 crédito)'}</>
+              <>🎬 {mode === 'talking' ? '🎤 Criar anúncio falado (1 crédito)' : mode === 'product' ? 'Criar anúncio (1 crédito)' : 'Gerar vídeo (1 crédito)'}</>
             )}
           </button>
 
@@ -363,6 +457,13 @@ export default function VideoGenerator() {
             </span>
           )}
         </div>
+
+        {loading && liveStatus && (
+          <p className="mt-4 text-sm text-primary-700 font-medium animate-pulse flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-primary-500 animate-ping" />
+            ✨ {liveStatus}
+          </p>
+        )}
       </div>
 
       {error && (
@@ -382,7 +483,7 @@ export default function VideoGenerator() {
         <div className="card mb-8">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-gray-900">
-              {mode === 'product' ? '🎬 Anúncio do produto criado!' : 'Vídeo gerado'}
+              {mode === 'product' ? '🎬 Anúncio do produto criado!' : mode === 'talking' ? '🎤 Anúncio falado criado!' : 'Vídeo gerado'}
             </h3>
             <button onClick={handleDownload} className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1">
               ⬇️ Baixar
@@ -391,8 +492,11 @@ export default function VideoGenerator() {
           <div className="rounded-xl overflow-hidden border border-gray-200 bg-gray-100">
             <video src={result.videoUrl} controls className="w-full h-auto max-h-[500px]" />
           </div>
+          {result?.script && (
+            <p className="mt-3 text-sm text-gray-500">🎙️ Roteiro: <b className="text-gray-700">&quot;{result.script}&quot;</b></p>
+          )}
           {productName && <p className="mt-3 text-sm text-gray-500">📦 Anúncio para: <b className="text-gray-700">{productName}</b></p>}
-          {preset && !prompt.trim() && (
+          {preset && mode !== 'talking' && !prompt.trim() && (
             <p className="mt-1 text-sm text-gray-500">🎬 Estilo: <b className="text-gray-700">{AD_STYLES.find((s) => s.key === preset)?.label || preset}</b></p>
           )}
           {prompt && <p className="mt-1 text-sm text-gray-500 italic">&quot;{prompt}&quot;</p>}

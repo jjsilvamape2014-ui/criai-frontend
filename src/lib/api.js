@@ -65,10 +65,11 @@ class ApiClient {
     });
   }
 
-  // Geração com status em tempo real ("onde a IA está pesquisando"). Consome SSE.
-  // onStatus(text) é chamado a cada etapa; resolve com o resultado final (event done).
-  async generateImageLive(prompt, options = {}, onStatus, onResearch) {
-    const url = `${this.baseURL}/generate/live-image`;
+  // Cliente SSE genérico para as rotas de geração em tempo real.
+  // onStatus(text) a cada etapa; onResearch(payload) quando a IA achar referências;
+  // onEvent(event, payload) para eventos extras. Resolve no evento "done".
+  async _stream(endpoint, payload, { onStatus, onResearch, onEvent } = {}) {
+    const url = `${this.baseURL}${endpoint}`;
     const token = this.getToken();
     const res = await fetch(url, {
       method: 'POST',
@@ -76,20 +77,20 @@ class ApiClient {
         'Content-Type': 'application/json',
         ...(token && { Authorization: `Bearer ${token}` }),
       },
-      body: JSON.stringify({ prompt, ...options }),
+      body: JSON.stringify(payload),
     });
 
     const ctype = res.headers.get('content-type') || '';
     if (!res.ok && !ctype.includes('text/event-stream')) {
       const errData = await res.json().catch(() => null);
-      const error = new Error(errData?.error || 'Erro na geração');
+      const error = new Error(errData?.error || 'Erro na requisição');
       error.status = res.status;
       error.data = errData;
       throw error;
     }
     if (!res.body) {
       const errData = await res.json().catch(() => null);
-      const error = new Error(errData?.error || 'Erro na geração');
+      const error = new Error(errData?.error || 'Erro na requisição');
       error.data = errData;
       throw error;
     }
@@ -126,6 +127,7 @@ class ApiClient {
           error.data = payload;
           throw error;
         }
+        if (onEvent) onEvent(event, payload);
       }
     };
 
@@ -133,16 +135,23 @@ class ApiClient {
       const { value, done: streamDone } = await reader.read();
       if (streamDone) break;
       buffer += decoder.decode(value, { stream: true });
-      try {
-        parseEvents();
-      } catch (e) {
-        throw e;
-      }
+      parseEvents();
       if (result) break;
     }
 
     if (!result) throw new Error('Stream encerrou sem resultado');
+    return result;
+  }
+
+  // Geração com status em tempo real ("onde a IA está pesquisando"). Consome SSE.
+  async generateImageLive(prompt, options = {}, onStatus, onResearch) {
+    const result = await this._stream('/generate/live-image', { prompt, ...options }, { onStatus, onResearch });
     return { ...result, research: result.research || null };
+  }
+
+  // "Anúncio Falado": avatar apresentando o produto com narração em PT-BR (SSE ao vivo).
+  async generateTalkingAd(fields = {}, onStatus) {
+    return this._stream('/generate/talking-ad', fields, { onStatus });
   }
 
   async generateVideo(imageUrl, options = {}) {

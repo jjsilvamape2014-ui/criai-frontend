@@ -108,7 +108,6 @@ export default function ImageGenerator() {
           onKeyDown={handleKey}
           placeholder="Descreva a imagem que você quer criar..."
           className="w-full bg-transparent text-white placeholder-gray-500 px-5 pt-5 pb-4 text-base sm:text-lg outline-none resize-none min-h-[90px] leading-relaxed"
-          maxLength={500}
         />
 
         {/* Barra inferior: anexar + gerar */}
