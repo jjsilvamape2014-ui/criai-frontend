@@ -5,6 +5,7 @@ import { api } from '@/lib/api';
 import Header from '@/components/Header';
 import LandingGenerator from '@/components/LandingGenerator';
 import CerebroEditor from '@/components/CerebroEditor';
+import VideoGenerator from '@/components/VideoGenerator';
 
 const IDEIAS = [
   { cat: 'Anúncio de produto', prompt: 'Anúncio de hambúrguer artesanal com o preço R$ 29,90 e a chamada Peça já', src: '/showcase/anuncio-hamburguer.webp' },
@@ -65,6 +66,7 @@ export default function DashboardPage() {
   const [fpResults, setFpResults] = useState([]);
   const [fpLoading, setFpLoading] = useState(false);
   const [fpError, setFpError] = useState(null);
+  const [tool, setTool] = useState('image');
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -185,10 +187,43 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Gerador - o coração do app */}
-        <div className="mb-12">
-          <LandingGenerator initialPrompt="" scrollOnSet />
+        {/* Seletor de ferramenta: imagem / vídeo + anúncio, tudo no mesmo lugar */}
+        <div className="flex flex-wrap gap-2 mb-8">
+          <button
+            onClick={() => setTool('image')}
+            className={`rounded-xl px-5 py-3 text-sm font-semibold transition-all border ${
+              tool === 'image'
+                ? 'bg-primary-600 text-white border-primary-600 shadow-lg shadow-primary-500/30'
+                : 'bg-white/5 text-gray-300 border-white/10 hover:border-primary-500/40'
+            }`}
+          >
+            🖼️ Criar imagem
+          </button>
+          <button
+            onClick={() => setTool('video')}
+            className={`rounded-xl px-5 py-3 text-sm font-semibold transition-all border ${
+              tool === 'video'
+                ? 'bg-primary-600 text-white border-primary-600 shadow-lg shadow-primary-500/30'
+                : 'bg-white/5 text-gray-300 border-white/10 hover:border-primary-500/40'
+            }`}
+          >
+            🎬 Vídeo · Anúncio
+          </button>
         </div>
+
+        {/* Gerador - o coração do app */}
+        {tool === 'image' && (
+          <div className="mb-12">
+            <LandingGenerator initialPrompt="" scrollOnSet />
+          </div>
+        )}
+
+        {/* Anúncio em vídeo / anúncio falado (mesmo lugar, na hora) */}
+        {tool === 'video' && (
+          <div className="mb-12">
+            <VideoGenerator />
+          </div>
+        )}
 
         {/* Formatos rápidos - anúncio Instagram, post, story, logo */}
         <div className="mb-12">
