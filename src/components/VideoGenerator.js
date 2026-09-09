@@ -31,6 +31,7 @@ export default function VideoGenerator() {
   const [productPrice, setProductPrice] = useState('');
   const [preset, setPreset] = useState('afiliado');
   const [script, setScript] = useState('');
+  const [presenter, setPresenter] = useState('mulher');
   const [liveStatus, setLiveStatus] = useState('');
 
   const [imageUrl, setImageUrl] = useState('');
@@ -113,7 +114,7 @@ export default function VideoGenerator() {
     setLiveStatus('');
 
     if (mode === 'talking') {
-      const payload = { productName, productDesc, script };
+      const payload = { productName, productDesc, script, presenter };
       if (productPrice.trim()) payload.productPrice = productPrice.trim();
       if (imageData) {
         payload.imageData = imageData;
@@ -371,6 +372,32 @@ export default function VideoGenerator() {
         {/* Campos do anúncio falado */}
         {mode === 'talking' && (
           <div className="mt-6">
+            <div className="mb-4">
+              <label className={fieldLabel}>Quem apresenta o produto?</label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                <button
+                  onClick={() => setPresenter('mulher')}
+                  className={`rounded-xl px-4 py-2 text-xs font-semibold transition-all border ${
+                    presenter === 'mulher'
+                      ? 'bg-primary-600 text-white border-primary-600 shadow'
+                      : 'bg-white/5 text-gray-300 border-white/10 hover:border-primary-500/40'
+                  }`}
+                >
+                  👩 Apresentadora
+                </button>
+                <button
+                  onClick={() => setPresenter('homem')}
+                  className={`rounded-xl px-4 py-2 text-xs font-semibold transition-all border ${
+                    presenter === 'homem'
+                      ? 'bg-primary-600 text-white border-primary-600 shadow'
+                      : 'bg-white/5 text-gray-300 border-white/10 hover:border-primary-500/40'
+                  }`}
+                >
+                  👨 Apresentador
+                </button>
+                <span className="text-[11px] text-gray-500 self-center">Sempre uma pessoa bonita e carismática, estilo comercial de TV</span>
+              </div>
+            </div>
             <div className="grid sm:grid-cols-3 gap-4">
               <div>
                 <label className={fieldLabel}>🏷️ Nome do produto</label>
