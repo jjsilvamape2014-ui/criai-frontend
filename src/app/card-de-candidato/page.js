@@ -56,7 +56,7 @@ const CORES_CAMPANHA = [
   { id: 'laranja', label: 'Laranja', phrase: 'laranja e branco' },
 ];
 
-const CARGO = ['Prefeito(a)', 'Vereador(a)'];
+const CARGO = ['Prefeito(a)', 'Vereador(a)', 'Presidente', 'Governador(a)', 'Senador(a)', 'Deputado(a) Federal', 'Deputado(a) Estadual', 'Deputado(a) Distrital'];
 
 export default function CardDeCandidatoPage() {
   const [foto, setFoto] = useState(null);
@@ -84,13 +84,16 @@ export default function CardDeCandidatoPage() {
   };
 
   const buildArgs = () => {
-    const cargoLower = cargo === 'Prefeito(a)' ? 'prefeito(a)' : 'vereador(a)';
+    const cargoTx = cargo === 'Presidente'
+      ? 'Presidente da República'
+      : `${cargo} de ${cidade.trim() || 'sua cidade'}`;
     const colors = (CORES_CAMPANHA.find((c) => c.id === cor) || CORES_CAMPANHA[0]).phrase;
     const colig = coligacao.trim() ? `, coligação "${coligacao.trim()}"` : '';
     const base = {
       photo: foto,
       urn: nomeUrna.trim(),
-      cargo: cargoLower,
+      cargo: cargo,
+      cargoTx,
       city: cidade.trim(),
       num: numero.trim(),
       slogan: slogan.trim(),
@@ -122,14 +125,14 @@ export default function CardDeCandidatoPage() {
         'Card político vertical tipo "santinho" de campanha eleitoral 2026',
         `${hero} centralizado`,
         nomeBig,
-        `cargo ${a.cargo} de ${a.city}`,
+        `cargo ${a.cargoTx}`,
       ],
       moderno: [
         'Card político vertical de campanha 2026, conceito ARROJADO estilo numerão:',
         `o NÚMERO ${a.num} GIGANTE em primeiro plano`,
         hero,
         nomeBig,
-        `cargo ${a.cargo} de ${a.city}`,
+        `cargo ${a.cargoTx}`,
       ],
       institucional: [
         'Card político vertical de campanha 2026, visual INSTITUCIONAL de assessoria de comunicação:',
@@ -137,14 +140,14 @@ export default function CardDeCandidatoPage() {
         camisa,
         `fundo com faixa de cor ${a.colors} e bandeira/mapa da cidade em degradê`,
         nomeBig,
-        `cargo ${a.cargo} de ${a.city}`,
+        `cargo ${a.cargoTx}`,
       ],
       tiara: [
         'Card político vertical de campanha 2026, layout FOTO TIARA:',
         `${hero} grande no topo em retrato 3:4`,
         `número ${a.num} grande centralizado na metade inferior`,
         nomeBig,
-        `cargo ${a.cargo} de ${a.city}`,
+        `cargo ${a.cargoTx}`,
       ],
       faixa: [
         'Card político vertical de campanha 2026, layout FAIXA PARTIDÁRIA:',
@@ -152,13 +155,13 @@ export default function CardDeCandidatoPage() {
         hero,
         nomeBig,
         `número ${a.num} em tipografia ousada`,
-        `cargo ${a.cargo} de ${a.city}`,
+        `cargo ${a.cargoTx}`,
       ],
       cracha: [
         'Card político vertical de campanha 2026, layout CRACHÁ em pé:',
         hero,
         `"crachá" com o nome "${a.urn}" em uma tag retangular sólida abaixo da foto`,
-        `cargo ${a.cargo} de ${a.city}`,
+        `cargo ${a.cargoTx}`,
         `número ${a.num} em destaque`,
       ],
     }[estilo] || [];
@@ -183,7 +186,7 @@ export default function CardDeCandidatoPage() {
       `Parte de TRÁS do santinho político (card de campanha vertical ${a.year}):`,
       `"VOTE ${a.num}" enorme e em negrito no topo`,
       `nome de urna "${a.urn}" nas letras tradicionais de urna`,
-      `cargo ${a.cargo} de ${a.city}`,
+      `cargo ${a.cargoTx}`,
       'seção de PROPOSTAS em bullets curtos e legíveis:',
       props,
       a.slogan ? `slogan "${a.slogan}" na parte inferior` : '',
@@ -334,7 +337,11 @@ export default function CardDeCandidatoPage() {
           <input
             value={numero}
             onChange={(e) => setNumero(e.target.value)}
-            placeholder={cargo === 'Prefeito(a)' ? 'Ex.: 12' : 'Ex.: 12345'}
+            placeholder={
+              cargo === 'Prefeito(a)' || cargo === 'Governador(a)' || cargo === 'Presidente' || cargo === 'Senador(a)'
+                ? 'Ex.: 12'
+                : 'Ex.: 12345'
+            }
             maxLength={5}
             className="mt-1 w-full rounded-xl border border-brand-borderStrong bg-brand-surface p-3 text-[14px] text-brand-text placeholder-brand-dim outline-none focus:border-brand-accent"
           />

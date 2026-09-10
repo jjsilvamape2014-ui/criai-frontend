@@ -14,6 +14,7 @@ const MODES = [
 
 const NEGOCIOS = ['Alimentação', 'Beleza', 'Imóveis', 'Moda', 'Loja', 'Automóveis', 'Tecnologia', 'Outro'];
 const OBJETIVOS = ['Vender', 'Divulgar', 'Promover oferta', 'Conseguir clientes', 'Postar nas redes'];
+const AUDIENCIAS = ['A Criativa decide', 'Público geral', 'Homens', 'Mulheres', 'Famílias', 'Premium', 'Jovens'];
 
 function IconDownload({ className = 'h-4 w-4' }) {
   return (
@@ -55,6 +56,7 @@ export default function DashboardPage() {
   const [status, setStatus] = useState('');
   const [input, setInput] = useState('');
   const [mode, setMode] = useState('');
+  const [audience, setAudience] = useState('A Criativa decide');
   const [changeText, setChangeText] = useState('');
   const [review, setReview] = useState(null);
   const [reviewLoading, setReviewLoading] = useState(false);
@@ -83,8 +85,12 @@ export default function DashboardPage() {
   }, [loadHistory]);
 
   const promptWithMode = (msg) => {
+    const parts = [];
     const hint = MODES.find((m) => m.id === mode)?.hint;
-    return hint ? `${hint}. ${msg}` : msg;
+    if (hint) parts.push(hint);
+    if (audience && audience !== 'A Criativa decide') parts.push(`Público-alvo: ${audience.toLowerCase()}`);
+    parts.push(msg.trim());
+    return parts.join('. ');
   };
 
   const generate = async (msg) => {
@@ -114,7 +120,8 @@ export default function DashboardPage() {
     setUnderstanding(true);
     try {
       const r = await api.getIntent(msg);
-      if (r?.success && r.canTakeOver && r.confirmation) {
+      // Sempre mostra o "Entendi": o usuário confere a interpretação ANTES de gastar crédito.
+      if (r?.success && r.confirmation) {
         setIntent({ ...r, msg });
         setInput('');
       } else {
@@ -125,6 +132,17 @@ export default function DashboardPage() {
     } finally {
       setUnderstanding(false);
     }
+  };
+
+  const answerQuestion = (answer) => {
+    if (!intent) return;
+    beginCreation(`${intent.msg} ${answer.trim()}`);
+  };
+
+  const backToEdit = () => {
+    if (intent) setInput(intent.msg);
+    setIntent(null);
+    setTimeout(() => inputRef.current?.focus(), 50);
   };
 
   const confirmIntent = () => {
@@ -358,7 +376,8 @@ export default function DashboardPage() {
             ) : intent ? (
               <div className="mx-auto max-w-xl">
                 <div className="rounded-2xl border border-primary-500/30 bg-primary-500/[0.06] p-6 text-center">
-                  <p className="text-lg font-semibold text-white">{intent.confirmation}</p>
+                  <p className="text-[13px] font-semibold uppercase tracking-wide text-primary-300">Entendi o que você quer</p>
+                  <p className="mt-2 text-lg font-semibold text-white">{intent.confirmation}</p>
                   {intent.direction && (
                     <p className="mt-3 text-[14px] leading-relaxed text-gray-300">{intent.direction}</p>
                   )}
@@ -367,18 +386,42 @@ export default function DashboardPage() {
                       {[intent.intent.platform, intent.intent.emotion, intent.intent.visualStyle].filter(Boolean).join(' · ')}
                     </p>
                   )}
+
+                  {intent.question && (
+                    <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.04] p-4 text-left">
+                      <p className="text-sm font-medium text-white">{intent.question}</p>
+                      {intent.options && intent.options.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {intent.options.map((o) => (
+                            <button
+                              key={o}
+                              onClick={() => answerQuestion(o)}
+                              disabled={understanding}
+                              className="rounded-full border border-primary-500/40 bg-primary-500/10 px-4 py-2 text-[13px] font-medium text-primary-100 hover:bg-primary-500/20 disabled:opacity-50 transition-colors"
+                            >
+                              {o}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   <div className="mt-5 flex flex-col gap-2">
+                    {!intent.question && (
+                      <button
+                        onClick={confirmIntent}
+                        disabled={understanding}
+                        className="w-full rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 px-5 py-3 text-sm font-semibold text-white hover:from-primary-500 hover:to-primary-400 disabled:opacity-40 transition-all"
+                      >
+                        {understanding ? 'Entendendo…' : 'Está certo'}
+                      </button>
+                    )}
                     <button
-                      onClick={confirmIntent}
-                      className="w-full rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 px-5 py-3 text-sm font-semibold text-white hover:from-primary-500 hover:to-primary-400 transition-all"
-                    >
-                      Criar para mim
-                    </button>
-                    <button
-                      onClick={() => setIntent(null)}
+                      onClick={backToEdit}
                       className="w-full rounded-xl border border-white/10 px-5 py-2.5 text-[13px] text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
                     >
-                      Voltar e ajustar
+                      Quero mudar algo
                     </button>
                   </div>
                 </div>
@@ -427,6 +470,22 @@ export default function DashboardPage() {
                     >
                       {understanding ? 'Entendendo…' : 'Criar imagem'}
                     </button>
+                  </div>
+                  <div className="mt-2 flex flex-wrap items-center gap-1.5 px-1">
+                    <span className="text-[11px] text-gray-500">Para quem é?</span>
+                    {AUDIENCIAS.map((a) => (
+                      <button
+                        key={a}
+                        onClick={() => setAudience(a)}
+                        className={`rounded-full px-3 py-1 text-[12px] border transition-colors ${
+                          audience === a
+                            ? 'border-primary-500 bg-primary-500/20 text-primary-200'
+                            : 'border-white/10 bg-white/5 text-gray-400 hover:text-white hover:border-white/20'
+                        }`}
+                      >
+                        {a}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
