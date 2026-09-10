@@ -48,6 +48,111 @@ function IconTrash({ className = 'h-4 w-4' }) {
   );
 }
 
+function CampaignView({ result, onExit, onDownloadUrl, onCopy }) {
+  const [copied, setCopied] = useState(null);
+  const copy = async (label, text) => {
+    await onCopy(text);
+    setCopied(label);
+    setTimeout(() => setCopied(null), 1500);
+  };
+  const [downloading, setDownloading] = useState(false);
+  const downloadAll = async () => {
+    setDownloading(true);
+    if (result.postImage) await onDownloadUrl(result.postImage, 'post-campanha.png');
+    if (result.storyImage) await onDownloadUrl(result.storyImage, 'story-campanha.png');
+    setDownloading(false);
+  };
+
+  return (
+    <div className="mx-auto max-w-2xl">
+      {(result.confirmation || result.direction) && (
+        <div className="mb-4 rounded-2xl border border-primary-500/30 bg-primary-500/[0.06] p-4">
+          {result.confirmation && <p className="text-sm font-semibold text-white">{result.confirmation}</p>}
+          {result.direction && <p className="mt-1 text-[13px] text-gray-300">{result.direction}</p>}
+        </div>
+      )}
+
+      <div className="grid grid-cols-2 gap-3">
+        {result.postImage && (
+          <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+            <img src={result.postImage} alt="Post da campanha" className="w-full aspect-square bg-black/20 object-cover" />
+            <button
+              onClick={() => onDownloadUrl(result.postImage, 'post-campanha.png')}
+              className="w-full border-t border-white/10 py-2.5 text-[13px] font-semibold text-primary-200 hover:bg-white/5 transition-colors"
+            >
+              <IconDownload /> Post (feed)
+            </button>
+          </div>
+        )}
+        {result.storyImage && (
+          <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+            <img src={result.storyImage} alt="Story da campanha" className="w-full aspect-[9/16] bg-black/20 object-cover" />
+            <button
+              onClick={() => onDownloadUrl(result.storyImage, 'story-campanha.png')}
+              className="w-full border-t border-white/10 py-2.5 text-[13px] font-semibold text-primary-200 hover:bg-white/5 transition-colors"
+            >
+              <IconDownload /> Story
+            </button>
+          </div>
+        )}
+      </div>
+
+      {(result.caption || result.cta) && (
+        <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+          <p className="text-[12px] font-semibold uppercase tracking-wide text-gray-500">Legenda pronta para postar</p>
+          {result.caption && (
+            <p className="mt-2 text-[14px] leading-relaxed text-gray-200">{result.caption}</p>
+          )}
+          {result.cta && (
+            <p className="mt-2 inline-block rounded-lg bg-primary-500/15 px-3 py-1 text-[13px] font-semibold text-primary-200">
+              CTA: {result.cta}
+            </p>
+          )}
+          {(result.hashtags || []).length > 0 && (
+            <p className="mt-2 text-[12px] text-gray-500">{result.hashtags.join(' ')}</p>
+          )}
+          <button
+            onClick={() => copy('legenda', `${result.caption || ''}\n\n${(result.hashtags || []).join(' ')}\n\nCTA: ${result.cta || ''}`)}
+            className="mt-3 rounded-xl border border-white/10 px-4 py-2 text-[13px] text-gray-200 hover:bg-white/5 transition-colors"
+          >
+            {copied === 'legenda' ? 'Copiado!' : 'Copiar legenda + hashtags'}
+          </button>
+        </div>
+      )}
+
+      {(result.plan || []).length > 0 && (
+        <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+          <p className="text-[12px] font-semibold uppercase tracking-wide text-gray-500">Plano da semana</p>
+          <ul className="mt-2 flex flex-col gap-1.5">
+            {result.plan.map((line, i) => (
+              <li key={i} className="text-[13px] text-gray-300">{line}</li>
+            ))}
+          </ul>
+          <button
+            onClick={() => copy('plano', result.plan.join('\n'))}
+            className="mt-3 rounded-xl border border-white/10 px-4 py-2 text-[13px] text-gray-200 hover:bg-white/5 transition-colors"
+          >
+            {copied === 'plano' ? 'Copiado!' : 'Copiar plano'}
+          </button>
+        </div>
+      )}
+
+      <div className="mt-4 flex flex-col gap-2">
+        <button
+          onClick={downloadAll}
+          disabled={downloading}
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 px-5 py-3 text-sm font-semibold text-white hover:from-primary-500 hover:to-primary-400 disabled:opacity-40 transition-all"
+        >
+          <IconDownload /> {downloading ? 'Baixando…' : 'Baixar tudo'}
+        </button>
+        <button onClick={onExit} className="w-full rounded-xl border border-white/10 py-2.5 text-[13px] text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
+          ← Criar outra peça
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const [history, setHistory] = useState([]);
   const [lastResult, setLastResult] = useState(null);
@@ -67,6 +172,7 @@ export default function DashboardPage() {
   const [wGoal, setWGoal] = useState('');
   const [concepts, setConcepts] = useState(null);
   const [conceptsLoading, setConceptsLoading] = useState(false);
+  const [campaign, setCampaign] = useState(null); // { loading, ask, result }
   const inputRef = useRef(null);
   const activePrompt = useRef('');
 
@@ -211,6 +317,54 @@ export default function DashboardPage() {
     generate(next);
   };
 
+  const runCampaign = async (raw) => {
+    const text = (raw ?? input).trim() || activePrompt.current?.trim() || '';
+    if (!text || campaign?.loading) return;
+    setCampaign({ loading: true });
+    try {
+      const r = await api.campaign(text);
+      if (!r?.success) throw new Error('Sem resposta');
+      if (r.code === 'NEED_ANSWER') {
+        setCampaign({ ask: { question: r.question, options: r.options || [], base: text, confirmation: r.confirmation } });
+        return;
+      }
+      setCampaign({ result: r });
+      loadHistory();
+    } catch (err) {
+      if (err.data?.code === 'NO_CREDITS') { setCampaign(null); window.location.href = '/plans'; return; }
+      setCampaign({ error: true });
+    }
+  };
+
+  const answerCampaign = (answer) => {
+    if (!campaign?.ask) return;
+    const base = campaign.ask.base;
+    setCampaign(null);
+    runCampaign(`${base} ${answer.trim()}`);
+  };
+
+  const exitCampaign = () => setCampaign(null);
+
+  const downloadUrl = async (url, name) => {
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    } catch {
+      window.open(url, '_blank');
+    }
+  };
+
+  const copyText = async (text) => {
+    try { await navigator.clipboard.writeText(text); } catch {}
+  };
+
   const pickConcepts = async () => {
     if (!wBusiness || !wGoal || conceptsLoading) return;
     setConceptsLoading(true);
@@ -258,7 +412,45 @@ export default function DashboardPage() {
           </aside>
 
           <section className="min-w-0 flex-1">
-            {lastResult && !generating ? (
+            {campaign?.loading ? (
+              <div className="mx-auto max-w-xl rounded-2xl border border-primary-500/30 bg-primary-500/[0.06] p-8 text-center">
+                <p className="text-lg font-semibold text-white">Montando sua campanha…</p>
+                <p className="mt-2 text-[13px] text-gray-400">Entendendo seu negócio, escrevendo a legenda e criando o Post + Story.</p>
+                <div className="mt-4 flex justify-center gap-1">
+                  <span className="h-2 w-2 animate-bounce rounded-full bg-primary-400" />
+                  <span className="h-2 w-2 animate-bounce rounded-full bg-primary-400 [animation-delay:120ms]" />
+                  <span className="h-2 w-2 animate-bounce rounded-full bg-primary-400 [animation-delay:240ms]" />
+                </div>
+              </div>
+            ) : campaign?.ask ? (
+              <div className="mx-auto max-w-xl">
+                <div className="rounded-2xl border border-primary-500/30 bg-primary-500/[0.06] p-6 text-center">
+                  <p className="text-[13px] font-semibold uppercase tracking-wide text-primary-300">Antes de começar</p>
+                  <p className="mt-2 text-lg font-semibold text-white">{campaign.ask.question}</p>
+                  <div className="mt-4 flex flex-wrap justify-center gap-2">
+                    {(campaign.ask.options || []).map((o) => (
+                      <button
+                        key={o}
+                        onClick={() => answerCampaign(o)}
+                        className="rounded-xl border border-primary-500/40 bg-primary-500/10 px-5 py-2.5 text-sm font-medium text-primary-100 hover:bg-primary-500/20 transition-colors"
+                      >
+                        {o}
+                      </button>
+                    ))}
+                  </div>
+                  <button onClick={exitCampaign} className="mt-5 text-[13px] text-gray-400 hover:text-white transition-colors">
+                    ← Cancelar campanha
+                  </button>
+                </div>
+              </div>
+            ) : campaign?.error ? (
+              <div className="mx-auto max-w-xl rounded-2xl border border-red-500/30 bg-red-500/[0.06] p-6 text-center">
+                <p className="text-sm font-semibold text-white">Não consegui montar a campanha agora.</p>
+                <button onClick={exitCampaign} className="mt-4 text-[13px] text-gray-400 hover:text-white transition-colors">← Voltar</button>
+              </div>
+            ) : campaign?.result ? (
+              <CampaignView result={campaign.result} onExit={exitCampaign} onDownloadUrl={downloadUrl} onCopy={copyText} />
+            ) : lastResult && !generating ? (
               <div className="mx-auto max-w-2xl">
                 <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
                   <img src={lastResult.imageUrl} alt="" className="w-full bg-black/20" />
@@ -308,6 +500,14 @@ export default function DashboardPage() {
                   ) : (
                     <>👁️ Olhe como um cliente</>
                   )}
+                </button>
+
+                <button
+                  onClick={() => runCampaign(activePrompt.current)}
+                  disabled={campaign?.loading}
+                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-primary-500/40 bg-primary-500/10 px-4 py-2.5 text-sm font-semibold text-primary-200 hover:bg-primary-500/20 disabled:opacity-50 transition-all"
+                >
+                  🚀 Criar campanha inteira (Post + Story + Legenda + CTA)
                 </button>
 
                 {review && (
@@ -498,6 +698,13 @@ export default function DashboardPage() {
                   className="mt-4 mx-auto flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[13px] text-gray-300 hover:text-white hover:border-white/20 transition-colors"
                 >
                   ✨ Não sei o que criar
+                </button>
+                <button
+                  onClick={() => runCampaign()}
+                  disabled={!input.trim() && !activePrompt.current}
+                  className="mt-2 mx-auto flex items-center gap-2 rounded-full border border-primary-500/40 bg-primary-500/10 px-4 py-2 text-[13px] text-primary-200 hover:bg-primary-500/20 disabled:opacity-40 transition-colors"
+                >
+                  🚀 Quero uma campanha inteira (Post + Story + Legenda)
                 </button>
 
                 {wizardOpen && (

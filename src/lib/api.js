@@ -186,6 +186,13 @@ class ApiClient {
     });
   }
 
+  async campaign(msg) {
+    return this.request('/generate/campaign', {
+      method: 'POST',
+      body: JSON.stringify({ msg }),
+    });
+  }
+
   async deleteHistoryItem(id) {
     return this.request(`/generate/history/${id}`, { method: 'DELETE' });
   }
