@@ -6,15 +6,24 @@ import { setAuthTokenCookie } from '@/lib/auth-cookie';
 import Header from '@/components/Header';
 
 const MODES = [
-  { id: '', label: 'Foto realista', hint: 'Fotografia realista, câmera profissional, iluminação natural' },
-  { id: 'produto', label: 'Produto', hint: 'Foto comercial de produto em destaque, fundo limpo, iluminação de estúdio' },
-  { id: 'anuncio', label: 'Anúncio', hint: 'Peça publicitária pronta para divulgação, texto legível e chamada clara' },
-  { id: 'arte', label: 'Arte', hint: 'Arte criativa e ilustração' },
+  { id: '', label: '📷 Foto', hint: 'Fotografia realista, câmera profissional, iluminação natural' },
+  { id: 'produto', label: '🛍️ Produto', hint: 'Foto comercial de produto em destaque, fundo limpo, iluminação de estúdio' },
+  { id: 'anuncio', label: '📢 Anúncio', hint: 'Peça publicitária pronta para divulgação, texto legível e chamada clara' },
+  { id: 'arte', label: '🎨 Arte', hint: 'Arte criativa e ilustração' },
 ];
 
 const NEGOCIOS = ['Alimentação', 'Beleza', 'Imóveis', 'Moda', 'Loja', 'Automóveis', 'Tecnologia', 'Outro'];
 const OBJETIVOS = ['Vender', 'Divulgar', 'Promover oferta', 'Conseguir clientes', 'Postar nas redes'];
 const AUDIENCIAS = ['A Criativa decide', 'Público geral', 'Homens', 'Mulheres', 'Famílias', 'Premium', 'Jovens'];
+const AUDIENCIA_ICONS = {
+  'A Criativa decide': '✨',
+  'Público geral': '👥',
+  'Homens': '👨',
+  'Mulheres': '👩',
+  'Famílias': '👨‍👩‍👧',
+  'Premium': '💎',
+  'Jovens': '🎧',
+};
 
 function IconDownload({ className = 'h-4 w-4' }) {
   return (
@@ -173,6 +182,12 @@ export default function DashboardPage() {
   const [concepts, setConcepts] = useState(null);
   const [conceptsLoading, setConceptsLoading] = useState(false);
   const [campaign, setCampaign] = useState(null); // { loading, ask, result }
+  const [favs, setFavs] = useState(() => {
+    try { return new Set(JSON.parse(localStorage.getItem('criai_favs') || '[]')); } catch { return new Set(); }
+  });
+  const [favFilter, setFavFilter] = useState(false);
+  const [showAllAudiences, setShowAllAudiences] = useState(false);
+  const [sideToolsOpen, setSideToolsOpen] = useState(false);
   const inputRef = useRef(null);
   const activePrompt = useRef('');
 
@@ -318,8 +333,9 @@ export default function DashboardPage() {
   };
 
   const runCampaign = async (raw) => {
+    if (campaign?.loading) return;
     const text = (raw ?? input).trim() || activePrompt.current?.trim() || '';
-    if (!text || campaign?.loading) return;
+    if (!text) { noCampaignText(); return; }
     setCampaign({ loading: true });
     try {
       const r = await api.campaign(text);
@@ -365,6 +381,24 @@ export default function DashboardPage() {
     try { await navigator.clipboard.writeText(text); } catch {}
   };
 
+  const toggleFav = (id) => {
+    setFavs((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      try { localStorage.setItem('criai_favs', JSON.stringify([...next])); } catch {}
+      return next;
+    });
+  };
+
+  const goTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  const goRecentes = () => { setFavFilter(false); document.getElementById('recentes')?.scrollIntoView({ behavior: 'smooth' }); };
+  const goFavs = () => { setFavFilter(true); document.getElementById('recentes')?.scrollIntoView({ behavior: 'smooth' }); };
+
+  const noCampaignText = () => {
+    setStatus('Escreva sobre o que é o seu negócio (ex.: quero divulgar minha hamburgueria) para eu montar a campanha.');
+    setTimeout(() => inputRef.current?.focus(), 50);
+  };
+
   const pickConcepts = async () => {
     if (!wBusiness || !wGoal || conceptsLoading) return;
     setConceptsLoading(true);
@@ -387,7 +421,8 @@ export default function DashboardPage() {
     );
   }
 
-  const recentes = history.filter((i) => i.imageUrl && i.status === 'COMPLETED');
+  const completed = history.filter((i) => i.imageUrl && i.status === 'COMPLETED');
+  const recentes = favFilter ? completed.filter((i) => favs.has(i.id)) : completed;
 
   return (
     <>
@@ -400,14 +435,31 @@ export default function DashboardPage() {
                 onClick={newCreation}
                 className="mb-3 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 px-4 py-2.5 text-sm font-semibold text-white hover:from-primary-500 hover:to-primary-400 transition-all"
               >
-                Nova criação
+                ✨ Nova criação
               </button>
-              <a href="#recentes" className="btn-ghost w-full justify-start text-sm px-3 py-2">Minhas criações</a>
-              <a href="/plans" className="btn-ghost w-full justify-start text-sm px-3 py-2">Planos e créditos</a>
-              <p className="mt-4 px-3 pb-1 text-[11px] font-semibold uppercase tracking-wide text-gray-500">Mais ferramentas</p>
-              <a href="/video" className="btn-ghost w-full justify-start text-sm px-3 py-2">Transformar em vídeo</a>
-              <a href="/card-de-candidato" className="btn-ghost w-full justify-start text-sm px-3 py-2">Santinho de candidato</a>
-              <a href="/cerebro" className="btn-ghost w-full justify-start text-sm px-3 py-2">Editar imagem</a>
+              <div className="flex flex-col gap-0.5">
+                <button onClick={goTop} className="btn-ghost w-full justify-start text-sm px-3 py-2">⌂ Início</button>
+                <button onClick={goRecentes} className={`btn-ghost w-full justify-start text-sm px-3 py-2 ${favFilter ? '' : 'text-primary-200'}`}>▣ Minhas criações</button>
+                <button onClick={goFavs} className={`btn-ghost w-full justify-start text-sm px-3 py-2 ${favFilter ? 'text-primary-200' : ''}`}>♡ Favoritos</button>
+                <a href="/plans" className="btn-ghost w-full justify-start text-sm px-3 py-2">💳 Planos</a>
+              </div>
+              <div className="my-2 border-t border-white/10" />
+              <button
+                onClick={() => setSideToolsOpen(!sideToolsOpen)}
+                className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-[13px] font-semibold text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+              >
+                + Mais ferramentas
+                <svg className={`h-3.5 w-3.5 transition-transform ${sideToolsOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {sideToolsOpen && (
+                <div className="mt-1 flex flex-col gap-0.5 animate-slide-in">
+                  <a href="/video" className="btn-ghost w-full justify-start text-sm px-3 py-2">🎬 Transformar em vídeo</a>
+                  <a href="/card-de-candidato" className="btn-ghost w-full justify-start text-sm px-3 py-2">🗳️ Santinho de candidato</a>
+                  <a href="/cerebro" className="btn-ghost w-full justify-start text-sm px-3 py-2">🖌️ Editar imagem</a>
+                </div>
+              )}
             </div>
           </aside>
 
@@ -630,9 +682,8 @@ export default function DashboardPage() {
               <div className="mx-auto max-w-2xl">
                 <div className="text-center">
                   <h1 className="text-3xl font-bold text-white">O que você quer criar?</h1>
-                  <p className="mt-2 text-[15px] text-gray-400">
-                    Conte a sua ideia do seu jeito. A Criativa AI entende o resto.
-                  </p>
+                  <p className="mt-2 text-[15px] text-gray-400">Conte sua ideia. A Criativa cuida do resto.</p>
+                  <p className="mt-1 text-[13px] text-primary-300/80">Não precisa saber criar prompts.</p>
                 </div>
 
                 <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.04] p-3 focus-within:border-primary-500/40 transition-colors">
@@ -643,49 +694,75 @@ export default function DashboardPage() {
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); beginCreation(); }
                     }}
-                    rows={3}
-                    placeholder="Descreva a imagem que você quer criar…"
+                    rows={4}
+                    placeholder="Descreva o que você está imaginando…"
                     className="w-full resize-none bg-transparent px-2 py-2 text-[15px] text-white placeholder-gray-500 outline-none"
                   />
-                  <div className="mt-1 flex items-center justify-between gap-2 px-1">
-                    <div className="flex flex-wrap gap-1.5">
-                      {MODES.map((m) => (
-                        <button
-                          key={m.id || 'foto'}
-                          onClick={() => setMode(mode === m.id ? '' : m.id)}
-                          className={`rounded-full px-3 py-1.5 text-[12px] border transition-colors ${
-                            mode === m.id
-                              ? 'border-primary-500 bg-primary-500/20 text-primary-200'
-                              : 'border-white/10 bg-white/5 text-gray-400 hover:text-white hover:border-white/20'
-                          }`}
-                        >
-                          {m.label}
-                        </button>
-                      ))}
-                    </div>
-                    <button
-                      onClick={() => beginCreation()}
-                      disabled={generating || understanding || !input.trim()}
-                      className="shrink-0 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 hover:from-primary-500 hover:to-primary-400 disabled:opacity-40 transition-all"
-                    >
-                      {understanding ? 'Entendendo…' : 'Criar imagem'}
-                    </button>
-                  </div>
-                  <div className="mt-2 flex flex-wrap items-center gap-1.5 px-1">
-                    <span className="text-[11px] text-gray-500">Para quem é?</span>
-                    {AUDIENCIAS.map((a) => (
+                  <div className="mt-1 flex flex-wrap gap-1.5 px-1">
+                    {MODES.map((m) => (
                       <button
-                        key={a}
-                        onClick={() => setAudience(a)}
-                        className={`rounded-full px-3 py-1 text-[12px] border transition-colors ${
-                          audience === a
+                        key={m.id || 'foto'}
+                        onClick={() => setMode(mode === m.id ? '' : m.id)}
+                        className={`rounded-full px-3 py-1.5 text-[12px] border transition-colors ${
+                          mode === m.id
                             ? 'border-primary-500 bg-primary-500/20 text-primary-200'
                             : 'border-white/10 bg-white/5 text-gray-400 hover:text-white hover:border-white/20'
                         }`}
                       >
-                        {a}
+                        {m.label}
                       </button>
                     ))}
+                  </div>
+                  <div className="mt-2 flex flex-wrap items-center gap-1.5 px-1">
+                    <span className="text-[11px] text-gray-500">Para quem é?</span>
+                    {AUDIENCIAS.slice(0, 2).map((a) => (
+                      <button
+                        key={a}
+                        onClick={() => { setAudience(a); setShowAllAudiences(false); }}
+                        className={`rounded-full px-3 py-1 text-[12px] border transition-colors ${
+                          audience === a && !showAllAudiences
+                            ? 'border-primary-500 bg-primary-500/20 text-primary-200'
+                            : 'border-white/10 bg-white/5 text-gray-400 hover:text-white hover:border-white/20'
+                        }`}
+                      >
+                        {AUDIENCIA_ICONS[a]} {a}
+                      </button>
+                    ))}
+                    {showAllAudiences
+                      ? AUDIENCIAS.slice(2).map((a) => (
+                          <button
+                            key={a}
+                            onClick={() => setAudience(a)}
+                            className={`rounded-full px-3 py-1 text-[12px] border transition-colors ${
+                              audience === a
+                                ? 'border-primary-500 bg-primary-500/20 text-primary-200'
+                                : 'border-white/10 bg-white/5 text-gray-400 hover:text-white hover:border-white/20'
+                            }`}
+                          >
+                            {AUDIENCIA_ICONS[a]} {a}
+                          </button>
+                        ))
+                      : (
+                          <button
+                            onClick={() => setShowAllAudiences(true)}
+                            className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[12px] text-gray-400 hover:text-white hover:border-white/20 transition-colors"
+                          >
+                            🎯 Escolher público…
+                          </button>
+                        )}
+                  </div>
+                  <div className="mt-3 flex justify-end px-1">
+                    <button
+                      onClick={() => beginCreation()}
+                      disabled={generating || understanding || !input.trim()}
+                      className={`rounded-xl px-6 py-2.5 text-sm font-semibold transition-all ${
+                        input.trim()
+                          ? 'bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-lg shadow-primary-600/25 hover:from-primary-500 hover:to-primary-400'
+                          : 'bg-white/5 text-gray-500 border border-white/10'
+                      }`}
+                    >
+                      {understanding ? 'Entendendo…' : input.trim() ? '✨ Criar imagem →' : 'Criar imagem'}
+                    </button>
                   </div>
                 </div>
 
@@ -693,19 +770,24 @@ export default function DashboardPage() {
                   Enter envia · Shift+Enter pula linha · os tipos só orientam a IA
                 </p>
 
-                <button
-                  onClick={() => setWizardOpen(!wizardOpen)}
-                  className="mt-4 mx-auto flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[13px] text-gray-300 hover:text-white hover:border-white/20 transition-colors"
-                >
-                  ✨ Não sei o que criar
-                </button>
-                <button
-                  onClick={() => runCampaign()}
-                  disabled={!input.trim() && !activePrompt.current}
-                  className="mt-2 mx-auto flex items-center gap-2 rounded-full border border-primary-500/40 bg-primary-500/10 px-4 py-2 text-[13px] text-primary-200 hover:bg-primary-500/20 disabled:opacity-40 transition-colors"
-                >
-                  🚀 Quero uma campanha inteira (Post + Story + Legenda)
-                </button>
+                <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-center">
+                  <p className="text-sm font-semibold text-white">✨ Precisa de uma ideia?</p>
+                  <p className="mt-1 text-[12px] text-gray-500">A Criativa pode pensar por você — uma criação ou a campanha inteira.</p>
+                  <div className="mt-3 flex flex-wrap justify-center gap-2">
+                    <button
+                      onClick={() => setWizardOpen(!wizardOpen)}
+                      className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[13px] text-gray-200 hover:text-white hover:border-white/20 transition-colors"
+                    >
+                      💡 Não sei o que criar
+                    </button>
+                    <button
+                      onClick={() => runCampaign()}
+                      className="rounded-full border border-primary-500/40 bg-primary-500/10 px-4 py-2 text-[13px] text-primary-200 hover:bg-primary-500/20 transition-colors"
+                    >
+                      🚀 Criar campanha
+                    </button>
+                  </div>
+                </div>
 
                 {wizardOpen && (
                   <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
@@ -785,8 +867,12 @@ export default function DashboardPage() {
                 {recentes.length > 0 && (
                   <div id="recentes" className="mt-10">
                     <div className="mb-3 flex items-center justify-between">
-                      <h2 className="text-lg font-semibold text-white">Suas criações recentes</h2>
-                      <span className="text-[12px] text-gray-500">{recentes.length} criação(ões)</span>
+                      <h2 className="text-lg font-semibold text-white">{favFilter ? '♡ Favoritos' : 'Suas criações recentes'}</h2>
+                      {favFilter ? (
+                        <button onClick={goRecentes} className="text-[12px] text-primary-300 hover:text-primary-200 transition-colors">Ver todas</button>
+                      ) : (
+                        <span className="text-[12px] text-gray-500">{completed.length} criação(ões)</span>
+                      )}
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {recentes.slice(0, 12).map((item) => (
@@ -796,6 +882,17 @@ export default function DashboardPage() {
                         >
                           <button onClick={() => openItem(item)} className="absolute inset-0">
                             <img src={item.imageUrl} alt="" className="h-full w-full object-cover" />
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); toggleFav(item.id); }}
+                            className={`absolute top-2 right-2 rounded-lg p-1.5 transition-colors ${
+                              favs.has(item.id)
+                                ? 'bg-primary-500/30 text-primary-200'
+                                : 'bg-black/40 text-white/80 opacity-0 group-hover:opacity-100 hover:text-white'
+                            }`}
+                            aria-label="Favoritar"
+                          >
+                            {favs.has(item.id) ? '❤️' : '🤍'}
                           </button>
                           <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-gradient-to-t from-black/80 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             <a
