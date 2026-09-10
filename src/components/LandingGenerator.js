@@ -87,6 +87,17 @@ export default function LandingGenerator({ initialPrompt = '', scrollOnSet = fal
 
   return (
     <div>
+      {/* Eleições 2026 — atalho para o santinho do candidato */}
+      <a
+        href="/card-de-candidato"
+        className="mb-4 flex items-center justify-between gap-3 rounded-[16px] border-2 border-brand-accent/40 bg-gradient-to-r from-brand-accent/20 to-transparent px-4 py-3 transition-all hover:border-brand-accent"
+      >
+        <div>
+          <p className="text-[14px] font-bold text-brand-text">🗳️ Eleições 2026 · Card de candidato</p>
+          <p className="text-[12px] text-brand-dim mt-0.5">Foto, nome, número e slogan — o santinho pronto no instante.</p>
+        </div>
+        <span className="shrink-0 rounded-lg bg-brand-accent px-3 py-2 text-[12px] font-bold text-brand-bg">Criar agora →</span>
+      </a>
       {/* Escolha o formato — dois cartões grandes, impossível errar */}
       <div className="grid sm:grid-cols-2 gap-3 mb-5 max-w-[560px]">
         <button
