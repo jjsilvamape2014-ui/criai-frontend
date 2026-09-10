@@ -86,9 +86,12 @@ export default function Header() {
           </div>
 
           {/* Floating nav bar below the logo */}
-          <nav className="flex items-center justify-center gap-1 bg-white/5 border border-white/10 rounded-xl px-1.5 py-1 backdrop-blur-md">
-            <a href="/dashboard" className="btn-ghost text-sm px-4 py-1.5">Criar imagem</a>
-            <a href="/plans" className="btn-ghost text-sm px-4 py-1.5">Planos</a>
+          <nav className="flex items-center justify-center gap-1 overflow-x-auto bg-white/5 border border-white/10 rounded-xl px-1.5 py-1 backdrop-blur-md scrollbar-none">
+            <a href="/dashboard" className="btn-ghost text-sm px-3 py-1.5 whitespace-nowrap">🖼️ Criar imagem</a>
+            <a href="/video" className="btn-ghost text-sm px-3 py-1.5 whitespace-nowrap">🎬 Vídeo</a>
+            <a href="/cerebro" className="btn-ghost text-sm px-3 py-1.5 whitespace-nowrap">🧠 Cérebro</a>
+            <a href="/card-de-candidato" className="btn-ghost text-sm px-3 py-1.5 whitespace-nowrap">🗳️ Candidato</a>
+            <a href="/plans" className="btn-ghost text-sm px-3 py-1.5 whitespace-nowrap">⭐ Planos</a>
           </nav>
         </div>
       </div>
