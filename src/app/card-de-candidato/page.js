@@ -114,6 +114,7 @@ export default function CardDeCandidatoPage() {
       'ano 2026',
       a.colig,
       `paleta de campanha em ${a.colors}`,
+      'ultra sharp e nítido para impressão, cara limpa (clean), bordas vetoriais, alta definição profissional',
       'tipografia forte estilo material oficial de urna, layout vertical limpo e profissional, todo o texto perfeitamente escrito em português, sem erros, sem letras inventadas',
     ];
     const lead = {
@@ -207,6 +208,7 @@ export default function CardDeCandidatoPage() {
         model: 'flux2pro',
         width: 1216,
         height: 1520,
+        upscale: true,
       };
       if (a.photo) opts.referenceImage = a.photo;
       const data = await api.generateImageLive(msg, opts, setStatus, () => {});
@@ -229,6 +231,12 @@ export default function CardDeCandidatoPage() {
   return (
     <div className="mx-auto max-w-[560px] px-4 pb-16 pt-8">
       <div className="mb-6">
+        <a
+          href="/dashboard"
+          className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-brand-dim hover:text-brand-text transition-colors"
+        >
+          ← Voltar
+        </a>
         <p className="text-[22px] font-bold text-brand-text">🗳️ Card de candidato</p>
         <p className="mt-1 text-[14px] text-brand-sub">
           Monte o santinho do candidato(a) eleições 2026: foto, nome, número e slogan prontos para imprimir e divulgar no WhatsApp.
