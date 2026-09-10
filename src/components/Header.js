@@ -44,7 +44,7 @@ export default function Header() {
                     onClick={() => setMenuOpen(!menuOpen)}
                     className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-xl glass hover:bg-white/10 transition-all duration-200"
                   >
-                    <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-blue-500 rounded-lg flex items-center justify-center font-bold text-sm text-white shadow-lg shadow-primary-500/20">
+                    <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-400 rounded-lg flex items-center justify-center font-bold text-sm text-white shadow-lg shadow-primary-500/20">
                       {user.name?.[0]?.toUpperCase() || 'U'}
                     </div>
                     <span className="text-sm font-medium text-white hidden sm:block">{user.name}</span>

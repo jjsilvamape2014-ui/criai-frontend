@@ -61,26 +61,26 @@ export default function PlansPage() {
       <Header />
       <div className="max-w-6xl mx-auto px-4 py-8 pt-36">
         <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Escolha seu plano</h1>
-          <p className="text-gray-500">Comece grátis. Quando os créditos acabarem, é só R$ 39,99/mês.</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Escolha seu plano</h1>
+          <p className="text-gray-400">Comece grátis. Quando os créditos acabarem, é só R$ 39,99/mês.</p>
         </div>
 
         {/* Planos */}
         <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto mb-12">
           {/* Free */}
-          <div className={`card border-2 ${user?.plan === 'FREE' ? 'border-primary-500' : 'border-gray-200'}`}>
+          <div className={`card border-2 ${user?.plan === 'FREE' ? 'border-primary-500' : 'border-white/10'}`}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Gratuito</h3>
-              {user?.plan === 'FREE' && <span className="text-xs bg-primary-100 text-primary-700 px-2 py-1 rounded-full font-bold">ATUAL</span>}
+              <h3 className="text-lg font-semibold text-white">Gratuito</h3>
+              {user?.plan === 'FREE' && <span className="text-xs bg-primary-500/20 text-primary-300 px-2 py-1 rounded-full font-bold">ATUAL</span>}
             </div>
-            <p className="text-4xl font-bold text-gray-900 mb-1">R$ 0<span className="text-base font-normal text-gray-400"> Limitado</span></p>
+            <p className="text-4xl font-bold text-white mb-1">R$ 0<span className="text-base font-normal text-gray-400"> Limitado</span></p>
             <p className="text-sm text-gray-400 mb-6">Teste tudo sem pagar nada</p>
-            <ul className="space-y-3 text-sm text-gray-600 mb-6">
+            <ul className="space-y-3 text-sm text-gray-300 mb-6">
               <li className="flex items-center gap-2">✅ Créditos grátis de imagem</li>
               <li className="flex items-center gap-2">✅ Resolução 4K</li>
               <li className="flex items-center gap-2">✅ Sem watermark</li>
               <li className="flex items-center gap-2">✅ Texto em português nítido</li>
-              <li className="flex items-center gap-2 text-gray-400">❌ Ao acabar os créditos, assina o Premium</li>
+              <li className="flex items-center gap-2 text-gray-500">❌ Ao acabar os créditos, assina o Premium</li>
             </ul>
             {user?.plan === 'FREE' ? (
               user?.creditsImages + user?.creditsPurchased > 0 ? (
@@ -99,12 +99,12 @@ export default function PlansPage() {
               SEM LIMITES
             </div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Premium</h3>
-              {user?.plan === 'PREMIUM' && <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-bold">ATUAL</span>}
+              <h3 className="text-lg font-semibold text-white">Premium</h3>
+              {user?.plan === 'PREMIUM' && <span className="text-xs bg-amber-500/20 text-amber-300 px-2 py-1 rounded-full font-bold">ATUAL</span>}
             </div>
-            <p className="text-4xl font-bold text-primary-600 mb-1">R$ 39,99<span className="text-base font-normal text-gray-400">/mês</span></p>
+            <p className="text-4xl font-bold text-primary-400 mb-1">R$ 39,99<span className="text-base font-normal text-gray-400">/mês</span></p>
             <p className="text-sm text-gray-400 mb-6">Crie sem limites, quando quiser</p>
-            <ul className="space-y-3 text-sm text-gray-600 mb-6">
+            <ul className="space-y-3 text-sm text-gray-300 mb-6">
               <li className="flex items-center gap-2">✅ Imagens ilimitadas em 4K</li>
               <li className="flex items-center gap-2">✅ Todos os estilos de anúncio</li>
               <li className="flex items-center gap-2">✅ Modelos exclusivos premium</li>
@@ -113,7 +113,7 @@ export default function PlansPage() {
               <li className="flex items-center gap-2">✅ Suporte prioritário</li>
             </ul>
             {user?.plan === 'PREMIUM' ? (
-              <button disabled className="w-full py-3 rounded-xl bg-gray-100 text-gray-400 font-semibold cursor-default">
+              <button disabled className="w-full py-3 rounded-xl bg-white/5 text-gray-500 font-semibold cursor-default">
                 Plano atual
               </button>
             ) : (
@@ -130,17 +130,17 @@ export default function PlansPage() {
 
         {/* Créditos avulsos */}
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-xl font-bold text-center text-gray-900 mb-2">Ou compre créditos avulsos</h2>
-          <p className="text-center text-gray-500 text-sm mb-8">Não expiram. Use quando quiser.</p>
+          <h2 className="text-xl font-bold text-center text-white mb-2">Ou compre créditos avulsos</h2>
+          <p className="text-center text-gray-400 text-sm mb-8">Não expiram. Use quando quiser.</p>
 
           <div className="grid md:grid-cols-3 gap-4">
             {creditPackages.map(pkg => (
               <div key={pkg.id} className="card text-center">
-                <h4 className="font-semibold text-gray-900 mb-1">{pkg.name}</h4>
-                <p className="text-3xl font-bold text-gray-900 mb-2">{pkg.price}</p>
-                <ul className="space-y-1 text-sm text-gray-500 mb-4">
+                <h4 className="font-semibold text-white mb-1">{pkg.name}</h4>
+                <p className="text-3xl font-bold text-white mb-2">{pkg.price}</p>
+                <ul className="space-y-1 text-sm text-gray-400 mb-4">
                   <li>{pkg.images} imagens</li>
-                  <li className="text-green-600 font-medium">Não expira</li>
+                  <li className="text-green-400 font-medium">Não expira</li>
                 </ul>
                 <button
                   onClick={() => handleBuyCredits(pkg.id)}
@@ -156,7 +156,7 @@ export default function PlansPage() {
 
         {/* Dúvidas */}
         <div className="max-w-2xl mx-auto mt-16">
-          <h2 className="text-lg font-bold text-gray-900 mb-4 text-center">Perguntas frequentes</h2>
+          <h2 className="text-lg font-bold text-white mb-4 text-center">Perguntas frequentes</h2>
           <div className="space-y-3">
             {[
               { q: 'O plano Free é grátis mesmo?', a: 'Sim! Você ganha créditos gratuitos para começar a criar. Quando os créditos acabarem, o app te mostra a assinatura Premium de R$ 39,99/mês para continuar.' },
@@ -166,11 +166,11 @@ export default function PlansPage() {
               { q: 'Posso usar as imagens comercialmente?', a: 'Sim. Todas as imagens geradas são suas. Use onde quiser, sem restrições.' },
             ].map((item, i) => (
               <details key={i} className="card py-4 cursor-pointer">
-                <summary className="font-medium text-gray-900 list-none flex justify-between items-center">
+                <summary className="font-medium text-white list-none flex justify-between items-center">
                   {item.q}
                   <span className="text-gray-400 text-lg">+</span>
                 </summary>
-                <p className="text-sm text-gray-500 mt-3">{item.a}</p>
+                <p className="text-sm text-gray-400 mt-3">{item.a}</p>
               </details>
             ))}
           </div>

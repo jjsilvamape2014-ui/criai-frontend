@@ -17,7 +17,7 @@ const instrument = Instrument_Sans({
   variable: '--font-instrument',
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://criai-frontend-production.up.railway.app';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ia.linhafacil2026.com.br';
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),

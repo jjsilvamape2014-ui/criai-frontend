@@ -27,9 +27,9 @@ module.exports = {
           red: '#4A4348',
         },
         primary: {
-          50: '#f5f3ff', 100: '#ede9fe', 200: '#ddd6fe', 300: '#c4b5fd',
-          400: '#a78bfa', 500: '#8b5cf6', 600: '#7c3aed', 700: '#6d28d9',
-          800: '#5b21b6', 900: '#4c1d95',
+          50: '#fff0ea', 100: '#ffd5c4', 200: '#ffb79e', 300: '#ff9a7a',
+          400: '#ff7a52', 500: '#ff5a2b', 600: '#ea4b1d', 700: '#d63d12',
+          800: '#b53310', 900: '#8f290d',
         },
         dark: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1',
           400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155',
@@ -38,8 +38,8 @@ module.exports = {
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-        'gradient-brand': 'linear-gradient(135deg, #7c3aed 0%, #6366f1 50%, #3b82f6 100%)',
-        'gradient-brand-soft': 'linear-gradient(135deg, rgba(124,58,237,0.15) 0%, rgba(99,102,241,0.08) 100%)',
+        'gradient-brand': 'linear-gradient(135deg, #FF5A2B 0%, #FF9A7A 55%, #FFB79E 100%)',
+        'gradient-brand-soft': 'linear-gradient(135deg, rgba(255,90,43,0.15) 0%, rgba(255,122,82,0.07) 100%)',
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
@@ -52,7 +52,7 @@ module.exports = {
       },
       keyframes: {
         float: { '0%, 100%': { transform: 'translateY(0px)' }, '50%': { transform: 'translateY(-20px)' } },
-        glow: { '0%': { boxShadow: '0 0 20px rgba(124,58,237,0.3)' }, '100%': { boxShadow: '0 0 40px rgba(124,58,237,0.6)' } },
+        glow: { '0%': { boxShadow: '0 0 20px rgba(255,90,43,0.25)' }, '100%': { boxShadow: '0 0 40px rgba(255,90,43,0.5)' } },
         fadeUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
         slideIn: { '0%': { opacity: '0', transform: 'translateX(-10px)' }, '100%': { opacity: '1', transform: 'translateX(0)' } },
         letterPop: { '0%': { opacity: '0', transform: 'translateY(15px) scale(0.5)', filter: 'blur(4px)' }, '100%': { opacity: '1', transform: 'translateY(0) scale(1)', filter: 'blur(0)' } },

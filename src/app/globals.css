@@ -54,13 +54,13 @@
 
 /* Gradient text - mais ousado */
 .gradient-text {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-300 via-primary-400 to-blue-400;
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-300 via-primary-400 to-orange-300;
 }
 
 /* Gradient text com brilho para o hero */
 .gradient-text-hero {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-300 via-fuchsia-300 to-blue-300;
-  filter: drop-shadow(0 0 24px rgba(124,58,237,0.35));
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-300 via-orange-300 to-amber-200;
+  filter: drop-shadow(0 0 24px rgba(255,90,43,0.3));
 }
 
 /* Glass morphism */
