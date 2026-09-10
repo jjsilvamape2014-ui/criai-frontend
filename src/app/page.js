@@ -55,7 +55,11 @@ export default function Home() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setLogged(!!localStorage.getItem('token'));
+      if (localStorage.getItem('token')) {
+        window.location.replace('/dashboard');
+        return;
+      }
+      setLogged(false);
     }
   }, []);
 
