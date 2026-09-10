@@ -165,6 +165,24 @@ class ApiClient {
     return this.request('/generate/history');
   }
 
+  async getIntent(message) {
+    return this.request('/generate/intent', {
+      method: 'POST',
+      body: JSON.stringify({ message }),
+    });
+  }
+
+  async getConcepts(business, goal) {
+    return this.request('/generate/concepts', {
+      method: 'POST',
+      body: JSON.stringify({ business, goal }),
+    });
+  }
+
+  async deleteHistoryItem(id) {
+    return this.request(`/generate/history/${id}`, { method: 'DELETE' });
+  }
+
   // Credits
   async getCreditPackages() {
     return this.request('/credits/packages');

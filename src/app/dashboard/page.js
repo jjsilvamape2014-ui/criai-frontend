@@ -5,34 +5,72 @@ import { api } from '@/lib/api';
 import { setAuthTokenCookie } from '@/lib/auth-cookie';
 import Header from '@/components/Header';
 
-const SUGESTOES = [
-  { label: '🍔 Anúncio de lanche', prompt: 'Anúncio de hambúrguer artesanal com o preço R$ 29,90 e a chamada Peça já' },
-  { label: '🖼️ Post de promoção', prompt: 'Post quadrado com a frase Promoção de Setembro, fundo laranja' },
-  { label: '✏️ Logotipo', prompt: 'Logotipo para a marca Padaria São João, traço minimalista' },
-  { label: '🎬 Capa de vídeo', prompt: 'Thumbnail com o título Como Vender Mais no Instagram' },
-  { label: '🛍️ Anúncio de açaí', prompt: 'Anúncio de açaí com o preço R$ 12,90 em destaque, fundo roxo' },
-  { label: '📸 Foto de perfil', prompt: 'Retrato profissional, fundo neutro, luz suave de estúdio' },
+const MODES = [
+  { id: '', label: 'Foto realista', hint: 'Fotografia realista, câmera profissional, iluminação natural' },
+  { id: 'produto', label: 'Produto', hint: 'Foto comercial de produto em destaque, fundo limpo, iluminação de estúdio' },
+  { id: 'anuncio', label: 'Anúncio', hint: 'Peça publicitária pronta para divulgação, texto legível e chamada clara' },
+  { id: 'arte', label: 'Arte', hint: 'Arte criativa e ilustração' },
 ];
+
+const NEGOCIOS = ['Alimentação', 'Beleza', 'Imóveis', 'Moda', 'Loja', 'Automóveis', 'Tecnologia', 'Outro'];
+const OBJETIVOS = ['Vender', 'Divulgar', 'Promover oferta', 'Conseguir clientes', 'Postar nas redes'];
+
+function IconDownload({ className = 'h-4 w-4' }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0 0l-4-4m4 4l4-4" />
+    </svg>
+  );
+}
+
+function IconRefresh({ className = 'h-4 w-4' }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h5M20 20v-5h-5M20 9a8 8 0 10-2.3 5.7L15 17" />
+    </svg>
+  );
+}
+
+function IconEdit({ className = 'h-4 w-4' }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
+    </svg>
+  );
+}
+
+function IconTrash({ className = 'h-4 w-4' }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-1 14H6L5 7m5-4h4l1 1h4v2H5V4h4l1-1z" />
+    </svg>
+  );
+}
 
 export default function DashboardPage() {
   const [history, setHistory] = useState([]);
-  const [messages, setMessages] = useState([]); // { role, text?, imageUrl? }
+  const [lastResult, setLastResult] = useState(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [status, setStatus] = useState('');
   const [input, setInput] = useState('');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mode, setMode] = useState('');
+  const [changeText, setChangeText] = useState('');
+  const [intent, setIntent] = useState(null); // { confirmation, direction, intent, msg }
+  const [understanding, setUnderstanding] = useState(false);
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const [wBusiness, setWBusiness] = useState('');
+  const [wGoal, setWGoal] = useState('');
+  const [concepts, setConcepts] = useState(null);
+  const [conceptsLoading, setConceptsLoading] = useState(false);
   const inputRef = useRef(null);
-  const endRef = useRef(null);
   const activePrompt = useRef('');
 
   const loadHistory = useCallback(async () => {
     try {
       const hist = await api.getHistory();
       setHistory(hist || []);
-    } catch {
-      // histórico vazio não derruba a página
-    }
+    } catch {}
   }, []);
 
   useEffect(() => {
@@ -42,49 +80,82 @@ export default function DashboardPage() {
     Promise.all([loadHistory()]).then(() => setLoading(false));
   }, [loadHistory]);
 
-  useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
-  }, [messages, generating, status]);
+  const promptWithMode = (msg) => {
+    const hint = MODES.find((m) => m.id === mode)?.hint;
+    return hint ? `${hint}. ${msg}` : msg;
+  };
 
-  const send = async (rawPrompt) => {
-    const msg = (rawPrompt ?? input).trim();
-    if (!msg || generating) return;
+  const generate = async (msg) => {
+    const clean = (msg ?? input).trim();
+    if (!clean || generating) return;
     setInput('');
-    activePrompt.current = msg;
-    setMessages((m) => [...m, { role: 'user', text: msg }]);
+    setChangeText('');
+    activePrompt.current = clean;
     setGenerating(true);
     setStatus('');
     try {
-      const data = await api.generateImageLive(msg, { model: 'flux2pro', width: 1216, height: 1520 }, setStatus, () => {});
-      setMessages((m) => [...m, { role: 'assistant', imageUrl: data.imageUrl, text: msg }]);
+      const data = await api.generateImageLive(promptWithMode(clean), { model: 'flux2pro', width: 1216, height: 1520 }, setStatus, () => {});
+      setLastResult({ imageUrl: data.imageUrl, prompt: clean });
       loadHistory();
     } catch (err) {
       if (err.data?.code === 'NO_CREDITS') { window.location.href = '/plans'; return; }
-      setMessages((m) => [...m, { role: 'error', text: 'Não consegui gerar agora. Tente novamente.' }]);
+      setStatus('Não consegui gerar agora. Tente novamente.');
     } finally {
       setGenerating(false);
-      setStatus('');
     }
   };
 
-  const openItem = (item) => {
-    setMessages([
-      { role: 'user', text: item.prompt || 'Minha criação' },
-      { role: 'assistant', imageUrl: item.imageUrl, text: item.prompt || '' },
-    ]);
-    setSidebarOpen(false);
+  const beginCreation = async (raw) => {
+    const msg = (raw ?? input).trim();
+    if (!msg || generating || understanding) return;
+    setUnderstanding(true);
+    try {
+      const r = await api.getIntent(msg);
+      if (r?.success && r.canTakeOver && r.confirmation) {
+        setIntent({ ...r, msg });
+        setInput('');
+      } else {
+        generate(msg);
+      }
+    } catch {
+      generate(msg);
+    } finally {
+      setUnderstanding(false);
+    }
+  };
+
+  const confirmIntent = () => {
+    if (!intent) return;
+    const m = intent.msg;
+    setIntent(null);
+    generate(m);
+  };
+
+  const newCreation = () => {
+    setLastResult(null);
+    setIntent(null);
+    setChangeText('');
+    setTimeout(() => inputRef.current?.focus(), 50);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const newChat = () => {
-    setMessages([]);
-    setSidebarOpen(false);
-    setTimeout(() => inputRef.current?.focus(), 50);
+  const openItem = (item) => {
+    setLastResult({ imageUrl: item.imageUrl, prompt: item.prompt || '' });
+    setIntent(null);
+    setChangeText('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const openCerebro = (url, prompt) => {
+  const removeItem = async (id) => {
+    try {
+      await api.deleteHistoryItem(id);
+      setHistory((h) => h.filter((i) => i.id !== id));
+    } catch {}
+  };
+
+  const openCerebro = (url, change) => {
     sessionStorage.setItem('criai_ref_image', url);
-    sessionStorage.setItem('criai_ref_prompt', prompt || '');
+    sessionStorage.setItem('criai_ref_prompt', change || '');
     window.location.href = '/cerebro';
   };
 
@@ -92,6 +163,23 @@ export default function DashboardPage() {
     sessionStorage.setItem('criai_video_image', url);
     sessionStorage.setItem('criai_video_name', activePrompt.current || '');
     window.location.href = '/video';
+  };
+
+  const submitChange = () => {
+    const t = changeText.trim();
+    if (!t || !lastResult) return;
+    openCerebro(lastResult.imageUrl, t);
+  };
+
+  const pickConcepts = async () => {
+    if (!wBusiness || !wGoal || conceptsLoading) return;
+    setConceptsLoading(true);
+    setConcepts(null);
+    try {
+      const r = await api.getConcepts(wBusiness, wGoal);
+      if (r?.success) setConcepts(r.concepts || []);
+    } catch {}
+    setConceptsLoading(false);
   };
 
   if (loading) {
@@ -105,197 +193,301 @@ export default function DashboardPage() {
     );
   }
 
-  const empty = messages.length === 0;
+  const recentes = history.filter((i) => i.imageUrl && i.status === 'COMPLETED');
 
   return (
     <>
       <Header />
-      <main className="mx-auto w-full max-w-6xl px-4 pt-40 pb-8">
-        <div className="flex gap-5" style={{ height: 'calc(100dvh - 200px)', minHeight: 480 }}>
-          {/* Sidebar — histórico */}
-          <aside className={`${sidebarOpen ? 'fixed inset-0 z-40' : 'hidden md:block'} md:relative md:w-72 md:shrink-0`}>
-            {sidebarOpen && (
-              <div className="fixed inset-0 bg-black/60 z-30" onClick={() => setSidebarOpen(false)} />
-            )}
-            <div className={`flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.04] p-3 ${sidebarOpen ? 'relative z-40 w-72 animate-slide-in' : ''}`}>
+      <main className="mx-auto w-full max-w-6xl px-4 pt-44 pb-10">
+        <div className="flex gap-6 items-start">
+          <aside className="hidden lg:block w-60 shrink-0 sticky top-44">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-3">
               <button
-                onClick={newChat}
-                className="mb-2 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 px-4 py-2.5 text-sm font-semibold text-white hover:from-primary-500 hover:to-primary-400 transition-all"
+                onClick={newCreation}
+                className="mb-3 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 px-4 py-2.5 text-sm font-semibold text-white hover:from-primary-500 hover:to-primary-400 transition-all"
               >
-                <span className="text-base">✚</span> Nova criação
+                Nova criação
               </button>
-              <a
-                href="/card-de-candidato"
-                className="mb-3 flex items-center justify-center gap-2 rounded-xl border border-primary-500/30 bg-primary-500/10 px-4 py-2.5 text-sm font-semibold text-primary-300 hover:bg-primary-500/20 transition-all"
-              >
-                🗳️ Santinho do candidato
-              </a>
-              <p className="px-2 pb-1 text-[11px] font-semibold uppercase tracking-wide text-gray-500">Histórico</p>
-              <div className="flex-1 overflow-y-auto pb-2">
-                {history.length === 0 ? (
-                  <p className="px-2 pt-3 text-[13px] text-gray-500">Suas imagens aparecem aqui.</p>
-                ) : (
-                  <div className="flex flex-col gap-1.5">
-                    {history.map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => openItem(item)}
-                        className="group flex items-center gap-2.5 rounded-xl border border-transparent p-2 text-left hover:bg-white/5 hover:border-white/10 transition-all"
-                      >
-                        {item.imageUrl ? (
-                          <img src={item.imageUrl} alt="" className="h-11 w-11 shrink-0 rounded-lg object-cover border border-white/10" />
-                        ) : (
-                          <div className="h-11 w-11 shrink-0 rounded-lg bg-white/10" />
-                        )}
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate text-[13px] text-gray-300">{item.prompt || 'Sem descrição'}</span>
-                          <span className={`text-[10px] ${item.status === 'COMPLETED' ? 'text-green-400' : item.status === 'FAILED' ? 'text-red-400' : 'text-amber-400'}`}>
-                            {item.status === 'COMPLETED' ? '✓ Pronto' : item.status === 'FAILED' ? '✗ Falhou' : '... gerando'}
-                          </span>
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <a href="/plans" className="mt-2 rounded-xl border border-white/10 px-3 py-2.5 text-center text-[13px] text-gray-300 hover:text-white hover:border-white/20 transition-colors">
-                ⭐ Planos & créditos
-              </a>
+              <a href="#recentes" className="btn-ghost w-full justify-start text-sm px-3 py-2">Minhas criações</a>
+              <a href="/plans" className="btn-ghost w-full justify-start text-sm px-3 py-2">Planos e créditos</a>
+              <p className="mt-4 px-3 pb-1 text-[11px] font-semibold uppercase tracking-wide text-gray-500">Mais ferramentas</p>
+              <a href="/video" className="btn-ghost w-full justify-start text-sm px-3 py-2">Transformar em vídeo</a>
+              <a href="/card-de-candidato" className="btn-ghost w-full justify-start text-sm px-3 py-2">Santinho de candidato</a>
+              <a href="/cerebro" className="btn-ghost w-full justify-start text-sm px-3 py-2">Editar imagem</a>
             </div>
           </aside>
 
-          {/* Conversa */}
-          <section className="flex min-w-0 flex-1 flex-col rounded-2xl border border-white/10 bg-white/[0.03]">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="md:hidden mt-3 ml-3 w-fit rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-[13px] text-gray-300"
-            >
-              ☰ Histórico
-            </button>
-
-            <div className="flex-1 overflow-y-auto px-4 md:px-8 py-6">
-              {empty ? (
-                <div className="flex h-full flex-col items-center justify-center text-center">
-                  <p className="text-3xl font-bold text-white">O que você quer criar?</p>
-                  <p className="mt-2 max-w-md text-[15px] text-gray-400">
-                    Escreva com as suas palavras — a IA monta o resto. Tudo fica salvo no histórico aqui ao lado.
-                  </p>
-                  <div className="mt-6 grid w-full max-w-lg grid-cols-1 sm:grid-cols-2 gap-2">
-                    {SUGESTOES.map((s) => (
-                      <button
-                        key={s.label}
-                        onClick={() => send(s.prompt)}
-                        className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-left text-[13px] text-gray-300 hover:border-primary-500/40 hover:text-white transition-all"
-                      >
-                        {s.label}
-                      </button>
-                    ))}
-                  </div>
-                  <a
-                    href="/card-de-candidato"
-                    className="mt-3 rounded-xl border border-primary-500/40 bg-primary-500/10 px-5 py-3 inline-flex items-center gap-2 text-[13px] font-semibold text-primary-300 hover:bg-primary-500/20 transition-all"
-                  >
-                    🗳️ Montar um santinho de candidato →
-                  </a>
-                </div>
-              ) : (
-                <div className="mx-auto flex max-w-2xl flex-col gap-5">
-                  {messages.map((msg, i) => {
-                    if (msg.role === 'user') {
-                      return (
-                        <div key={i} className="flex justify-end">
-                          <div className="max-w-[85%] rounded-2xl rounded-br-md bg-primary-600/80 px-4 py-2.5 text-[14px] text-white">
-                            {msg.text}
-                          </div>
-                        </div>
-                      );
-                    }
-                    if (msg.role === 'error') {
-                      return (
-                        <div key={i} className="mx-auto rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-[13px] text-red-300">
-                          {msg.text}
-                        </div>
-                      );
-                    }
-                    return (
-                      <div key={i} className="flex justify-start">
-                        <div className="w-full max-w-[420px] overflow-hidden rounded-2xl border border-white/10 bg-white/5">
-                          {msg.imageUrl ? (
-                            <>
-                              <img src={msg.imageUrl} alt="" className="w-full bg-black/20" />
-                              <div className="p-3">
-                                <p className="mb-2.5 text-[12px] leading-snug text-gray-400 line-clamp-2">{msg.text}</p>
-                                <div className="flex flex-col gap-1.5">
-                                  <a
-                                    href={msg.imageUrl}
-                                    download="criativa-imagem.png"
-                                    className="block rounded-lg bg-gradient-to-r from-primary-600 to-primary-500 py-2 text-center text-[13px] font-semibold text-white hover:from-primary-500 hover:to-primary-400 transition-all"
-                                  >
-                                    Baixar imagem
-                                  </a>
-                                  <button
-                                    onClick={() => openVideo(msg.imageUrl)}
-                                    className="block rounded-lg border border-white/15 py-2 text-center text-[13px] text-gray-200 hover:bg-white/10 transition-colors"
-                                  >
-                                    🎬 Transformar em vídeo
-                                  </button>
-                                  <button
-                                    onClick={() => openCerebro(msg.imageUrl, msg.text)}
-                                    className="block rounded-lg border border-white/15 py-2 text-center text-[13px] text-primary-300 hover:bg-white/10 transition-colors"
-                                  >
-                                    🧠 Editar na conversa
-                                  </button>
-                                </div>
-                              </div>
-                            </>
-                          ) : (
-                            <div className="flex items-center gap-3 px-5 py-6 text-[14px] text-gray-300">
-                              <span className="flex gap-1">
-                                <span className="h-2 w-2 animate-bounce rounded-full bg-primary-400" />
-                                <span className="h-2 w-2 animate-bounce rounded-full bg-primary-400 [animation-delay:120ms]" />
-                                <span className="h-2 w-2 animate-bounce rounded-full bg-primary-400 [animation-delay:240ms]" />
-                              </span>
-                              {status || 'Pensando…'}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                  <div ref={endRef} />
-                </div>
-              )}
-            </div>
-
-            {/* Compositor */}
-            <div className="border-t border-white/10 p-3 md:p-4">
+          <section className="min-w-0 flex-1">
+            {lastResult && !generating ? (
               <div className="mx-auto max-w-2xl">
-                <div className="flex items-end gap-2 rounded-2xl border border-white/10 bg-white/5 p-2 focus-within:border-primary-500/40 transition-colors">
+                <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+                  <img src={lastResult.imageUrl} alt="" className="w-full bg-black/20" />
+                </div>
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  <a
+                    href={lastResult.imageUrl}
+                    download="criativa-imagem.png"
+                    className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 px-4 py-3 text-sm font-semibold text-white hover:from-primary-500 hover:to-primary-400 transition-all"
+                  >
+                    <IconDownload /> Baixar
+                  </a>
+                  <button
+                    onClick={() => generate(activePrompt.current)}
+                    disabled={generating}
+                    className="flex items-center justify-center gap-2 rounded-xl border border-white/15 px-4 py-3 text-sm text-gray-200 hover:bg-white/10 disabled:opacity-40 transition-colors"
+                  >
+                    <IconRefresh /> Gerar novamente
+                  </button>
+                  <button
+                    onClick={() => openCerebro(lastResult.imageUrl, '')}
+                    className="flex items-center justify-center gap-2 rounded-xl border border-white/15 px-4 py-3 text-sm text-gray-200 hover:bg-white/10 transition-colors"
+                  >
+                    <IconEdit /> Editar
+                  </button>
+                  <button
+                    onClick={() => openVideo(lastResult.imageUrl)}
+                    className="flex items-center justify-center gap-2 rounded-xl border border-white/15 px-4 py-3 text-sm text-gray-200 hover:bg-white/10 transition-colors"
+                  >
+                    🎬 Vídeo
+                  </button>
+                </div>
+                <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                  <p className="text-sm font-semibold text-white">O que você quer mudar?</p>
+                  <p className="mt-0.5 text-[12px] text-gray-500">Descreva e a IA ajusta a imagem para você.</p>
+                  <div className="mt-3 flex gap-2">
+                    <input
+                      value={changeText}
+                      onChange={(e) => setChangeText(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') submitChange(); }}
+                      placeholder="Ex.: troque o fundo por azul"
+                      className="flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder-gray-500 outline-none focus:border-primary-500/40"
+                    />
+                    <button
+                      onClick={submitChange}
+                      disabled={!changeText.trim()}
+                      className="rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-500 disabled:opacity-40 transition-colors"
+                    >
+                      Ajustar
+                    </button>
+                  </div>
+                </div>
+                <p className="mt-4 text-center text-[12px] text-gray-500">
+                  Descrição: <span className="text-gray-400">{lastResult.prompt || 'Minha criação'}</span>
+                </p>
+                <div className="mt-3 text-center">
+                  <button onClick={newCreation} className="text-[13px] text-primary-300 hover:text-primary-200 transition-colors">
+                    ← Criar outra imagem
+                  </button>
+                </div>
+              </div>
+            ) : intent ? (
+              <div className="mx-auto max-w-xl">
+                <div className="rounded-2xl border border-primary-500/30 bg-primary-500/[0.06] p-6 text-center">
+                  <p className="text-lg font-semibold text-white">{intent.confirmation}</p>
+                  {intent.direction && (
+                    <p className="mt-3 text-[14px] leading-relaxed text-gray-300">{intent.direction}</p>
+                  )}
+                  {intent.intent && (intent.intent.platform || intent.intent.emotion || intent.intent.visualStyle) && (
+                    <p className="mt-2 text-[12px] text-gray-500">
+                      {[intent.intent.platform, intent.intent.emotion, intent.intent.visualStyle].filter(Boolean).join(' · ')}
+                    </p>
+                  )}
+                  <div className="mt-5 flex flex-col gap-2">
+                    <button
+                      onClick={confirmIntent}
+                      className="w-full rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 px-5 py-3 text-sm font-semibold text-white hover:from-primary-500 hover:to-primary-400 transition-all"
+                    >
+                      Criar para mim
+                    </button>
+                    <button
+                      onClick={() => setIntent(null)}
+                      className="w-full rounded-xl border border-white/10 px-5 py-2.5 text-[13px] text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+                    >
+                      Voltar e ajustar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="mx-auto max-w-2xl">
+                <div className="text-center">
+                  <h1 className="text-3xl font-bold text-white">O que você quer criar?</h1>
+                  <p className="mt-2 text-[15px] text-gray-400">
+                    Conte a sua ideia do seu jeito. A Criativa AI entende o resto.
+                  </p>
+                </div>
+
+                <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.04] p-3 focus-within:border-primary-500/40 transition-colors">
                   <textarea
                     ref={inputRef}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+                      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); beginCreation(); }
                     }}
-                    rows={1}
-                    placeholder="Descreva a imagem que você quer…"
-                    className="max-h-40 flex-1 resize-none bg-transparent px-2 py-2 text-[14px] text-white placeholder-gray-500 outline-none"
+                    rows={3}
+                    placeholder="Descreva a imagem que você quer criar…"
+                    className="w-full resize-none bg-transparent px-2 py-2 text-[15px] text-white placeholder-gray-500 outline-none"
                   />
-                  <button
-                    onClick={() => send()}
-                    disabled={generating || !input.trim()}
-                    className="mb-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-lg shadow-primary-600/25 hover:from-primary-500 hover:to-primary-400 disabled:opacity-40 transition-all"
-                    aria-label="Gerar"
-                  >
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5m0 0l-6 6m6-6l6 6" />
-                    </svg>
-                  </button>
+                  <div className="mt-1 flex items-center justify-between gap-2 px-1">
+                    <div className="flex flex-wrap gap-1.5">
+                      {MODES.map((m) => (
+                        <button
+                          key={m.id || 'foto'}
+                          onClick={() => setMode(mode === m.id ? '' : m.id)}
+                          className={`rounded-full px-3 py-1.5 text-[12px] border transition-colors ${
+                            mode === m.id
+                              ? 'border-primary-500 bg-primary-500/20 text-primary-200'
+                              : 'border-white/10 bg-white/5 text-gray-400 hover:text-white hover:border-white/20'
+                          }`}
+                        >
+                          {m.label}
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => beginCreation()}
+                      disabled={generating || understanding || !input.trim()}
+                      className="shrink-0 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-600/25 hover:from-primary-500 hover:to-primary-400 disabled:opacity-40 transition-all"
+                    >
+                      {understanding ? 'Entendendo…' : 'Criar imagem'}
+                    </button>
+                  </div>
                 </div>
-                <p className="mt-1.5 text-center text-[11px] text-gray-500">Enter envia · Shift+Enter pula linha</p>
+
+                <p className="mt-1.5 text-center text-[11px] text-gray-500">
+                  Enter envia · Shift+Enter pula linha · os tipos só orientam a IA
+                </p>
+
+                <button
+                  onClick={() => setWizardOpen(!wizardOpen)}
+                  className="mt-4 mx-auto flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[13px] text-gray-300 hover:text-white hover:border-white/20 transition-colors"
+                >
+                  ✨ Não sei o que criar
+                </button>
+
+                {wizardOpen && (
+                  <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                    <p className="text-sm font-semibold text-white">Deixe a Criativa pensar por você</p>
+                    <p className="mt-0.5 text-[12px] text-gray-500">Escolha o seu negócio e o seu objetivo: a IA cria 3 ideias para escolher.</p>
+                    <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <select
+                        value={wBusiness}
+                        onChange={(e) => setWBusiness(e.target.value)}
+                        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none focus:border-primary-500/40"
+                      >
+                        <option value="" className="bg-neutral-900">Meu negócio é…</option>
+                        {NEGOCIOS.map((n) => <option key={n} value={n} className="bg-neutral-900">{n}</option>)}
+                      </select>
+                      <select
+                        value={wGoal}
+                        onChange={(e) => setWGoal(e.target.value)}
+                        className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none focus:border-primary-500/40"
+                      >
+                        <option value="" className="bg-neutral-900">Quero…</option>
+                        {OBJETIVOS.map((o) => <option key={o} value={o} className="bg-neutral-900">{o}</option>)}
+                      </select>
+                    </div>
+                    <button
+                      onClick={pickConcepts}
+                      disabled={!wBusiness || !wGoal || conceptsLoading}
+                      className="mt-3 w-full rounded-xl bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-500 disabled:opacity-40 transition-colors"
+                    >
+                      {conceptsLoading ? 'Criando ideias…' : 'Gerar 3 ideias'}
+                    </button>
+
+                    {(conceptsLoading || concepts) && (
+                      <div className="mt-4">
+                        {conceptsLoading ? (
+                          <p className="text-[13px] text-gray-400 flex items-center gap-2">
+                            <span className="flex gap-1">
+                              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary-400" />
+                              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary-400 [animation-delay:120ms]" />
+                              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary-400 [animation-delay:240ms]" />
+                            </span>
+                            Pensando em conceitos diferentes…
+                          </p>
+                        ) : (
+                          <div className="flex flex-col gap-2">
+                            {concepts.map((c, i) => (
+                              <div key={i} className="rounded-xl border border-white/10 bg-white/5 p-3">
+                                <p className="text-sm font-semibold text-white">{c.title}</p>
+                                <p className="mt-1 text-[12px] leading-snug text-gray-400">{c.description}</p>
+                                <button
+                                  onClick={() => generate(c.prompt + '. ' + c.description)}
+                                  className="mt-2 rounded-lg border border-primary-500/40 bg-primary-500/10 px-3 py-1.5 text-[12px] font-semibold text-primary-200 hover:bg-primary-500/20 transition-colors"
+                                >
+                                  Gostei desta
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {(generating || status) && (
+                  <div className="mt-4 flex items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-gray-300">
+                    {generating && (
+                      <span className="flex gap-1">
+                        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary-400" />
+                        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary-400 [animation-delay:120ms]" />
+                        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary-400 [animation-delay:240ms]" />
+                      </span>
+                    )}
+                    <span>{generating ? status || 'Entendendo seu pedido…' : status}</span>
+                  </div>
+                )}
+
+                {recentes.length > 0 && (
+                  <div id="recentes" className="mt-10">
+                    <div className="mb-3 flex items-center justify-between">
+                      <h2 className="text-lg font-semibold text-white">Suas criações recentes</h2>
+                      <span className="text-[12px] text-gray-500">{recentes.length} criação(ões)</span>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {recentes.slice(0, 12).map((item) => (
+                        <div
+                          key={item.id}
+                          className="group relative aspect-square overflow-hidden rounded-xl border border-white/10 bg-white/5"
+                        >
+                          <button onClick={() => openItem(item)} className="absolute inset-0">
+                            <img src={item.imageUrl} alt="" className="h-full w-full object-cover" />
+                          </button>
+                          <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-gradient-to-t from-black/80 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <a
+                              href={item.imageUrl}
+                              download="criativa-imagem.png"
+                              onClick={(e) => e.stopPropagation()}
+                              className="rounded-lg bg-white/15 p-1.5 text-white hover:bg-white/25 transition-colors"
+                              aria-label="Baixar"
+                            >
+                              <IconDownload />
+                            </a>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); openCerebro(item.imageUrl, ''); }}
+                              className="rounded-lg bg-white/15 p-1.5 text-white hover:bg-white/25 transition-colors"
+                              aria-label="Editar"
+                            >
+                              <IconEdit />
+                            </button>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); removeItem(item.id); }}
+                              className="rounded-lg bg-red-500/25 p-1.5 text-red-200 hover:bg-red-500/40 transition-colors"
+                              aria-label="Excluir"
+                            >
+                              <IconTrash />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
+            )}
           </section>
         </div>
       </main>

@@ -68,6 +68,7 @@ export default function Header() {
                           </span>
                         </div>
                         <a href="/dashboard" className="block px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">Minha área</a>
+                        <a href="/cerebro" className="block px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">Estúdio inteligente</a>
                         <a href="/plans" className="block px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">Planos & Assinatura</a>
                         <div className="border-t border-white/10 mt-1 pt-1">
                           <button onClick={handleLogout} className="block w-full text-left px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors">
@@ -91,7 +92,6 @@ export default function Header() {
           <nav className="flex items-center justify-center gap-1 overflow-x-auto bg-white/5 border border-white/10 rounded-xl px-1.5 py-1 backdrop-blur-md scrollbar-none">
             <a href="/dashboard" className="btn-ghost text-sm px-3 py-1.5 whitespace-nowrap">🖼️ Criar imagem</a>
             <a href="/video" className="btn-ghost text-sm px-3 py-1.5 whitespace-nowrap">🎬 Vídeo</a>
-            <a href="/cerebro" className="btn-ghost text-sm px-3 py-1.5 whitespace-nowrap">🧠 Cérebro</a>
             <a href="/card-de-candidato" className="btn-ghost text-sm px-3 py-1.5 whitespace-nowrap">🗳️ Candidato</a>
             <a href="/plans" className="btn-ghost text-sm px-3 py-1.5 whitespace-nowrap">⭐ Planos</a>
           </nav>
