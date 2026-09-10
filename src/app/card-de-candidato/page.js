@@ -7,14 +7,38 @@ const STYLES = [
   {
     id: 'classico',
     icon: '📄',
-    title: 'Clássico (santinho)',
-    desc: 'Foto do candidato em destaque, nome e número em grande. O modelo que todo mundo reconhece.',
+    title: 'Clássico',
+    desc: 'Foto em destaque, nome e número grandes. O que todo mundo reconhece.',
   },
   {
     id: 'moderno',
     icon: '⚡',
     title: 'Moderno 2026',
-    desc: 'Número gigante em primeiro plano e layout arrojado, visual de campanha atual.',
+    desc: 'Número gigante em primeiro plano e layout arrojado.',
+  },
+  {
+    id: 'institucional',
+    icon: '🏛️',
+    title: 'Institucional',
+    desc: 'Camisa oficial de campanha e fundo na cor partidária, visual de assessoria.',
+  },
+  {
+    id: 'tiara',
+    icon: '👑',
+    title: 'Foto tiara',
+    desc: 'Retrato grande no topo com o número em destaque embaixo.',
+  },
+  {
+    id: 'faixa',
+    icon: '🎗️',
+    title: 'Faixa partidária',
+    desc: 'Faixa de cor atravessando o card, tipografia forte e ousada.',
+  },
+  {
+    id: 'cracha',
+    icon: '🪪',
+    title: 'Crachá',
+    desc: 'Foto central com a tag do nome por baixo, estilo "João Carlos Mello".',
   },
   {
     id: 'verso',
@@ -22,6 +46,14 @@ const STYLES = [
     title: 'Frente e verso',
     desc: 'Gera a frente do santinho e a parte de trás com propostas, voto e coligação.',
   },
+];
+
+const CORES_CAMPANHA = [
+  { id: 'verde', label: 'Verde (exemplo pesquisado)', phrase: 'verde e amarelo vibrante' },
+  { id: 'azul', label: 'Azul', phrase: 'azul e branco' },
+  { id: 'vermelho', label: 'Vermelho', phrase: 'vermelho e branco' },
+  { id: 'amarelo', label: 'Amarelo / Ouro', phrase: 'amarelo ouro e preto' },
+  { id: 'laranja', label: 'Laranja', phrase: 'laranja e branco' },
 ];
 
 const CARGO = ['Prefeito(a)', 'Vereador(a)'];
@@ -37,6 +69,7 @@ export default function CardDeCandidatoPage() {
   const [slogan, setSlogan] = useState('');
   const [propostas, setPropostas] = useState('');
   const [estilo, setEstilo] = useState('classico');
+  const [cor, setCor] = useState('verde');
   const [front, setFront] = useState(null);
   const [back, setBack] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -52,7 +85,7 @@ export default function CardDeCandidatoPage() {
 
   const buildArgs = () => {
     const cargoLower = cargo === 'Prefeito(a)' ? 'prefeito(a)' : 'vereador(a)';
-    const colors = 'cores institucionais de campanha (azul, verde ou vermelho com branco, vibrante mas elegante)';
+    const colors = (CORES_CAMPANHA.find((c) => c.id === cor) || CORES_CAMPANHA[0]).phrase;
     const colig = coligacao.trim() ? `, coligação "${coligacao.trim()}"` : '';
     const base = {
       photo: foto,
@@ -71,25 +104,66 @@ export default function CardDeCandidatoPage() {
   const buildFrontPrompt = (a) => {
     const hero =
       a.photo
-        ? 'retrato do candidato da foto de referência em destaque (rosto idêntico, vestindo terno/social sobre fundo da campanha)'
+        ? 'retrato do candidato da foto de referência em destaque (rosto idêntico)'
         : 'retrato profissional de candidato(a) sorridente com traje social, sorriso confiante';
-    const lead =
-      estilo === 'moderno'
-        ? `Card político vertical de campanha eleitoral ${a.year}: o NÚMERO ${a.num} GIGANTE em primeiro plano no estilo arrojado de 2026`
-        : `Card político vertical tipo "santinho" de campanha eleitoral ${a.year}: ${hero} em primeiro plano central`;
-    const parts = [
-      lead,
-      estilo === 'moderno' ? `${hero}` : '',
-      `nome de urna "${a.urn}" em letras grandes e bem legíveis`,
-      `cargo ${a.cargo} de ${a.city}`,
-      a.slogan ? `slogan "${a.slogan}"` : '',
-      `ano ${a.year}`,
+    const camisa =
+      'candidato vestindo camisa de campanha na cor oficial com o nome e número em pequeno detalhe no peito';
+    const nomeBig = `nome de urna "${a.urn}" em letras grandes e bem legíveis`;
+    const numBig = `NÚMERO ${a.num} em destaque grande e exato`;
+    const common = [
+      'ano 2026',
       a.colig,
-      a.colors,
-      'fundo com degradê na cor da campanha e mapa/bandeira da cidade ao fundo',
-      'tipografia forte estilo material oficial (fonte de urna), layout vertical limpo e profissional',
-      'todo o texto perfeitamente escrito em português, sem erros, sem letras inventadas',
+      `paleta de campanha em ${a.colors}`,
+      'tipografia forte estilo material oficial de urna, layout vertical limpo e profissional, todo o texto perfeitamente escrito em português, sem erros, sem letras inventadas',
     ];
+    const lead = {
+      classico: [
+        'Card político vertical tipo "santinho" de campanha eleitoral 2026',
+        `${hero} centralizado`,
+        nomeBig,
+        `cargo ${a.cargo} de ${a.city}`,
+      ],
+      moderno: [
+        'Card político vertical de campanha 2026, conceito ARROJADO estilo numerão:',
+        `o NÚMERO ${a.num} GIGANTE em primeiro plano`,
+        hero,
+        nomeBig,
+        `cargo ${a.cargo} de ${a.city}`,
+      ],
+      institucional: [
+        'Card político vertical de campanha 2026, visual INSTITUCIONAL de assessoria de comunicação:',
+        hero,
+        camisa,
+        `fundo com faixa de cor ${a.colors} e bandeira/mapa da cidade em degradê`,
+        nomeBig,
+        `cargo ${a.cargo} de ${a.city}`,
+      ],
+      tiara: [
+        'Card político vertical de campanha 2026, layout FOTO TIARA:',
+        `${hero} grande no topo em retrato 3:4`,
+        `número ${a.num} grande centralizado na metade inferior`,
+        nomeBig,
+        `cargo ${a.cargo} de ${a.city}`,
+      ],
+      faixa: [
+        'Card político vertical de campanha 2026, layout FAIXA PARTIDÁRIA:',
+        `faixa diagonal larga em ${a.colors} atravessando o card`,
+        hero,
+        nomeBig,
+        `número ${a.num} em tipografia ousada`,
+        `cargo ${a.cargo} de ${a.city}`,
+      ],
+      cracha: [
+        'Card político vertical de campanha 2026, layout CRACHÁ em pé:',
+        hero,
+        `"crachá" com o nome "${a.urn}" em uma tag retangular sólida abaixo da foto`,
+        `cargo ${a.cargo} de ${a.city}`,
+        `número ${a.num} em destaque`,
+      ],
+    }[estilo] || [];
+
+    const parts = [...lead, ...common.filter(Boolean)];
+    if (a.slogan) parts.push(`slogan "${a.slogan}"`);
     return parts.filter(Boolean).join(', ');
   };
 
@@ -304,6 +378,25 @@ export default function CardDeCandidatoPage() {
                   {s.icon} {s.title}
                 </p>
                 <p className="mt-0.5 text-[12px] text-brand-dim">{s.desc}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      {/* Cor de campanha */}
+        <div className="pt-1">
+          <p className="mb-2 text-[13px] font-semibold text-brand-text">Cor da campanha</p>
+          <div className="flex flex-wrap gap-2">
+            {CORES_CAMPANHA.map((c) => (
+              <button
+                key={c.id}
+                onClick={() => setCor(c.id)}
+                className={`rounded-full border px-3 py-1.5 text-[12px] transition-all ${
+                  cor === c.id
+                    ? 'border-brand-accent bg-brand-accent/15 text-brand-accent'
+                    : 'border-brand-borderStrong text-brand-dim hover:text-brand-text'
+                }`}
+              >
+                {c.label}
               </button>
             ))}
           </div>
