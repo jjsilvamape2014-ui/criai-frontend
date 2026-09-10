@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import LandingGenerator from '@/components/LandingGenerator';
 import ImageSlot from '@/components/ImageSlot';
+import { setAuthTokenCookie } from '@/lib/auth-cookie';
 
 const GALLERY = [
   { cat: 'Anúncio de produto', prompt: 'Anúncio de hambúrguer artesanal com o preço R$ 29,90 e a chamada Peça já', src: '/showcase/anuncio-hamburguer.webp' },
@@ -55,7 +56,9 @@ export default function Home() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      if (localStorage.getItem('token')) {
+      const token = localStorage.getItem('token');
+      if (token) {
+        setAuthTokenCookie(token);
         window.location.replace('/dashboard');
         return;
       }

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { api } from '@/lib/api';
+import { setAuthTokenCookie } from '@/lib/auth-cookie';
 import Header from '@/components/Header';
 
 export default function LoginPage() {
@@ -16,6 +17,7 @@ export default function LoginPage() {
     try {
       const data = await api.login(email, password);
       localStorage.setItem('token', data.token);
+      setAuthTokenCookie(data.token);
       window.location.href = '/dashboard';
     } catch (err) {
       setError(err.message || 'Email ou senha incorretos');

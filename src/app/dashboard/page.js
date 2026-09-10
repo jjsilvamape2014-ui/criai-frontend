@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { api } from '@/lib/api';
+import { setAuthTokenCookie } from '@/lib/auth-cookie';
 import Header from '@/components/Header';
 
 const SUGESTOES = [
@@ -37,6 +38,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) { window.location.href = '/login'; return; }
+    setAuthTokenCookie(token);
     Promise.all([loadHistory()]).then(() => setLoading(false));
   }, [loadHistory]);
 

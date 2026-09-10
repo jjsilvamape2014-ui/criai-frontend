@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { api } from '@/lib/api';
+import { setAuthTokenCookie } from '@/lib/auth-cookie';
 import Header from '@/components/Header';
 
 export default function RegisterPage() {
@@ -19,6 +20,7 @@ export default function RegisterPage() {
     try {
       const data = await api.register(email, password, name);
       localStorage.setItem('token', data.token);
+      setAuthTokenCookie(data.token);
       window.location.href = '/dashboard';
     } catch (err) {
       setError(err.message || 'Erro ao criar conta');

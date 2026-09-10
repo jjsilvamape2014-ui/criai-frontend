@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
+import { clearAuthTokenCookie } from '@/lib/auth-cookie';
 import Logo from '@/components/Logo';
 
 export default function Header() {
@@ -23,6 +24,7 @@ export default function Header() {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    clearAuthTokenCookie();
     setUser(null);
     window.location.href = '/';
   };
