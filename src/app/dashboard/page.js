@@ -56,6 +56,8 @@ export default function DashboardPage() {
   const [input, setInput] = useState('');
   const [mode, setMode] = useState('');
   const [changeText, setChangeText] = useState('');
+  const [review, setReview] = useState(null);
+  const [reviewLoading, setReviewLoading] = useState(false);
   const [intent, setIntent] = useState(null); // { confirmation, direction, intent, msg }
   const [understanding, setUnderstanding] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
@@ -90,6 +92,7 @@ export default function DashboardPage() {
     if (!clean || generating) return;
     setInput('');
     setChangeText('');
+    setReview(null);
     activePrompt.current = clean;
     setGenerating(true);
     setStatus('');
@@ -169,6 +172,25 @@ export default function DashboardPage() {
     const t = changeText.trim();
     if (!t || !lastResult) return;
     openCerebro(lastResult.imageUrl, t);
+  };
+
+  const runReview = async () => {
+    if (!lastResult || reviewLoading) return;
+    setReviewLoading(true);
+    setReview(null);
+    try {
+      const r = await api.getClientReview(lastResult.imageUrl);
+      if (r?.success) setReview(r.clientReview);
+    } catch {}
+    setReviewLoading(false);
+  };
+
+  const makeBetter = () => {
+    if (!lastResult || !review) return;
+    const base = activePrompt.current || lastResult.prompt || '';
+    const next = review.suggestion ? `${base} ${review.suggestion}` : base;
+    setReview(null);
+    generate(next);
   };
 
   const pickConcepts = async () => {
@@ -251,6 +273,59 @@ export default function DashboardPage() {
                     🎬 Vídeo
                   </button>
                 </div>
+                <button
+                  onClick={runReview}
+                  disabled={reviewLoading || review}
+                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-primary-500/40 bg-primary-500/10 px-4 py-2.5 text-sm font-semibold text-primary-200 hover:bg-primary-500/20 disabled:opacity-50 transition-all"
+                >
+                  {reviewLoading ? (
+                    <>
+                      <span className="flex gap-1">
+                        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary-400" />
+                        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary-400 [animation-delay:120ms]" />
+                        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-primary-400 [animation-delay:240ms]" />
+                      </span>
+                      Olhando com olhos de cliente…
+                    </>
+                  ) : (
+                    <>👁️ Olhe como um cliente</>
+                  )}
+                </button>
+
+                {review && (
+                  <div className="mt-3 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                    <p className="text-sm font-semibold text-white">Se eu fosse seu cliente…</p>
+                    <p className="mt-0.5 text-[12px] text-gray-500">{review.verdict}</p>
+                    <div className="mt-3 flex flex-col gap-2">
+                      {[
+                        ['Atenção', review.attention],
+                        ['Clareza', review.clarity],
+                        ['Desejo', review.desire],
+                        ['Profissionalismo', review.professionalism],
+                      ].map(([label, val]) => (
+                        <div key={label} className="flex items-center gap-3">
+                          <span className="w-28 shrink-0 text-[12px] text-gray-400">{label}</span>
+                          <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
+                            <div className="h-full rounded-full bg-gradient-to-r from-primary-600 to-primary-400" style={{ width: `${Math.max(0, Math.min(100, (val || 0) * 10))}%` }} />
+                          </div>
+                          <span className="w-8 shrink-0 text-right text-[12px] font-semibold text-white">{val}/10</span>
+                        </div>
+                      ))}
+                    </div>
+                    {review.suggestion && (
+                      <p className="mt-3 rounded-xl border border-primary-500/20 bg-primary-500/[0.07] px-3 py-2 text-[12px] leading-snug text-primary-100">
+                        Sugestão: {review.suggestion}
+                      </p>
+                    )}
+                    <button
+                      onClick={makeBetter}
+                      disabled={generating}
+                      className="mt-3 w-full rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 px-4 py-2.5 text-sm font-semibold text-white hover:from-primary-500 hover:to-primary-400 disabled:opacity-40 transition-all"
+                    >
+                      ✨ Faça melhor
+                    </button>
+                  </div>
+                )}
                 <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
                   <p className="text-sm font-semibold text-white">O que você quer mudar?</p>
                   <p className="mt-0.5 text-[12px] text-gray-500">Descreva e a IA ajusta a imagem para você.</p>

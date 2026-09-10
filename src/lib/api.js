@@ -179,6 +179,13 @@ class ApiClient {
     });
   }
 
+  async getClientReview(imageUrl) {
+    return this.request('/generate/review', {
+      method: 'POST',
+      body: JSON.stringify({ imageUrl }),
+    });
+  }
+
   async deleteHistoryItem(id) {
     return this.request(`/generate/history/${id}`, { method: 'DELETE' });
   }
