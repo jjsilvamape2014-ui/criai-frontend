@@ -21,6 +21,7 @@ export default function Header() {
     if (token) {
       api.getProfile().then(setUser).catch(() => {
         localStorage.removeItem('token');
+        clearAuthTokenCookie();
       });
     }
   }, []);
