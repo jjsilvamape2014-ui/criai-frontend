@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react';
 import { api } from '@/lib/api';
 
 const JOB_KEY = 'criai_cerebro_job';
-const PRESENTER_RE = /(apresentador|apresentadora|apresentando|pessoa (real )?(falando|mostrando)|avatar|influencer|garot[oa][- ]propaganda|ugc)/i;
 
 // Atalhos da tela inicial: preenchem a caixa com um pedido pronto para completar.
 const STARTERS = [
@@ -16,7 +15,7 @@ const STARTERS = [
   },
   {
     title: 'Vídeo com apresentador', short: 'Vídeo com apresentador',
-    href: '/video?modo=apresentador',
+    prompt: 'Vídeo com apresentadora mostrando [produto ou serviço] da [nome da empresa], [preço ou oferta], WhatsApp [número]',
     icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
   },
   {
@@ -211,18 +210,6 @@ export default function CerebroEditor() {
     }
     const token = localStorage.getItem('token');
     if (!token) { setShowLoginModal(true); return; }
-
-    // Pessoa real falando é outra ferramenta (lipsync); o Cérebro faria o vídeo animado.
-    if (PRESENTER_RE.test(msg)) {
-      setError(null);
-      setInput('');
-      setMessages([...messages, { role: 'user', message: msg }, {
-        role: 'assistant',
-        message: 'Para um vídeo com uma pessoa real apresentando o seu produto, use o anúncio falado: você envia a foto do produto, escolhe homem ou mulher, e a IA cria o apresentador falando o roteiro em português.',
-        action: { href: '/video?modo=apresentador', label: 'Abrir vídeo com apresentador' },
-      }]);
-      return;
-    }
 
     setLoading(true); setError(null);
     const newMessages = [...messages, { role: 'user', message: msg }];
@@ -473,7 +460,7 @@ export default function CerebroEditor() {
                     <div className="h-full w-1/3 rounded-full bg-brand-accent animate-[criai-bar_1.6s_ease-in-out_infinite]" />
                   </div>
                   {jobStep && (
-                    <p className="mt-2 text-[12px] text-brand-dim">O vídeo leva de 1 a 4 minutos. Pode deixar esta página aberta.</p>
+                    <p className="mt-2 text-[12px] text-brand-dim">Vídeos levam alguns minutos. Pode deixar esta página aberta.</p>
                   )}
                 </div>
               </div>
