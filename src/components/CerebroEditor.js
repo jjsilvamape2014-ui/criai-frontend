@@ -39,6 +39,15 @@ const STARTERS = [
   },
 ];
 
+// Opções fechadas: o cliente diz O QUE quer; o servidor não precisa adivinhar.
+const MODES = [
+  { id: 'anuncio', label: 'Anúncio em vídeo', hint: 'O que você vende? Ex.: instalação e manutenção de ar-condicionado, orçamento pelo WhatsApp', fields: ['empresa', 'whatsapp'] },
+  { id: 'apresentador', label: 'Com apresentador', hint: 'O que a pessoa vai mostrar? Ex.: nossa placa de avaliação do Google por R$ 80,00', fields: ['empresa', 'whatsapp', 'voz'] },
+  { id: 'animar', label: 'Animar minha imagem', hint: 'Anexe a imagem e descreva o movimento. Ex.: a barriga do mascote girando como uma betoneira', needsImage: true },
+  { id: 'falar', label: 'Personagem falando', hint: 'Anexe o personagem e escreva a fala. Ex.: Bom dia! Eu sou o Delta.', needsImage: true, fields: ['voz'] },
+  { id: 'livre', label: 'Imagem / post / logo', hint: 'Ex.: post de Instagram da minha pizzaria com a promoção de terça' },
+];
+
 // Exemplos reais (mesmas imagens da página inicial): clicar preenche o pedido.
 const INSPIRATION = [
   { cat: 'Anúncio de produto', src: '/showcase/anuncio-hamburguer.webp', prompt: 'Anúncio de hambúrguer artesanal com o preço R$ 29,90 e a chamada Peça já' },
@@ -76,6 +85,9 @@ export default function CerebroEditor() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [portraitMode, setPortraitMode] = useState(false);
   const [jobStep, setJobStep] = useState(null); // progresso do anúncio em vídeo
+  const [mode, setMode] = useState('anuncio');
+  const [fields, setFields] = useState({ empresa: '', whatsapp: '', voz: 'masculina' });
+  const modeDef = MODES.find((m) => m.id === mode) || MODES[0];
   const endRef = useRef(null);
   const inputRef = useRef(null);
   const fileRef = useRef(null);
@@ -208,6 +220,11 @@ export default function CerebroEditor() {
       if (el) { el.focus(); el.setSelectionRange(blank.index, blank.index + blank[0].length); }
       return;
     }
+    if (modeDef.needsImage && !refImages.length) {
+      setError({ type: 'GENERIC', message: 'Anexe a imagem primeiro (botão "Anexar imagem").' });
+      fileRef.current?.click();
+      return;
+    }
     const token = localStorage.getItem('token');
     if (!token) { setShowLoginModal(true); return; }
 
@@ -221,6 +238,7 @@ export default function CerebroEditor() {
         ...(sessionId ? { sessionId } : {}),
         images: refImages,
         ...(portraitMode ? { portrait: true } : {}),
+        ...(mode !== 'livre' ? { mode, fields } : {}),
       });
       setSessionId(data.sessionId);
       setPortraitMode(false);
@@ -272,6 +290,7 @@ export default function CerebroEditor() {
 
   const pickStarter = (s) => {
     if (s.href) { window.location.href = s.href; return; }
+    setMode(s.mode || 'livre');
     setInput(s.prompt);
     if (s.needsImage && !refImages.length) fileRef.current?.click();
     setTimeout(() => {
@@ -297,6 +316,41 @@ export default function CerebroEditor() {
         </div>
       )}
       <div className="rounded-[18px] border border-brand-borderStrong bg-brand-surface focus-within:border-brand-dim transition-colors shadow-[0_12px_40px_-12px_rgba(0,0,0,0.6)]">
+        <div className="flex flex-wrap gap-1.5 px-3 pt-3">
+          {MODES.map((m) => (
+            <button
+              key={m.id}
+              type="button"
+              onClick={() => { setMode(m.id); setError(null); }}
+              disabled={loading}
+              className={`h-8 px-3 rounded-full text-[12.5px] font-medium transition-colors border ${mode === m.id ? 'bg-brand-accent text-brand-bg border-brand-accent' : 'border-brand-borderStrong text-brand-sub hover:text-brand-text hover:border-brand-dim'}`}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
+        {(modeDef.fields || []).length > 0 && (
+          <div className="flex flex-wrap gap-2 px-4 pt-3">
+            {modeDef.fields.includes('empresa') && (
+              <input value={fields.empresa} onChange={(e) => setFields({ ...fields, empresa: e.target.value })} disabled={loading}
+                placeholder="Nome da empresa" className="h-9 flex-1 min-w-[140px] rounded-[10px] bg-transparent border border-brand-borderStrong px-3 text-[13.5px] text-brand-text placeholder-brand-dim outline-none focus:border-brand-dim" />
+            )}
+            {modeDef.fields.includes('whatsapp') && (
+              <input value={fields.whatsapp} onChange={(e) => setFields({ ...fields, whatsapp: e.target.value })} disabled={loading} inputMode="tel"
+                placeholder="WhatsApp (opcional)" className="h-9 flex-1 min-w-[140px] rounded-[10px] bg-transparent border border-brand-borderStrong px-3 text-[13.5px] text-brand-text placeholder-brand-dim outline-none focus:border-brand-dim" />
+            )}
+            {modeDef.fields.includes('voz') && (
+              <div className="flex h-9 rounded-[10px] border border-brand-borderStrong overflow-hidden text-[12.5px]">
+                {['masculina', 'feminina'].map((v) => (
+                  <button key={v} type="button" onClick={() => setFields({ ...fields, voz: v })} disabled={loading}
+                    className={`px-3 ${fields.voz === v ? 'bg-white/10 text-brand-text' : 'text-brand-tert hover:text-brand-text'}`}>
+                    Voz {v}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
         {refImages.length > 0 && (
           <div className="flex flex-wrap gap-2 px-4 pt-4">
             {refImages.map((img, i) => (
@@ -319,7 +373,7 @@ export default function CerebroEditor() {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={loading}
-          placeholder={refImages.length ? 'Diga o que fazer com a imagem...' : 'Ex.: vídeo de anúncio com voz da minha pizzaria, pizza grande R$ 49,90, WhatsApp...'}
+          placeholder={modeDef.hint}
           className="block w-full resize-none bg-transparent px-5 pt-4 pb-2 text-[15px] leading-relaxed text-brand-text placeholder-brand-dim outline-none disabled:opacity-60"
         />
         <div className="flex items-center justify-between px-3 pb-3">
@@ -356,23 +410,11 @@ export default function CerebroEditor() {
             O que vamos <span className="text-brand-accent">criar</span> hoje?
           </h1>
           <p className="mt-4 text-center text-[15px] sm:text-[17px] text-brand-sub max-w-[520px] mx-auto leading-relaxed" style={{ textWrap: 'pretty' }}>
-            Peça como pediria a um designer. Vídeo, post, logo ou edição de foto, com o texto em português escrito certo.
+            Escolha o que quer criar, preencha e pronto. Vídeo com narração, imagem animada, personagem falando, post ou logo.
           </p>
 
           <div className="mt-9">{composer}</div>
 
-          <div className="mt-4 flex flex-wrap justify-center gap-2">
-            {STARTERS.map((s) => (
-              <button
-                key={s.title}
-                onClick={() => pickStarter(s)}
-                className="flex items-center gap-2 h-9 px-3.5 rounded-full border border-brand-borderStrong text-[13px] text-brand-sub hover:text-brand-text hover:border-brand-dim transition-colors"
-              >
-                <Icon d={s.icon} className="w-4 h-4 text-brand-accent" />
-                {s.short}
-              </button>
-            ))}
-          </div>
 
           <div className="mt-16">
             <div className="flex items-end justify-between pb-3 border-b border-brand-border">
