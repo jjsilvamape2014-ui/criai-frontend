@@ -238,7 +238,8 @@ export default function CerebroEditor() {
       if (!data.jobId) setCredits(data.credits || null);
     } catch (err) {
       if (err.data?.code === 'NO_CREDITS') {
-        setError({ type: 'NO_CREDITS', message: 'Seus créditos acabaram. Assine o plano por R$ 39,99/mês para continuar criando.' });
+        // o servidor explica o caso (ex.: apresentador custa 3 e há alternativa animada)
+        setError({ type: 'NO_CREDITS', message: err.data?.error || 'Seus créditos acabaram. Assine o plano por R$ 39,99/mês para continuar criando.' });
       } else if (err.data?.code === 'GEN_FAILED') {
         setError({ type: 'GENERIC', message: 'Não conseguimos gerar agora. Tente novamente.' });
       } else {
