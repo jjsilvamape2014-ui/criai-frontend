@@ -6,10 +6,10 @@ export function middleware(request) {
 
   if (hasToken) {
     if (pathname === '/') {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
+      return NextResponse.redirect(new URL('/cerebro', request.url));
     }
     if (pathname === '/login' || pathname === '/register') {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
+      return NextResponse.redirect(new URL('/cerebro', request.url));
     }
   }
 

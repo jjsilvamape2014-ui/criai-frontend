@@ -21,7 +21,7 @@ export default function RegisterPage() {
       const data = await api.register(email, password, name);
       localStorage.setItem('token', data.token);
       setAuthTokenCookie(data.token);
-      window.location.href = '/dashboard';
+      window.location.href = '/cerebro';
     } catch (err) {
       setError(err.message || 'Erro ao criar conta');
     } finally { setLoading(false); }

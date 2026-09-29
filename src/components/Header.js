@@ -8,7 +8,6 @@ import Logo from '@/components/Logo';
 export default function Header() {
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -36,7 +35,7 @@ export default function Header() {
         <div className={`flex flex-col gap-2 transition-all duration-300 rounded-2xl ${scrolled ? 'glass shadow-xl shadow-black/20 border border-white/10 px-4 py-2' : 'bg-transparent'}`}>
           {/* Top row: logo + auth */}
           <div className="flex items-center justify-between">
-            <a href={user ? '/dashboard' : '/'}>
+            <a href={user ? '/cerebro' : '/'}>
               <Logo size="md" />
             </a>
 
@@ -68,8 +67,8 @@ export default function Header() {
                             {user.plan === 'PREMIUM' ? '⭐ Premium' : 'Free'}
                           </span>
                         </div>
-                        <a href="/dashboard" className="block px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">Minha área</a>
-                        <a href="/cerebro" className="block px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">Estúdio inteligente</a>
+                        <a href="/cerebro" className="block px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">Criar</a>
+                        <a href="/dashboard#recentes" className="block px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">Minhas criações</a>
                         <a href="/plans" className="block px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">Planos & Assinatura</a>
                         <div className="border-t border-white/10 mt-1 pt-1">
                           <button onClick={handleLogout} className="block w-full text-left px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors">
@@ -89,33 +88,14 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Floating nav bar below the logo */}
-          <nav className="flex items-center justify-center gap-1 overflow-x-auto bg-white/5 border border-white/10 rounded-xl px-1.5 py-1 backdrop-blur-md scrollbar-none">
-            <a href="/dashboard" className="btn-ghost text-sm px-3 py-1.5 whitespace-nowrap">✨ Criar</a>
-            <a href="/dashboard#recentes" className="btn-ghost text-sm px-3 py-1.5 whitespace-nowrap">▣ Minhas criações</a>
-            <a href="/plans" className="btn-ghost text-sm px-3 py-1.5 whitespace-nowrap">⭐ Planos</a>
-            <div className="relative">
-              <button
-                onClick={() => setMoreOpen(!moreOpen)}
-                className={`btn-ghost text-sm px-3 py-1.5 whitespace-nowrap flex items-center gap-1 ${moreOpen ? 'text-white' : ''}`}
-              >
-                Mais
-                <svg className={`h-3.5 w-3.5 transition-transform ${moreOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              {moreOpen && (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={() => setMoreOpen(false)} />
-                  <div className="absolute right-0 top-full mt-1 w-52 glass rounded-xl border border-white/10 shadow-2xl shadow-black/40 py-1.5 z-50 animate-slide-in">
-                    <a href="/video" onClick={() => setMoreOpen(false)} className="block px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">🎬 Transformar em vídeo</a>
-                    <a href="/card-de-candidato" onClick={() => setMoreOpen(false)} className="block px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">🗳️ Santinho de candidato</a>
-                    <a href="/cerebro" onClick={() => setMoreOpen(false)} className="block px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">🖌️ Editar imagem</a>
-                  </div>
-                </>
-              )}
-            </div>
-          </nav>
+          {/* Menu: o Cérebro é a porta de entrada; as ferramentas antigas seguem acessíveis pelo endereço */}
+          {user && (
+            <nav className="flex items-center justify-center gap-1 overflow-x-auto bg-white/5 border border-white/10 rounded-xl px-1.5 py-1 backdrop-blur-md scrollbar-none">
+              <a href="/cerebro" className="btn-ghost text-sm px-3 py-1.5 whitespace-nowrap">Criar</a>
+              <a href="/dashboard#recentes" className="btn-ghost text-sm px-3 py-1.5 whitespace-nowrap">Minhas criações</a>
+              <a href="/plans" className="btn-ghost text-sm px-3 py-1.5 whitespace-nowrap">Planos</a>
+            </nav>
+          )}
         </div>
       </div>
     </header>

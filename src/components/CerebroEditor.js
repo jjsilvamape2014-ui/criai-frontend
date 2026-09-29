@@ -3,6 +3,54 @@
 import { useState, useEffect, useRef } from 'react';
 import { api } from '@/lib/api';
 
+const JOB_KEY = 'criai_cerebro_job';
+
+// Atalhos da tela inicial: preenchem a caixa com um pedido pronto para completar.
+const STARTERS = [
+  {
+    title: 'Anúncio em vídeo com voz',
+    desc: 'Vídeo animado 9:16 com narração, pronto para Reels e Status.',
+    prompt: 'Vídeo de anúncio com voz da [nome da empresa], [o que vende e preço], WhatsApp [número], cores [cores da marca]',
+    icon: 'M15 10l4.55-2.28A1 1 0 0121 8.62v6.76a1 1 0 01-1.45.9L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z',
+  },
+  {
+    title: 'Post para Instagram',
+    desc: 'Arte de divulgação com texto, preço e chamada.',
+    prompt: 'Criar um post de Instagram para [nome da empresa] divulgando [produto ou promoção], com o texto "[frase]"',
+    icon: 'M4 16l4.59-4.59a2 2 0 012.82 0L16 16m-2-2l1.59-1.59a2 2 0 012.82 0L20 14M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2zm8-12h.01',
+  },
+  {
+    title: 'Editar uma foto',
+    desc: 'Envie a foto e diga o que mudar: fundo, cor, remover objetos.',
+    prompt: 'Deixar o fundo branco e melhorar a iluminação',
+    icon: 'M15.23 5.23l3.54 3.54M9 11l6.36-6.36a2.5 2.5 0 113.54 3.54L12.54 14.54a4 4 0 01-1.79 1.04L7 17l1.42-3.75A4 4 0 019 11z',
+    needsImage: true,
+  },
+  {
+    title: 'Logo para a marca',
+    desc: 'Logo profissional a partir do nome e do ramo.',
+    prompt: 'Criar uma logo para [nome da empresa], que trabalha com [ramo], nas cores [cores]',
+    icon: 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.34M11 7.34l1.66-1.66a2 2 0 012.83 0l2.83 2.83a2 2 0 010 2.83L10 19.66',
+  },
+];
+
+function Icon({ d, className = 'w-5 h-5' }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+      <path strokeLinecap="round" strokeLinejoin="round" d={d} />
+    </svg>
+  );
+}
+
+function Spinner() {
+  return (
+    <svg className="animate-spin h-4 w-4 text-primary-400 shrink-0" viewBox="0 0 24 24">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+    </svg>
+  );
+}
+
 export default function CerebroEditor() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -16,26 +64,36 @@ export default function CerebroEditor() {
   const [portraitMode, setPortraitMode] = useState(false);
   const [jobStep, setJobStep] = useState(null); // progresso do anúncio em vídeo
   const endRef = useRef(null);
+  const inputRef = useRef(null);
+  const fileRef = useRef(null);
 
   // Acompanha o anúncio em vídeo (1–4 min) sem segurar a requisição.
-  const pollJob = async (jobId, baseMessages) => {
+  // O jobId fica no sessionStorage para retomar se a página for recarregada.
+  const pollJob = async (jobId) => {
+    if (typeof window !== 'undefined') sessionStorage.setItem(JOB_KEY, jobId);
     const started = Date.now();
-    while (Date.now() - started < 10 * 60 * 1000) {
-      await new Promise((r) => setTimeout(r, 4000));
-      let job;
-      try { job = await api.cerebroJob(jobId); } catch (e) { continue; }
-      if (job.status === 'running') { setJobStep(job.step || 'Produzindo o vídeo...'); continue; }
-      setJobStep(null);
-      if (job.status === 'done') {
-        setMessages([...baseMessages, { role: 'assistant', message: job.reply, videoUrl: job.videoUrl }]);
-        if (job.credits) setCredits(job.credits);
-      } else {
-        setError({ type: 'GENERIC', message: job.error || 'Nao consegui montar o video. Tente novamente.' });
+    try {
+      while (Date.now() - started < 10 * 60 * 1000) {
+        await new Promise((r) => setTimeout(r, 4000));
+        let job;
+        try { job = await api.cerebroJob(jobId); } catch (e) {
+          if (e.status === 404) break; // job perdido (servidor reiniciou)
+          continue;
+        }
+        if (job.status === 'running') { setJobStep(job.step || 'Produzindo o vídeo...'); continue; }
+        if (job.status === 'done') {
+          setMessages((prev) => [...prev, { role: 'assistant', message: job.reply, videoUrl: job.videoUrl }]);
+          if (job.credits) setCredits(job.credits);
+        } else {
+          setError({ type: 'GENERIC', message: job.error || 'Não consegui montar o vídeo. Tente novamente.' });
+        }
+        return;
       }
-      return;
+      setError({ type: 'GENERIC', message: 'O vídeo não foi concluído. Tente pedir novamente.' });
+    } finally {
+      setJobStep(null);
+      if (typeof window !== 'undefined') sessionStorage.removeItem(JOB_KEY);
     }
-    setJobStep(null);
-    setError({ type: 'GENERIC', message: 'O video esta demorando mais que o normal. Tente novamente em instantes.' });
   };
 
   useEffect(() => {
@@ -64,38 +122,54 @@ export default function CerebroEditor() {
           if (mem.memory?.refImages?.length) {
             setRefImages(mem.memory.refImages);
             setBaseImage(mem.memory.refImages[0]);
-          } else if (mem.memory.baseImage) {
+          } else if (mem.memory?.baseImage) {
             setBaseImage(mem.memory.baseImage);
             setRefImages([mem.memory.baseImage]);
           }
         })
         .catch(() => {});
     }
+    const pendingJob = sessionStorage.getItem(JOB_KEY);
+    if (pendingJob) {
+      setLoading(true);
+      setJobStep('Retomando o vídeo em produção...');
+      pollJob(pendingJob).finally(() => setLoading(false));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, loading]);
+    endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, [messages, loading, jobStep]);
+
+  // Caixa de texto cresce com o conteúdo (até ~6 linhas)
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.min(el.scrollHeight, 180)}px`;
+  }, [input]);
 
   const handleUpload = (e) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
     if (!files.length) return;
     setError(null);
-    const pending = refImages.slice(0, 4 - files.length);
-    if (pending.length + files.length > 4) {
-      setError({ type: 'GENERIC', message: 'Voce pode adicionar ate 4 imagens. Remova alguma para trocar.' });
+    const images = files.filter((f) => f.type.startsWith('image/'));
+    if (images.length !== files.length) setError({ type: 'GENERIC', message: 'Envie apenas arquivos de imagem.' });
+    if (refImages.length + images.length > 4) {
+      setError({ type: 'GENERIC', message: 'Você pode anexar até 4 imagens. Remova alguma para trocar.' });
       e.target.value = '';
       return;
     }
+    if (!images.length) { e.target.value = ''; return; }
     let loaded = 0;
-    const next = [...pending];
-    files.forEach((file) => {
-      if (!file.type.startsWith('image/')) { setError({ type: 'GENERIC', message: 'Envie apenas arquivos de imagem.' }); return; }
+    const next = [...refImages];
+    images.forEach((file) => {
       const reader = new FileReader();
       reader.onload = () => {
         next.push(reader.result);
         loaded++;
-        if (loaded === files.length) {
+        if (loaded === images.length) {
           setRefImages(next);
           if (!baseImage) setBaseImage(next[0]);
           e.target.value = '';
@@ -114,12 +188,20 @@ export default function CerebroEditor() {
   const handleSend = async () => {
     const msg = input.trim();
     if (!msg || loading) return;
+    const blank = msg.match(/\[[^\]]*\]/);
+    if (blank) {
+      setError({ type: 'GENERIC', message: `Complete o campo ${blank[0]} antes de enviar.` });
+      const el = inputRef.current;
+      if (el) { el.focus(); el.setSelectionRange(blank.index, blank.index + blank[0].length); }
+      return;
+    }
     const token = localStorage.getItem('token');
     if (!token) { setShowLoginModal(true); return; }
 
     setLoading(true); setError(null);
     const newMessages = [...messages, { role: 'user', message: msg }];
     setMessages(newMessages);
+    setInput('');
 
     try {
       const data = await api.cerebroChat(msg, {
@@ -130,13 +212,11 @@ export default function CerebroEditor() {
       setSessionId(data.sessionId);
       setPortraitMode(false);
       if (typeof window !== 'undefined') sessionStorage.setItem('criai_cerebro_session', data.sessionId);
-      const withReply = [...newMessages, { role: 'assistant', message: data.reply, imageUrl: data.imageUrl, videoUrl: data.videoUrl || null }];
-      setMessages(withReply);
+      setMessages([...newMessages, { role: 'assistant', message: data.reply, imageUrl: data.imageUrl, videoUrl: data.videoUrl || null }]);
       if (data.jobId) {
         // anúncio em vídeo rodando em segundo plano → acompanha o progresso
         setJobStep('Começando...');
-        setInput('');
-        await pollJob(data.jobId, withReply);
+        await pollJob(data.jobId);
       } else if (data.imageUrl && !data.videoUrl) {
         // vídeo NÃO vira imagem de referência (quebrava as edições seguintes)
         setBaseImage(data.imageUrl);
@@ -145,19 +225,19 @@ export default function CerebroEditor() {
       if (!data.jobId) setCredits(data.credits || null);
     } catch (err) {
       if (err.data?.code === 'NO_CREDITS') {
-        setError({ type: 'NO_CREDITS', message: 'Seus creditos acabaram! Assine o plano por R$ 39,99/mes para continuar criando.' });
+        setError({ type: 'NO_CREDITS', message: 'Seus créditos acabaram. Assine o plano por R$ 39,99/mês para continuar criando.' });
       } else if (err.data?.code === 'GEN_FAILED') {
-        setError({ type: 'GENERIC', message: 'Nao conseguimos gerar a nova imagem agora. Tente novamente.' });
+        setError({ type: 'GENERIC', message: 'Não conseguimos gerar agora. Tente novamente.' });
       } else {
-        setError({ type: 'GENERIC', message: err.message || 'Erro ao editar a imagem. Tente novamente.' });
+        setError({ type: 'GENERIC', message: err.message || 'Algo deu errado. Tente novamente.' });
       }
     } finally {
       setLoading(false);
-      setInput('');
     }
   };
 
   const handleReset = async () => {
+    if (loading) return;
     if (sessionId) {
       try { await api.cerebroReset(sessionId); } catch {}
     }
@@ -168,7 +248,7 @@ export default function CerebroEditor() {
   const handleDownload = (url) => {
     const link = document.createElement('a');
     link.href = url;
-    link.download = `criativa-edicao-${Date.now()}.png`;
+    link.download = `criativa-${Date.now()}.png`;
     document.body.appendChild(link); link.click(); document.body.removeChild(link);
   };
 
@@ -176,152 +256,183 @@ export default function CerebroEditor() {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
   };
 
-  const examples = ['Trocar a cor da caneca para azul', 'Deixar o fundo branco', 'Colocar minha logo na imagem', 'Remover os nomes/textos da embalagem', 'Transformar esta foto em vídeo', 'Vídeo de anúncio com voz da minha loja', 'Colocar um chapéu na pessoa'];
+  const pickStarter = (s) => {
+    setInput(s.prompt);
+    if (s.needsImage && !refImages.length) fileRef.current?.click();
+    setTimeout(() => {
+      const el = inputRef.current;
+      if (!el) return;
+      el.focus();
+      // seleciona o primeiro [campo] para o cliente já digitar por cima
+      const start = s.prompt.indexOf('[');
+      if (start >= 0) el.setSelectionRange(start, s.prompt.indexOf(']', start) + 1);
+    }, 0);
+  };
+
+  const empty = messages.length === 0 && !loading;
 
   return (
-    <div id="cerebro" className="card mb-8">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-3 mb-4">
-        <div>
-          <h3 className="font-semibold text-white flex items-center gap-2">
-            <span className="text-lg">🧠</span> Cerebro Visual
-            {sessionId && <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 font-medium">Sessao ativa</span>}
-          </h3>
-          <p className="text-xs text-gray-500 mt-1">Agente de criação por conversa: envie uma foto e peça o que quiser — colocar chapéu, trocar cor, remover pessoa, adicionar texto/logo, juntar imagens ou transformar em vídeo. Também cria peças do zero (flyer, banner, logo...) só digitando o pedido. (1 crédito por ação)</p>
+    <div id="cerebro" className="flex flex-col min-h-[calc(100vh-11rem)]">
+      {/* Topo */}
+      {!empty && (
+        <div className="flex items-center justify-between gap-3 pb-3 mb-2 border-b border-white/10">
+          <p className="text-sm font-semibold text-white">Conversa atual</p>
+          <button
+            onClick={handleReset}
+            disabled={loading}
+            className="text-xs font-medium text-gray-400 hover:text-white disabled:opacity-40 flex items-center gap-1.5"
+          >
+            <Icon d="M12 4v16m8-8H4" className="w-3.5 h-3.5" /> Nova criação
+          </button>
         </div>
-        {sessionId && (
-          <button onClick={handleReset} className="text-xs text-red-400 hover:text-red-300 font-medium shrink-0">Nova conversa</button>
-        )}
-      </div>
+      )}
 
-      {/* Base images / upload (até 4 referências) */}
-      <div className="mb-4 rounded-xl border border-white/10 bg-white/[0.03] p-3">
-        {refImages.length > 0 ? (
-          <>
-            <div className="flex flex-wrap items-center gap-3">
-              {refImages.map((img, i) => (
-                <div key={i} className="w-20 h-20 rounded-lg overflow-hidden border border-white/10 relative group shrink-0">
-                  <img src={img} alt={`Ref ${i + 1}`} className="w-full h-full object-cover" />
-                  <button
-                    onClick={() => removeImage(i)}
-                    className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/70 text-white text-[10px] font-bold opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-opacity flex items-center justify-center"
-                    title="Remover"
-                  >✕</button>
-                  {i === 0 && <span className="absolute bottom-1 left-1 text-[9px] px-1.5 py-0.5 rounded bg-primary-500/80 text-white font-bold">base</span>}
-                </div>
-              ))}
-              {refImages.length < 4 && (
-                <label className="w-20 h-20 rounded-lg border border-dashed border-white/20 hover:border-primary-500/40 flex items-center justify-center text-gray-500 hover:text-primary-300 cursor-pointer transition-colors shrink-0 text-2xl">
-                  +
-                  <input type="file" accept="image/*" multiple onChange={handleUpload} className="hidden" />
-                </label>
-              )}
-            </div>
-            <div className="mt-2 flex items-center justify-between flex-wrap gap-2">
-              <p className="text-xs text-gray-400 font-medium">
-                {refImages.length} de 4 imagens de {refImages.length === 1 ? 'referencia' : 'referencias'} na conversa
-              </p>
-              <label className="text-xs text-primary-400 hover:text-primary-300 font-medium cursor-pointer">
-                Trocar por outra imagem
-                <input type="file" accept="image/*" multiple onChange={handleUpload} className="hidden" />
-              </label>
-            </div>
-          </>
-        ) : (
-          <>
-            <label className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-primary-500/40 bg-primary-500/10 text-primary-300 text-sm font-semibold hover:bg-primary-500/20 transition-colors cursor-pointer w-full">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-              Enviar imagem para editar (ate 4 imagens)
-              <input type="file" accept="image/*" multiple onChange={handleUpload} className="hidden" />
-            </label>
-            <p className="mt-2 text-[11px] text-gray-500 text-center">
-              Sem imagem? Também posso <b className="text-primary-300">criar do zero</b> — é só digitar o pedido abaixo (ex: "criar um flyer de promoção").
+      {/* Conversa */}
+      <div className="flex-1">
+        {empty ? (
+          <div className="pt-6 sm:pt-12 pb-6">
+            <h1 className="text-3xl sm:text-4xl font-bold text-white text-center tracking-tight">O que vamos criar hoje?</h1>
+            <p className="mt-3 text-center text-gray-400 text-sm sm:text-base max-w-xl mx-auto">
+              Descreva o que você precisa, como se estivesse falando com um designer. Se tiver uma foto ou logo, anexe no clipe.
             </p>
-          </>
-        )}
-      </div>
-
-      {/* Messages */}
-      <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1 mb-4">
-        {messages.length === 0 && (
-          <div className="text-center py-6">
-            <p className="text-gray-500 text-sm mb-3">Exemplos do que posso fazer:</p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {examples.map((s) => (
-                <button key={s} onClick={() => setInput(s)} className="text-xs px-3 py-1.5 rounded-full border border-white/10 text-gray-300 hover:border-primary-500/40 hover:text-primary-300 transition-colors">{s}</button>
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {STARTERS.map((s) => (
+                <button
+                  key={s.title}
+                  onClick={() => pickStarter(s)}
+                  className="text-left rounded-2xl border border-white/10 bg-white/[0.03] p-4 hover:border-primary-500/50 hover:bg-primary-500/[0.06] transition-colors group"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-primary-500/15 text-primary-300 flex items-center justify-center shrink-0 group-hover:bg-primary-500/25">
+                      <Icon d={s.icon} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-white">{s.title}</p>
+                      <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">{s.desc}</p>
+                    </div>
+                  </div>
+                </button>
               ))}
             </div>
           </div>
-        )}
-        {messages.map((m, i) => (
-          <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[85%] rounded-2xl px-4 py-3 ${m.role === 'user' ? 'bg-primary-500/20 border border-primary-500/30 text-white' : 'bg-white/5 border border-white/10 text-gray-200'}`}>
-              <p className="text-sm whitespace-pre-wrap">{m.message}</p>
-              {m.videoUrl && (
-                <div className="mt-3 rounded-xl overflow-hidden border border-white/10 relative group max-w-[420px]">
-                  <video src={m.videoUrl} controls className="w-full max-h-[320px] object-contain bg-black" />
-                  <a href={m.videoUrl} download target="_blank" rel="noreferrer" className="absolute bottom-2 right-2 text-xs bg-black/70 text-white px-3 py-1.5 rounded-lg font-medium hover:bg-black/90">Baixar</a>
+        ) : (
+          <div className="space-y-4 py-4">
+            {messages.map((m, i) => (
+              <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[88%] sm:max-w-[80%] rounded-2xl px-4 py-3 ${m.role === 'user' ? 'bg-primary-500/20 border border-primary-500/30 text-white rounded-br-md' : 'bg-white/5 border border-white/10 text-gray-200 rounded-bl-md'}`}>
+                  {m.message && <p className="text-sm whitespace-pre-wrap leading-relaxed">{m.message}</p>}
+                  {m.videoUrl && (
+                    <div className="mt-3 rounded-xl overflow-hidden border border-white/10 max-w-[360px] bg-black">
+                      <video src={m.videoUrl} controls playsInline className="w-full max-h-[520px] object-contain bg-black" />
+                      <a href={m.videoUrl} download target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 py-2.5 text-sm font-semibold text-white bg-white/5 hover:bg-white/10 border-t border-white/10">
+                        <Icon d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" className="w-4 h-4" /> Baixar vídeo
+                      </a>
+                    </div>
+                  )}
+                  {m.imageUrl && !m.videoUrl && (
+                    <div className="mt-3 rounded-xl overflow-hidden border border-white/10 max-w-[420px]">
+                      <img src={m.imageUrl} alt="Resultado" className="w-full max-h-[420px] object-contain bg-black/30" />
+                      <button onClick={() => handleDownload(m.imageUrl)} className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-semibold text-white bg-white/5 hover:bg-white/10 border-t border-white/10">
+                        <Icon d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" className="w-4 h-4" /> Baixar imagem
+                      </button>
+                    </div>
+                  )}
                 </div>
-              )}
-              {m.imageUrl && !m.videoUrl && (
-                <div className="mt-3 rounded-xl overflow-hidden border border-white/10 relative group max-w-[420px]">
-                  <img src={m.imageUrl} alt="Resultado" className="w-full max-h-[320px] object-contain" />
-                  <button onClick={() => handleDownload(m.imageUrl)} className="absolute bottom-2 right-2 text-xs bg-black/70 text-white px-3 py-1.5 rounded-lg font-medium hover:bg-black/90">Baixar</button>
+              </div>
+            ))}
+            {loading && (
+              <div className="flex justify-start">
+                <div className="bg-white/5 border border-white/10 rounded-2xl rounded-bl-md px-4 py-3 max-w-[88%]">
+                  <div className="flex items-center gap-2.5">
+                    <Spinner />
+                    <span className="text-sm text-gray-200">{jobStep || 'Criando...'}</span>
+                  </div>
+                  {jobStep && (
+                    <p className="text-xs text-gray-500 mt-1.5">O vídeo leva de 1 a 4 minutos. Pode deixar esta página aberta.</p>
+                  )}
                 </div>
-              )}
-            </div>
-          </div>
-        ))}
-        {loading && (
-          <div className="flex justify-start">
-            <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-2xl px-4 py-3">
-              <svg className="animate-spin h-4 w-4 text-primary-400" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-              <span className="text-sm text-gray-300">{jobStep || 'Editando a imagem...'}</span>
-            </div>
+              </div>
+            )}
           </div>
         )}
         <div ref={endRef} />
       </div>
 
-      {/* Error */}
-      {error && (
-        <div className={`rounded-xl p-4 mb-4 border ${error.type === 'NO_CREDITS' ? 'bg-amber-500/10 border-amber-500/20' : 'bg-red-500/10 border-red-500/20'}`}>
-          <p className={`text-sm font-medium ${error.type === 'NO_CREDITS' ? 'text-amber-300' : 'text-red-300'}`}>{error.message}</p>
-          {error.type === 'NO_CREDITS' && (
-            <a href="/plans" className="inline-block mt-2 text-sm text-primary-400 font-semibold hover:underline">Ver planos e recargas</a>
+      {/* Caixa de pedido */}
+      <div className="sticky bottom-0 pt-2 pb-3 bg-gradient-to-t from-dark-950 via-dark-950 to-transparent">
+        {/* Erro */}
+        {error && (
+          <div className={`rounded-xl px-4 py-3 mb-3 border ${error.type === 'NO_CREDITS' ? 'bg-amber-500/10 border-amber-500/20' : 'bg-red-500/10 border-red-500/20'}`}>
+            <p className={`text-sm font-medium ${error.type === 'NO_CREDITS' ? 'text-amber-300' : 'text-red-300'}`}>{error.message}</p>
+            {error.type === 'NO_CREDITS' && (
+              <a href="/plans" className="inline-block mt-1.5 text-sm text-primary-400 font-semibold hover:underline">Ver planos e recargas</a>
+            )}
+          </div>
+        )}
+        <div className="rounded-2xl border border-white/15 bg-brand-surface focus-within:border-primary-500/60 transition-colors shadow-xl shadow-black/30">
+          {refImages.length > 0 && (
+            <div className="flex flex-wrap gap-2 px-3 pt-3">
+              {refImages.map((img, i) => (
+                <div key={i} className="w-14 h-14 rounded-lg overflow-hidden border border-white/10 relative group shrink-0">
+                  <img src={img} alt={`Anexo ${i + 1}`} className="w-full h-full object-cover" />
+                  <button
+                    onClick={() => removeImage(i)}
+                    disabled={loading}
+                    className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-black/75 text-white text-[10px] font-bold flex items-center justify-center hover:bg-red-600"
+                    title="Remover"
+                  >✕</button>
+                </div>
+              ))}
+            </div>
           )}
+          <textarea
+            ref={inputRef}
+            rows={1}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            disabled={loading}
+            placeholder={refImages.length ? 'Diga o que fazer com a imagem...' : 'Descreva o que você quer criar...'}
+            className="block w-full resize-none bg-transparent px-4 pt-3 pb-1 text-[15px] text-white placeholder-gray-500 outline-none disabled:opacity-60"
+          />
+          <div className="flex items-center justify-between px-2 pb-2">
+            <label
+              className={`flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-white/5 cursor-pointer ${refImages.length >= 4 || loading ? 'opacity-40 pointer-events-none' : ''}`}
+              title="Anexar foto ou logo (até 4)"
+            >
+              <Icon d="M15.17 7l-6.59 6.59a2 2 0 102.83 2.83l6.41-6.59a4 4 0 00-5.66-5.66l-6.4 6.58a6 6 0 108.49 8.49L20.5 13" className="w-5 h-5" />
+              <span className="hidden sm:inline">Anexar imagem</span>
+              <input ref={fileRef} type="file" accept="image/*" multiple onChange={handleUpload} className="hidden" />
+            </label>
+            <div className="flex items-center gap-3">
+              {credits && (
+                <a href="/plans" className="text-[11px] text-gray-500 hover:text-gray-300 hidden sm:block">
+                  {credits.creditsImages + credits.creditsPurchased} créditos
+                </a>
+              )}
+              <button
+                onClick={handleSend}
+                disabled={loading || !input.trim()}
+                className="w-10 h-10 rounded-xl bg-primary-500 hover:bg-primary-400 text-white flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                title="Enviar"
+              >
+                <Icon d="M5 12h14M13 6l6 6-6 6" className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
         </div>
-      )}
-
-      {/* Input */}
-      <div className="flex items-end gap-2">
-        <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="O que quer mudar na imagem? Ex: trocar a cor da caneca para azul..."
-          className="input flex-1 min-h-[44px] resize-none"
-        />
-        <button onClick={handleSend} disabled={loading || !input.trim()} className="btn-primary !px-4 !py-3 shrink-0" title="Enviar">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
-        </button>
+        <p className="mt-2 text-center text-[11px] text-gray-600">Cada criação usa 1 crédito. Enter envia, Shift+Enter quebra a linha.</p>
       </div>
-      {credits && (
-        <p className="mt-2 text-[11px] text-gray-500">
-          <b className="text-white">{credits.creditsImages + credits.creditsPurchased}</b> creditos restantes
-          <a href="/plans" className="ml-2 text-primary-400 hover:text-primary-300 font-medium">+ Recarregar</a>
-        </p>
-      )}
 
-      {/* Login modal */}
+      {/* Login */}
       {showLoginModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="glass rounded-2xl p-8 max-w-md w-full border border-white/10 shadow-2xl animate-fade-up">
             <h3 className="text-xl font-bold text-white mb-2 mt-0">Crie sua conta gratuita</h3>
-            <p className="text-gray-400 mb-6">Ganhe 10 imagens e 2 videos gratis todo mes. Sem cartao de credito.</p>
+            <p className="text-gray-400 mb-6">Ganhe 10 imagens e 2 vídeos grátis todo mês. Sem cartão de crédito.</p>
             <div className="space-y-3">
-              <a href="/register" className="btn-primary block text-center">Criar conta gratis</a>
-              <a href="/login" className="btn-secondary block text-center">Ja tenho conta</a>
+              <a href="/register" className="btn-primary block text-center">Criar conta grátis</a>
+              <a href="/login" className="btn-secondary block text-center">Já tenho conta</a>
             </div>
             <button onClick={() => setShowLoginModal(false)} className="mt-4 text-sm text-gray-500 hover:text-gray-300 w-full transition-colors">Fechar</button>
           </div>
