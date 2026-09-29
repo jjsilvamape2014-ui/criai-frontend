@@ -59,7 +59,7 @@ export default function Home() {
       const token = localStorage.getItem('token');
       if (token) {
         setAuthTokenCookie(token);
-        window.location.replace('/dashboard');
+        window.location.replace('/cerebro');
         return;
       }
       setLogged(false);

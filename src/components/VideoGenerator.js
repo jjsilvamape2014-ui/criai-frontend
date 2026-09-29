@@ -57,6 +57,8 @@ export default function VideoGenerator() {
   // Recebe a imagem vinda do "Criar anúncio em vídeo" (card da imagem gerada)
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    // Vindo do Cérebro: /video?modo=apresentador abre direto o anúncio falado
+    if (new URLSearchParams(window.location.search).get('modo') === 'apresentador') setMode('talking');
     const vidImg = sessionStorage.getItem('criai_video_image');
     const vidName = sessionStorage.getItem('criai_video_name');
     if (vidImg) {

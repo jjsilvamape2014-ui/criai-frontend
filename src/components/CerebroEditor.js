@@ -4,34 +4,48 @@ import { useState, useEffect, useRef } from 'react';
 import { api } from '@/lib/api';
 
 const JOB_KEY = 'criai_cerebro_job';
+const PRESENTER_RE = /(apresentador|apresentadora|apresentando|pessoa (real )?(falando|mostrando)|avatar|influencer|garot[oa][- ]propaganda|ugc)/i;
 
 // Atalhos da tela inicial: preenchem a caixa com um pedido pronto para completar.
 const STARTERS = [
   {
-    title: 'Anúncio em vídeo com voz',
+    title: 'Anúncio em vídeo com voz', short: 'Vídeo com voz',
     desc: 'Vídeo animado 9:16 com narração, pronto para Reels e Status.',
     prompt: 'Vídeo de anúncio com voz da [nome da empresa], [o que vende e preço], WhatsApp [número], cores [cores da marca]',
     icon: 'M15 10l4.55-2.28A1 1 0 0121 8.62v6.76a1 1 0 01-1.45.9L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z',
   },
   {
-    title: 'Post para Instagram',
+    title: 'Vídeo com apresentador', short: 'Vídeo com apresentador',
+    href: '/video?modo=apresentador',
+    icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+  },
+  {
+    title: 'Post para Instagram', short: 'Post para Instagram',
     desc: 'Arte de divulgação com texto, preço e chamada.',
     prompt: 'Criar um post de Instagram para [nome da empresa] divulgando [produto ou promoção], com o texto "[frase]"',
     icon: 'M4 16l4.59-4.59a2 2 0 012.82 0L16 16m-2-2l1.59-1.59a2 2 0 012.82 0L20 14M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2zm8-12h.01',
   },
   {
-    title: 'Editar uma foto',
+    title: 'Editar uma foto', short: 'Editar foto',
     desc: 'Envie a foto e diga o que mudar: fundo, cor, remover objetos.',
     prompt: 'Deixar o fundo branco e melhorar a iluminação',
     icon: 'M15.23 5.23l3.54 3.54M9 11l6.36-6.36a2.5 2.5 0 113.54 3.54L12.54 14.54a4 4 0 01-1.79 1.04L7 17l1.42-3.75A4 4 0 019 11z',
     needsImage: true,
   },
   {
-    title: 'Logo para a marca',
+    title: 'Logo para a marca', short: 'Logo',
     desc: 'Logo profissional a partir do nome e do ramo.',
     prompt: 'Criar uma logo para [nome da empresa], que trabalha com [ramo], nas cores [cores]',
     icon: 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.34M11 7.34l1.66-1.66a2 2 0 012.83 0l2.83 2.83a2 2 0 010 2.83L10 19.66',
   },
+];
+
+// Exemplos reais (mesmas imagens da página inicial): clicar preenche o pedido.
+const INSPIRATION = [
+  { cat: 'Anúncio de produto', src: '/showcase/anuncio-hamburguer.webp', prompt: 'Anúncio de hambúrguer artesanal com o preço R$ 29,90 e a chamada Peça já' },
+  { cat: 'Post para feed', src: '/showcase/post-feed.webp', prompt: 'Post quadrado com a frase Promoção de Setembro, fundo laranja' },
+  { cat: 'Logotipo', src: '/showcase/logo-padaria.webp', prompt: 'Logotipo para a marca Padaria São João, traço minimalista' },
+  { cat: 'Pôster', src: '/showcase/hero-acai.webp', prompt: 'Pôster de açaí com o preço R$ 12,90 em destaque, fundo roxo, tipografia forte' },
 ];
 
 function Icon({ d, className = 'w-5 h-5' }) {
@@ -198,6 +212,18 @@ export default function CerebroEditor() {
     const token = localStorage.getItem('token');
     if (!token) { setShowLoginModal(true); return; }
 
+    // Pessoa real falando é outra ferramenta (lipsync); o Cérebro faria o vídeo animado.
+    if (PRESENTER_RE.test(msg)) {
+      setError(null);
+      setInput('');
+      setMessages([...messages, { role: 'user', message: msg }, {
+        role: 'assistant',
+        message: 'Para um vídeo com uma pessoa real apresentando o seu produto, use o anúncio falado: você envia a foto do produto, escolhe homem ou mulher, e a IA cria o apresentador falando o roteiro em português.',
+        action: { href: '/video?modo=apresentador', label: 'Abrir vídeo com apresentador' },
+      }]);
+      return;
+    }
+
     setLoading(true); setError(null);
     const newMessages = [...messages, { role: 'user', message: msg }];
     setMessages(newMessages);
@@ -257,6 +283,7 @@ export default function CerebroEditor() {
   };
 
   const pickStarter = (s) => {
+    if (s.href) { window.location.href = s.href; return; }
     setInput(s.prompt);
     if (s.needsImage && !refImages.length) fileRef.current?.click();
     setTimeout(() => {
@@ -271,170 +298,210 @@ export default function CerebroEditor() {
 
   const empty = messages.length === 0 && !loading;
 
-  return (
-    <div id="cerebro" className="flex flex-col min-h-[calc(100vh-11rem)]">
-      {/* Topo */}
-      {!empty && (
-        <div className="flex items-center justify-between gap-3 pb-3 mb-2 border-b border-white/10">
-          <p className="text-sm font-semibold text-white">Conversa atual</p>
-          <button
-            onClick={handleReset}
-            disabled={loading}
-            className="text-xs font-medium text-gray-400 hover:text-white disabled:opacity-40 flex items-center gap-1.5"
-          >
-            <Icon d="M12 4v16m8-8H4" className="w-3.5 h-3.5" /> Nova criação
-          </button>
+  const composer = (
+    <div>
+      {error && (
+        <div className={`rounded-xl px-4 py-3 mb-3 border text-sm ${error.type === 'NO_CREDITS' ? 'bg-amber-500/10 border-amber-500/25 text-amber-200' : 'bg-red-500/10 border-red-500/25 text-red-200'}`}>
+          {error.message}
+          {error.type === 'NO_CREDITS' && (
+            <a href="/plans" className="ml-2 font-semibold text-brand-accent hover:underline">Ver planos</a>
+          )}
         </div>
       )}
-
-      {/* Conversa */}
-      <div className="flex-1">
-        {empty ? (
-          <div className="pt-6 sm:pt-12 pb-6">
-            <h1 className="text-3xl sm:text-4xl font-bold text-white text-center tracking-tight">O que vamos criar hoje?</h1>
-            <p className="mt-3 text-center text-gray-400 text-sm sm:text-base max-w-xl mx-auto">
-              Descreva o que você precisa, como se estivesse falando com um designer. Se tiver uma foto ou logo, anexe no clipe.
-            </p>
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {STARTERS.map((s) => (
+      <div className="rounded-[18px] border border-brand-borderStrong bg-brand-surface focus-within:border-brand-dim transition-colors shadow-[0_12px_40px_-12px_rgba(0,0,0,0.6)]">
+        {refImages.length > 0 && (
+          <div className="flex flex-wrap gap-2 px-4 pt-4">
+            {refImages.map((img, i) => (
+              <div key={i} className="w-16 h-16 rounded-[10px] overflow-hidden border border-brand-borderStrong relative group shrink-0">
+                <img src={img} alt={`Anexo ${i + 1}`} className="w-full h-full object-cover" />
                 <button
-                  key={s.title}
-                  onClick={() => pickStarter(s)}
-                  className="text-left rounded-2xl border border-white/10 bg-white/[0.03] p-4 hover:border-primary-500/50 hover:bg-primary-500/[0.06] transition-colors group"
+                  onClick={() => removeImage(i)}
+                  disabled={loading}
+                  className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/80 text-white text-[10px] flex items-center justify-center hover:bg-black"
+                  title="Remover"
+                >✕</button>
+              </div>
+            ))}
+          </div>
+        )}
+        <textarea
+          ref={inputRef}
+          rows={empty ? 3 : 1}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          disabled={loading}
+          placeholder={refImages.length ? 'Diga o que fazer com a imagem...' : 'Ex.: vídeo de anúncio com voz da minha pizzaria, pizza grande R$ 49,90, WhatsApp...'}
+          className="block w-full resize-none bg-transparent px-5 pt-4 pb-2 text-[15px] leading-relaxed text-brand-text placeholder-brand-dim outline-none disabled:opacity-60"
+        />
+        <div className="flex items-center justify-between px-3 pb-3">
+          <label
+            className={`flex items-center gap-2 h-9 px-3 rounded-full text-[13px] text-brand-tert hover:text-brand-text hover:bg-white/[0.04] cursor-pointer transition-colors ${refImages.length >= 4 || loading ? 'opacity-40 pointer-events-none' : ''}`}
+            title="Anexar foto ou logo (até 4)"
+          >
+            <Icon d="M15.17 7l-6.59 6.59a2 2 0 102.83 2.83l6.41-6.59a4 4 0 00-5.66-5.66l-6.4 6.58a6 6 0 108.49 8.49L20.5 13" className="w-[18px] h-[18px]" />
+            Anexar imagem
+            <input ref={fileRef} type="file" accept="image/*" multiple onChange={handleUpload} className="hidden" />
+          </label>
+          <button
+            onClick={handleSend}
+            disabled={loading || !input.trim()}
+            className="h-9 pl-4 pr-3 rounded-full bg-brand-accent hover:bg-brand-accentHover text-[13px] font-semibold text-brand-bg flex items-center gap-1.5 disabled:bg-brand-borderStrong disabled:text-brand-dim disabled:cursor-not-allowed transition-colors"
+          >
+            Criar
+            <Icon d="M5 12h14M13 6l6 6-6 6" className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div id="cerebro" className="flex flex-col min-h-[calc(100vh-4rem)] text-brand-text">
+      {empty ? (
+        <div className="pt-10 sm:pt-20 pb-16">
+          <p className="text-center text-xs font-semibold uppercase text-brand-accent" style={{ letterSpacing: '1.4px' }}>Estúdio de criação</p>
+          <h1
+            className="mt-4 text-center font-display font-extrabold text-[38px] sm:text-[52px] leading-[1.02]"
+            style={{ letterSpacing: '-2px', textWrap: 'balance' }}
+          >
+            O que vamos <span className="text-brand-accent">criar</span> hoje?
+          </h1>
+          <p className="mt-4 text-center text-[15px] sm:text-[17px] text-brand-sub max-w-[520px] mx-auto leading-relaxed" style={{ textWrap: 'pretty' }}>
+            Peça como pediria a um designer. Vídeo, post, logo ou edição de foto, com o texto em português escrito certo.
+          </p>
+
+          <div className="mt-9">{composer}</div>
+
+          <div className="mt-4 flex flex-wrap justify-center gap-2">
+            {STARTERS.map((s) => (
+              <button
+                key={s.title}
+                onClick={() => pickStarter(s)}
+                className="flex items-center gap-2 h-9 px-3.5 rounded-full border border-brand-borderStrong text-[13px] text-brand-sub hover:text-brand-text hover:border-brand-dim transition-colors"
+              >
+                <Icon d={s.icon} className="w-4 h-4 text-brand-accent" />
+                {s.short}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-16">
+            <div className="flex items-end justify-between pb-3 border-b border-brand-border">
+              <p className="text-xs font-semibold uppercase text-brand-tert" style={{ letterSpacing: '1.4px' }}>Feito na Criativa</p>
+              <p className="text-[12px] text-brand-dim">Clique para usar o pedido</p>
+            </div>
+            <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {INSPIRATION.map((it) => (
+                <button
+                  key={it.src}
+                  onClick={() => pickStarter({ prompt: it.prompt })}
+                  className="group text-left"
+                  title={it.prompt}
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-primary-500/15 text-primary-300 flex items-center justify-center shrink-0 group-hover:bg-primary-500/25">
-                      <Icon d={s.icon} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-white">{s.title}</p>
-                      <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">{s.desc}</p>
-                    </div>
+                  <div className="aspect-[4/5] rounded-[12px] overflow-hidden border border-brand-border bg-brand-surface">
+                    <img src={it.src} alt={it.cat} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
                   </div>
+                  <p className="mt-2 text-[12px] text-brand-tert group-hover:text-brand-text transition-colors">{it.cat}</p>
                 </button>
               ))}
             </div>
           </div>
-        ) : (
-          <div className="space-y-4 py-4">
+        </div>
+      ) : (
+        <>
+          <div className="flex items-center justify-between gap-3 py-4 border-b border-brand-border">
+            <p className="text-xs font-semibold uppercase text-brand-tert" style={{ letterSpacing: '1.4px' }}>Conversa</p>
+            <button
+              onClick={handleReset}
+              disabled={loading}
+              className="flex items-center gap-1.5 h-8 px-3 rounded-full border border-brand-borderStrong text-[12px] text-brand-sub hover:text-brand-text hover:border-brand-dim disabled:opacity-40 transition-colors"
+            >
+              <Icon d="M12 5v14M5 12h14" className="w-3.5 h-3.5" /> Nova criação
+            </button>
+          </div>
+
+          <div className="flex-1 space-y-6 py-6">
             {messages.map((m, i) => (
-              <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[88%] sm:max-w-[80%] rounded-2xl px-4 py-3 ${m.role === 'user' ? 'bg-primary-500/20 border border-primary-500/30 text-white rounded-br-md' : 'bg-white/5 border border-white/10 text-gray-200 rounded-bl-md'}`}>
-                  {m.message && <p className="text-sm whitespace-pre-wrap leading-relaxed">{m.message}</p>}
-                  {m.videoUrl && (
-                    <div className="mt-3 rounded-xl overflow-hidden border border-white/10 max-w-[360px] bg-black">
-                      <video src={m.videoUrl} controls playsInline className="w-full max-h-[520px] object-contain bg-black" />
-                      <a href={m.videoUrl} download target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 py-2.5 text-sm font-semibold text-white bg-white/5 hover:bg-white/10 border-t border-white/10">
-                        <Icon d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" className="w-4 h-4" /> Baixar vídeo
-                      </a>
-                    </div>
-                  )}
-                  {m.imageUrl && !m.videoUrl && (
-                    <div className="mt-3 rounded-xl overflow-hidden border border-white/10 max-w-[420px]">
-                      <img src={m.imageUrl} alt="Resultado" className="w-full max-h-[420px] object-contain bg-black/30" />
-                      <button onClick={() => handleDownload(m.imageUrl)} className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-semibold text-white bg-white/5 hover:bg-white/10 border-t border-white/10">
-                        <Icon d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" className="w-4 h-4" /> Baixar imagem
-                      </button>
-                    </div>
-                  )}
+              m.role === 'user' ? (
+                <div key={i} className="flex justify-end">
+                  <div className="max-w-[85%] rounded-[16px] rounded-br-[6px] bg-brand-surface border border-brand-borderStrong px-4 py-3">
+                    <p className="text-[15px] whitespace-pre-wrap leading-relaxed text-brand-text">{m.message}</p>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div key={i} className="flex gap-3">
+                  <div className="w-7 h-7 rounded-full bg-brand-accent/15 border border-brand-accent/30 flex items-center justify-center shrink-0 mt-0.5">
+                    <span className="w-2 h-2 rounded-full bg-brand-accent" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    {m.message && <p className="text-[15px] whitespace-pre-wrap leading-relaxed text-brand-sub">{m.message}</p>}
+                    {m.action && (
+                      <a href={m.action.href} className="mt-3 inline-flex items-center gap-2 h-10 px-4 rounded-full bg-brand-accent hover:bg-brand-accentHover text-[13px] font-semibold text-brand-bg">
+                        {m.action.label}
+                        <Icon d="M5 12h14M13 6l6 6-6 6" className="w-4 h-4" />
+                      </a>
+                    )}
+                    {m.videoUrl && (
+                      <div className="mt-3 w-full max-w-[340px] rounded-[14px] overflow-hidden border border-brand-borderStrong bg-black">
+                        <video src={m.videoUrl} controls playsInline className="w-full max-h-[560px] object-contain bg-black" />
+                        <a href={m.videoUrl} download target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 h-11 text-[13px] font-semibold text-brand-text bg-brand-surface hover:bg-[#1a171b] border-t border-brand-borderStrong">
+                          <Icon d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" className="w-4 h-4" /> Baixar vídeo
+                        </a>
+                      </div>
+                    )}
+                    {m.imageUrl && !m.videoUrl && (
+                      <div className="mt-3 w-full max-w-[420px] rounded-[14px] overflow-hidden border border-brand-borderStrong bg-brand-surface">
+                        <img src={m.imageUrl} alt="Resultado" className="w-full max-h-[480px] object-contain" />
+                        <button onClick={() => handleDownload(m.imageUrl)} className="w-full flex items-center justify-center gap-2 h-11 text-[13px] font-semibold text-brand-text hover:bg-[#1a171b] border-t border-brand-borderStrong">
+                          <Icon d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" className="w-4 h-4" /> Baixar imagem
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
             ))}
             {loading && (
-              <div className="flex justify-start">
-                <div className="bg-white/5 border border-white/10 rounded-2xl rounded-bl-md px-4 py-3 max-w-[88%]">
-                  <div className="flex items-center gap-2.5">
-                    <Spinner />
-                    <span className="text-sm text-gray-200">{jobStep || 'Criando...'}</span>
+              <div className="flex gap-3">
+                <div className="w-7 h-7 rounded-full bg-brand-accent/15 border border-brand-accent/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <span className="w-2 h-2 rounded-full bg-brand-accent animate-pulse" />
+                </div>
+                <div className="flex-1 max-w-[420px]">
+                  <p className="text-[15px] text-brand-text">{jobStep || 'Criando...'}</p>
+                  <div className="mt-3 h-[3px] rounded-full bg-brand-border overflow-hidden">
+                    <div className="h-full w-1/3 rounded-full bg-brand-accent animate-[criai-bar_1.6s_ease-in-out_infinite]" />
                   </div>
                   {jobStep && (
-                    <p className="text-xs text-gray-500 mt-1.5">O vídeo leva de 1 a 4 minutos. Pode deixar esta página aberta.</p>
+                    <p className="mt-2 text-[12px] text-brand-dim">O vídeo leva de 1 a 4 minutos. Pode deixar esta página aberta.</p>
                   )}
                 </div>
               </div>
             )}
+            <div ref={endRef} />
           </div>
-        )}
-        <div ref={endRef} />
-      </div>
 
-      {/* Caixa de pedido */}
-      <div className="sticky bottom-0 pt-2 pb-3 bg-gradient-to-t from-dark-950 via-dark-950 to-transparent">
-        {/* Erro */}
-        {error && (
-          <div className={`rounded-xl px-4 py-3 mb-3 border ${error.type === 'NO_CREDITS' ? 'bg-amber-500/10 border-amber-500/20' : 'bg-red-500/10 border-red-500/20'}`}>
-            <p className={`text-sm font-medium ${error.type === 'NO_CREDITS' ? 'text-amber-300' : 'text-red-300'}`}>{error.message}</p>
-            {error.type === 'NO_CREDITS' && (
-              <a href="/plans" className="inline-block mt-1.5 text-sm text-primary-400 font-semibold hover:underline">Ver planos e recargas</a>
-            )}
+          <div className="sticky bottom-0 pt-3 pb-4 bg-gradient-to-t from-brand-bg via-brand-bg to-transparent">
+            {composer}
           </div>
-        )}
-        <div className="rounded-2xl border border-white/15 bg-brand-surface focus-within:border-primary-500/60 transition-colors shadow-xl shadow-black/30">
-          {refImages.length > 0 && (
-            <div className="flex flex-wrap gap-2 px-3 pt-3">
-              {refImages.map((img, i) => (
-                <div key={i} className="w-14 h-14 rounded-lg overflow-hidden border border-white/10 relative group shrink-0">
-                  <img src={img} alt={`Anexo ${i + 1}`} className="w-full h-full object-cover" />
-                  <button
-                    onClick={() => removeImage(i)}
-                    disabled={loading}
-                    className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-black/75 text-white text-[10px] font-bold flex items-center justify-center hover:bg-red-600"
-                    title="Remover"
-                  >✕</button>
-                </div>
-              ))}
-            </div>
-          )}
-          <textarea
-            ref={inputRef}
-            rows={1}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={loading}
-            placeholder={refImages.length ? 'Diga o que fazer com a imagem...' : 'Descreva o que você quer criar...'}
-            className="block w-full resize-none bg-transparent px-4 pt-3 pb-1 text-[15px] text-white placeholder-gray-500 outline-none disabled:opacity-60"
-          />
-          <div className="flex items-center justify-between px-2 pb-2">
-            <label
-              className={`flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-white/5 cursor-pointer ${refImages.length >= 4 || loading ? 'opacity-40 pointer-events-none' : ''}`}
-              title="Anexar foto ou logo (até 4)"
-            >
-              <Icon d="M15.17 7l-6.59 6.59a2 2 0 102.83 2.83l6.41-6.59a4 4 0 00-5.66-5.66l-6.4 6.58a6 6 0 108.49 8.49L20.5 13" className="w-5 h-5" />
-              <span className="hidden sm:inline">Anexar imagem</span>
-              <input ref={fileRef} type="file" accept="image/*" multiple onChange={handleUpload} className="hidden" />
-            </label>
-            <div className="flex items-center gap-3">
-              {credits && (
-                <a href="/plans" className="text-[11px] text-gray-500 hover:text-gray-300 hidden sm:block">
-                  {credits.creditsImages + credits.creditsPurchased} créditos
-                </a>
-              )}
-              <button
-                onClick={handleSend}
-                disabled={loading || !input.trim()}
-                className="w-10 h-10 rounded-xl bg-primary-500 hover:bg-primary-400 text-white flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                title="Enviar"
-              >
-                <Icon d="M5 12h14M13 6l6 6-6 6" className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        </div>
-        <p className="mt-2 text-center text-[11px] text-gray-600">Cada criação usa 1 crédito. Enter envia, Shift+Enter quebra a linha.</p>
-      </div>
+        </>
+      )}
+
+      <style jsx global>{`
+        @keyframes criai-bar { 0% { transform: translateX(-100%); } 100% { transform: translateX(300%); } }
+      `}</style>
 
       {/* Login */}
       {showLoginModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="glass rounded-2xl p-8 max-w-md w-full border border-white/10 shadow-2xl animate-fade-up">
-            <h3 className="text-xl font-bold text-white mb-2 mt-0">Crie sua conta gratuita</h3>
-            <p className="text-gray-400 mb-6">Ganhe 10 imagens e 2 vídeos grátis todo mês. Sem cartão de crédito.</p>
+          <div className="rounded-2xl p-8 max-w-md w-full border border-brand-borderStrong bg-brand-surface shadow-2xl">
+            <h3 className="font-display text-2xl font-bold text-brand-text mb-2 mt-0">Crie sua conta gratuita</h3>
+            <p className="text-brand-sub mb-6">Ganhe 10 imagens e 2 vídeos grátis todo mês. Sem cartão de crédito.</p>
             <div className="space-y-3">
-              <a href="/register" className="btn-primary block text-center">Criar conta grátis</a>
-              <a href="/login" className="btn-secondary block text-center">Já tenho conta</a>
+              <a href="/register" className="block text-center rounded-[10px] bg-brand-accent py-3 text-sm font-semibold text-brand-bg hover:bg-brand-accentHover">Criar conta grátis</a>
+              <a href="/login" className="block text-center rounded-[10px] border border-brand-borderStrong py-3 text-sm font-semibold text-brand-text hover:border-brand-dim">Já tenho conta</a>
             </div>
-            <button onClick={() => setShowLoginModal(false)} className="mt-4 text-sm text-gray-500 hover:text-gray-300 w-full transition-colors">Fechar</button>
+            <button onClick={() => setShowLoginModal(false)} className="mt-4 text-sm text-brand-tert hover:text-brand-text w-full">Fechar</button>
           </div>
         </div>
       )}
