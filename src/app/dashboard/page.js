@@ -716,7 +716,7 @@ export default function DashboardPage() {
                             : 'border-white/10 bg-white/5 text-gray-400 hover:text-white hover:border-white/20'
                         }`}
                       >
-                        {AUDIENCIA_ICONS[a]} {a}
+                        {a}
                       </button>
                     ))}
                     {showAllAudiences
@@ -730,7 +730,7 @@ export default function DashboardPage() {
                                 : 'border-white/10 bg-white/5 text-gray-400 hover:text-white hover:border-white/20'
                             }`}
                           >
-                            {AUDIENCIA_ICONS[a]} {a}
+                            {a}
                           </button>
                         ))
                       : (

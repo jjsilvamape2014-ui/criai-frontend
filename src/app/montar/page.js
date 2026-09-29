@@ -3,6 +3,13 @@
 import { useRef, useState } from 'react';
 import Header from '@/components/Header';
 
+// Backend (mesmo endereço do resto do app) + login do usuário
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const authHeaders = () => {
+  const t = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  return t ? { Authorization: `Bearer ${t}` } : {};
+};
+
 export default function MontarPage() {
   const vidRef = useRef(null);
   const logoRef = useRef(null);
@@ -39,7 +46,7 @@ export default function MontarPage() {
     fd.append('video', video);
     let legenda = null;
     try {
-      const r = await fetch('/api/legenda/transcribe', { method: 'POST', body: fd });
+      const r = await fetch(`${API_BASE}/legenda/transcribe`, { method: 'POST', body: fd, headers: authHeaders() });
       const d = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
       legenda = d.srt;
@@ -63,7 +70,7 @@ export default function MontarPage() {
       cta: cta || 'Inscreva-se e fique por dentro das próximas sessões!'
     }));
     try {
-      const r = await fetch('/api/video/montar', { method: 'POST', body: fd2 });
+      const r = await fetch(`${API_BASE}/video/montar`, { method: 'POST', body: fd2, headers: authHeaders() });
       if (!r.ok) {
         const d = await r.json().catch(() => ({}));
         throw new Error(d.error || ('HTTP ' + r.status));

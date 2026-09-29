@@ -3,6 +3,13 @@
 import { useRef, useState } from 'react';
 import Header from '@/components/Header';
 
+// Backend (mesmo endereço do resto do app) + login do usuário
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const authHeaders = () => {
+  const t = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  return t ? { Authorization: `Bearer ${t}` } : {};
+};
+
 export default function LegendaPage() {
   const fileRef = useRef(null);
   const [arquivo, setArquivo] = useState(null);
@@ -21,7 +28,7 @@ export default function LegendaPage() {
     try {
       const fd = new FormData();
       fd.append('video', arquivo);
-      const r = await fetch('/api/legenda/transcribe', { method: 'POST', body: fd });
+      const r = await fetch(`${API_BASE}/legenda/transcribe`, { method: 'POST', body: fd, headers: authHeaders() });
       const d = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
       setRes(d);
