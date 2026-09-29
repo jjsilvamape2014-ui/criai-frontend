@@ -19,7 +19,7 @@ export default function Error({ error, reset }) {
         >
           Tentar de novo
         </button>
-        <a href="/dashboard" className="rounded-xl border border-brand-borderStrong px-6 py-3 text-sm font-semibold text-brand-text hover:border-brand-text transition-colors">
+        <a href="/cerebro" className="rounded-xl border border-brand-borderStrong px-6 py-3 text-sm font-semibold text-brand-text hover:border-brand-text transition-colors">
           Ir para o início
         </a>
       </div>

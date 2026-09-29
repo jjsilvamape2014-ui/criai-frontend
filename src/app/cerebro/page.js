@@ -12,7 +12,7 @@ export default function CerebroPage() {
   return (
     <>
       <Header />
-      <main className="mx-auto w-full max-w-4xl px-4 pt-40 pb-16">
+      <main className="mx-auto w-full max-w-3xl px-4 pt-36 pb-4">
         <CerebroEditor />
       </main>
     </>

@@ -18,7 +18,7 @@ export default function LoginPage() {
       const data = await api.login(email, password);
       localStorage.setItem('token', data.token);
       setAuthTokenCookie(data.token);
-      window.location.href = '/dashboard';
+      window.location.href = '/cerebro';
     } catch (err) {
       setError(err.message || 'Email ou senha incorretos');
     } finally { setLoading(false); }
