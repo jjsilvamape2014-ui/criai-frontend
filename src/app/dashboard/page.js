@@ -2,28 +2,19 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { api } from '@/lib/api';
-import { setAuthTokenCookie } from '@/lib/auth-cookie';
+import { setAuthTokenCookie, clearAuthTokenCookie } from '@/lib/auth-cookie';
 import Header from '@/components/Header';
 
 const MODES = [
-  { id: '', label: '📷 Foto', hint: 'Fotografia realista, câmera profissional, iluminação natural' },
-  { id: 'produto', label: '🛍️ Produto', hint: 'Foto comercial de produto em destaque, fundo limpo, iluminação de estúdio' },
-  { id: 'anuncio', label: '📢 Anúncio', hint: 'Peça publicitária pronta para divulgação, texto legível e chamada clara' },
-  { id: 'arte', label: '🎨 Arte', hint: 'Arte criativa e ilustração' },
+  { id: '', label: 'Foto', hint: 'Foto realista e natural, como bateria na rua: câmera de celular, luz do dia, sem pose' },
+  { id: 'produto', label: 'Produto', hint: 'Foto de produto na vitrine, simples e honesta' },
+  { id: 'anuncio', label: 'Anúncio', hint: 'Peça pronta pra publicar, com a chamada em destaque' },
+  { id: 'arte', label: 'Arte', hint: 'Arte criativa e ilustração' },
 ];
 
 const NEGOCIOS = ['Alimentação', 'Beleza', 'Imóveis', 'Moda', 'Loja', 'Automóveis', 'Tecnologia', 'Outro'];
 const OBJETIVOS = ['Vender', 'Divulgar', 'Promover oferta', 'Conseguir clientes', 'Postar nas redes'];
 const AUDIENCIAS = ['A Criativa decide', 'Público geral', 'Homens', 'Mulheres', 'Famílias', 'Premium', 'Jovens'];
-const AUDIENCIA_ICONS = {
-  'A Criativa decide': '✨',
-  'Público geral': '👥',
-  'Homens': '👨',
-  'Mulheres': '👩',
-  'Famílias': '👨‍👩‍👧',
-  'Premium': '💎',
-  'Jovens': '🎧',
-};
 
 function IconDownload({ className = 'h-4 w-4' }) {
   return (
@@ -200,7 +191,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (!token) { window.location.href = '/login'; return; }
+    if (!token) { clearAuthTokenCookie(); window.location.href = '/login'; return; }
     setAuthTokenCookie(token);
     Promise.all([loadHistory()]).then(() => setLoading(false));
   }, [loadHistory]);
@@ -725,7 +716,7 @@ export default function DashboardPage() {
                             : 'border-white/10 bg-white/5 text-gray-400 hover:text-white hover:border-white/20'
                         }`}
                       >
-                        {AUDIENCIA_ICONS[a]} {a}
+                        {a}
                       </button>
                     ))}
                     {showAllAudiences
@@ -739,7 +730,7 @@ export default function DashboardPage() {
                                 : 'border-white/10 bg-white/5 text-gray-400 hover:text-white hover:border-white/20'
                             }`}
                           >
-                            {AUDIENCIA_ICONS[a]} {a}
+                            {a}
                           </button>
                         ))
                       : (
