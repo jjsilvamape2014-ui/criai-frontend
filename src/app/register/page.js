@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { setAuthTokenCookie } from '@/lib/auth-cookie';
 import Header from '@/components/Header';
@@ -12,13 +12,20 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [convite, setConvite] = useState('');
+
+  // link de convite: /register?convite=LINHAFACIL
+  useEffect(() => {
+    const c = new URLSearchParams(window.location.search).get('convite');
+    if (c) setConvite(c.toUpperCase().slice(0, 30));
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true); setError('');
     if (password !== confirmPassword) { setError('As senhas nao coincidem'); setLoading(false); return; }
     try {
-      const data = await api.register(email, password, name);
+      const data = await api.register(email, password, name, convite);
       localStorage.setItem('token', data.token);
       setAuthTokenCookie(data.token);
       window.location.href = '/cerebro';
@@ -37,6 +44,11 @@ export default function RegisterPage() {
             <p className="text-gray-400 text-sm mb-6">
               Ganhe <b className="text-white">10 imagens e 1 vídeo curto grátis</b> todo mês. Sem cartão de crédito.
             </p>
+            {convite && (
+              <div className="mb-4 rounded-lg border border-brand-accent/40 bg-brand-accent/10 p-3 text-sm text-brand-text">
+                Convite de cliente Linha Fácil: <b>+60 créditos de bônus</b> que não vencem (código {convite}).
+              </div>
+            )}
             {error && (
               <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4">
                 <p className="text-sm text-red-300">{error}</p>
