@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import { api } from '@/lib/api';
 
-const PERIODOS = [7, 30, 90, 365];
+const PERIODOS = [1, 7, 30, 90, 365];
 
 const fmtData = (d) => (d ? new Date(d).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—');
 const fmtReais = (v) => (v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -39,13 +39,17 @@ export default function AdminPage() {
       .then(([r, c]) => { if (vivo) { setResumo(r); setConversas(Array.isArray(c) ? c : []); } })
       .catch((e) => { if (vivo) setErro(e.status === 403 || e.status === 401 ? 'Esta página é só para o dono do app. Entre com a conta de administrador.' : (e.message || 'Não consegui carregar os dados.')); })
       .finally(() => { if (vivo) setCarregando(false); });
-    return () => { vivo = false; };
+    // atualiza sozinho a cada 60 s (sem piscar a tela)
+    const t = setInterval(() => {
+      api.getAdminResumo(dias).then((r) => { if (vivo) setResumo(r); }).catch(() => {});
+    }, 60000);
+    return () => { vivo = false; clearInterval(t); };
   }, [dias]);
 
   return (
     <div className="min-h-screen bg-brand-bg text-brand-text">
       <Header />
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <main className="mx-auto max-w-6xl px-4 pt-24 pb-12 sm:px-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="font-display text-3xl font-bold">Painel do dono</h1>
@@ -60,7 +64,7 @@ export default function AdminPage() {
                 onClick={() => setDias(p)}
                 className={`min-h-[44px] rounded-xl border px-4 text-sm font-semibold ${dias === p ? 'border-brand-accent bg-brand-accent/15 text-brand-text' : 'border-brand-border bg-brand-surface text-brand-sub hover:text-brand-text'}`}
               >
-                {p === 365 ? '1 ano' : `${p} dias`}
+                {p === 1 ? 'Hoje' : p === 365 ? '1 ano' : `${p} dias`}
               </button>
             ))}
           </div>
@@ -71,6 +75,70 @@ export default function AdminPage() {
 
         {resumo && !erro && (
           <>
+            {resumo.visitas && (
+              <section aria-labelledby="visitas-h" className="mt-8">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <h2 id="visitas-h" className="font-display text-xl font-bold">Visitas</h2>
+                  <p className="text-xs text-brand-tert">Atualiza sozinho a cada minuto · contagem começou em 14/10/2026</p>
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-4 lg:grid-cols-4">
+                  <div className="rounded-2xl border border-brand-accent/40 bg-brand-accent/10 p-5">
+                    <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-brand-sub">
+                      <span aria-hidden="true" className={`h-2 w-2 rounded-full ${resumo.visitas.agora ? 'bg-brand-accent animate-pulse' : 'bg-brand-borderStrong'}`} /> No site agora
+                    </p>
+                    <p className="mt-2 font-display text-4xl font-bold">{resumo.visitas.agora}</p>
+                    <p className="mt-1 text-sm text-brand-sub">últimos 15 minutos</p>
+                  </div>
+                  <Numero titulo="Visitantes" valor={resumo.visitas.visitantes} detalhe={`${resumo.visitas.visitas} páginas vistas`} />
+                  <div className="col-span-2 rounded-2xl border border-brand-border bg-brand-surface p-5">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-brand-sub">Funil do período</p>
+                    <ol className="mt-3 grid grid-cols-4 gap-2 text-center">
+                      {[
+                        ['Visitaram', resumo.visitas.visitantes],
+                        ['Cadastraram', resumo.cadastros.noPeriodo],
+                        ['Usaram', resumo.usaram.pessoas],
+                        ['Compraram', resumo.compras.pessoas],
+                      ].map(([t, v]) => (
+                        <li key={t}><p className="font-display text-2xl font-bold">{v}</p><p className="text-[11px] text-brand-tert">{t}</p></li>
+                      ))}
+                    </ol>
+                  </div>
+                </div>
+                <div className="mt-4 grid gap-4 md:grid-cols-3">
+                  <div className="rounded-2xl border border-brand-border bg-brand-surface p-5">
+                    <h3 className="text-sm font-semibold">De onde vêm</h3>
+                    <ul className="mt-3 space-y-1.5 text-sm">
+                      {resumo.visitas.origens.length === 0 && <li className="text-brand-tert">Sem visitas ainda.</li>}
+                      {resumo.visitas.origens.map((o) => (
+                        <li key={o.origem} className="flex justify-between gap-2"><span className="text-brand-sub">{o.origem}</span><span className="font-mono">{o.v}</span></li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="rounded-2xl border border-brand-border bg-brand-surface p-5">
+                    <h3 className="text-sm font-semibold">Páginas mais vistas</h3>
+                    <ul className="mt-3 space-y-1.5 text-sm">
+                      {resumo.visitas.paginas.length === 0 && <li className="text-brand-tert">Sem visitas ainda.</li>}
+                      {resumo.visitas.paginas.map((p) => (
+                        <li key={p.path} className="flex justify-between gap-2"><span className="truncate text-brand-sub">{p.path}</span><span className="font-mono">{p.n}</span></li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="rounded-2xl border border-brand-border bg-brand-surface p-5">
+                    <h3 className="text-sm font-semibold">Últimas visitas</h3>
+                    <ul className="mt-3 space-y-1.5 text-sm">
+                      {resumo.visitas.recentes.length === 0 && <li className="text-brand-tert">Sem visitas ainda.</li>}
+                      {resumo.visitas.recentes.slice(0, 8).map((r, i) => (
+                        <li key={i} className="flex justify-between gap-2">
+                          <span className="truncate text-brand-sub">{r.path}{r.logado ? ' · logado' : ''}</span>
+                          <span className="shrink-0 font-mono text-[11px] text-brand-tert">{fmtData(r.created_at)} · {r.origem}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </section>
+            )}
+
             <section aria-label="Números" className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <Numero titulo="Cadastros" valor={resumo.cadastros.noPeriodo} detalhe={`${resumo.cadastros.total} no total`} />
               <Numero titulo="Usaram" valor={resumo.usaram.pessoas} detalhe={`${resumo.usaram.imagens} imagens · ${resumo.usaram.videos} vídeos`} />
@@ -90,6 +158,22 @@ export default function AdminPage() {
               </section>
             )}
             <p className="mt-3 text-xs text-brand-tert">{resumo.contasDeTesteIgnoradas || 0} contas de teste ignoradas · {resumo.usaram.falhas} gerações falharam no período</p>
+
+            <section aria-labelledby="compras-h" className="mt-10">
+              <h2 id="compras-h" className="font-display text-xl font-bold">Compras recentes</h2>
+              {(resumo.comprasRecentes || []).length === 0 ? (
+                <p className="mt-2 text-sm text-brand-sub">Nenhuma compra ainda.{resumo.limite && resumo.limite.abriramPagamento ? ` ${resumo.limite.abriramPagamento} pessoa(s) abriram o pagamento.` : ''}</p>
+              ) : (
+                <ul className="mt-3 divide-y divide-brand-border rounded-2xl border border-brand-border">
+                  {resumo.comprasRecentes.map((c, i) => (
+                    <li key={i} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 text-sm">
+                      <span><span className="font-semibold">{c.tipo}</span> <span className="font-mono text-xs text-brand-sub">· {c.cliente}</span></span>
+                      <span className="text-brand-sub">{fmtReais(c.valorReais)} · {fmtData(c.quando)}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
 
             <section aria-labelledby="pessoas-h" className="mt-10">
               <h2 id="pessoas-h" className="font-display text-xl font-bold">Pessoas</h2>
