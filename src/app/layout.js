@@ -1,4 +1,5 @@
 import { Bricolage_Grotesque, Instrument_Sans, JetBrains_Mono } from 'next/font/google';
+import VisitTracker from '@/components/VisitTracker';
 import './globals.css';
 
 const bricolage = Bricolage_Grotesque({
@@ -67,6 +68,7 @@ export default function RootLayout({ children }) {
     <html lang="pt-BR" className="dark">
       <body className={`${bricolage.variable} ${instrument.variable} ${jetbrains.variable} antialiased min-h-screen font-sans`}>
         {children}
+        <VisitTracker />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
