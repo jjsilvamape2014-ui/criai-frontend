@@ -77,12 +77,24 @@ export default function AdminPage() {
               <Numero titulo="Compraram" valor={resumo.compras.pessoas} detalhe={`${resumo.compras.pagamentos} pagamentos · ${resumo.compras.assinantesPremium} PREMIUM`} />
               <Numero titulo="Faturado" valor={fmtReais(resumo.compras.totalReais)} detalhe={resumo.compras.pendentesOuFalhos ? `${resumo.compras.pendentesOuFalhos} pagamento(s) não concluído(s)` : 'pagamentos concluídos'} />
             </section>
+            {resumo.limite && (
+              <section aria-labelledby="funil-h" className="mt-8 rounded-2xl border border-brand-border bg-brand-surface p-5">
+                <h2 id="funil-h" className="font-display text-lg font-bold">Chegaram na hora de pagar?</h2>
+                <dl className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-4">
+                  <div><dt className="text-xs text-brand-sub">Bateram no limite</dt><dd className="font-display text-2xl font-bold">{resumo.limite.pessoasQueBateram}</dd><dd className="text-xs text-brand-tert">{resumo.limite.vezes} vezes</dd></div>
+                  <div><dt className="text-xs text-brand-sub">Grátis sem crédito agora</dt><dd className="font-display text-2xl font-bold">{resumo.limite.semCreditoAgora}</dd></div>
+                  <div><dt className="text-xs text-brand-sub">Abriram o pagamento</dt><dd className="font-display text-2xl font-bold">{resumo.limite.abriramPagamento}</dd></div>
+                  <div><dt className="text-xs text-brand-sub">Abriram e não pagaram</dt><dd className="font-display text-2xl font-bold">{resumo.limite.abriramPagamentoSemConcluir}</dd></div>
+                </dl>
+                <p className="mt-3 text-xs text-brand-tert">"Bateram no limite" e "abriram o pagamento" começaram a ser contados em 13/10/2026. "Sem crédito agora" vale para todo mundo.</p>
+              </section>
+            )}
             <p className="mt-3 text-xs text-brand-tert">{resumo.contasDeTesteIgnoradas || 0} contas de teste ignoradas · {resumo.usaram.falhas} gerações falharam no período</p>
 
             <section aria-labelledby="pessoas-h" className="mt-10">
               <h2 id="pessoas-h" className="font-display text-xl font-bold">Pessoas</h2>
               <div className="mt-3 overflow-x-auto rounded-2xl border border-brand-border">
-                <table className="w-full min-w-[720px] text-left text-sm">
+                <table className="w-full min-w-[800px] text-left text-sm">
                   <thead className="bg-brand-surface text-xs uppercase tracking-wider text-brand-sub">
                     <tr>
                       <th scope="col" className="px-4 py-3">Cliente</th>
@@ -91,12 +103,13 @@ export default function AdminPage() {
                       <th scope="col" className="px-4 py-3">Último uso</th>
                       <th scope="col" className="px-4 py-3 text-right">Imagens</th>
                       <th scope="col" className="px-4 py-3 text-right">Vídeos</th>
+                      <th scope="col" className="px-4 py-3 text-right">Limite</th>
                       <th scope="col" className="px-4 py-3 text-right">Pagou</th>
                     </tr>
                   </thead>
                   <tbody>
                     {resumo.pessoas.length === 0 && (
-                      <tr><td colSpan={7} className="px-4 py-6 text-brand-sub">Ninguém neste período.</td></tr>
+                      <tr><td colSpan={8} className="px-4 py-6 text-brand-sub">Ninguém neste período.</td></tr>
                     )}
                     {resumo.pessoas.map((p, i) => (
                       <tr key={`${p.cliente}-${i}`} className="border-t border-brand-border">
@@ -106,6 +119,7 @@ export default function AdminPage() {
                         <td className="px-4 py-3 text-brand-sub">{fmtData(p.ultimoUso)}</td>
                         <td className="px-4 py-3 text-right">{p.imagens}</td>
                         <td className="px-4 py-3 text-right">{p.videos}</td>
+                        <td className="px-4 py-3 text-right">{p.limite ? `${p.limite}×` : p.semCredito ? 'sem crédito' : '—'}{p.abriuPagamento ? ' · abriu pagamento' : ''}</td>
                         <td className="px-4 py-3 text-right">{p.pagamentos ? fmtReais(p.pagoReais) : '—'}</td>
                       </tr>
                     ))}
