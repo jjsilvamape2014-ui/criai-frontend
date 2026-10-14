@@ -126,7 +126,7 @@ export default function PlansPage() {
           <h2 id="faq-h" className="text-center font-display text-lg font-bold">Perguntas frequentes</h2>
           <div className="mt-4 space-y-2">
             {[
-              { q: 'Como funcionam os créditos?', a: `Cada imagem usa 1 crédito. Vídeo usa ${porSeg} créditos por segundo: um vídeo de 5 s usa ${p.videoCreditsPer5s}, um anúncio de 15 s usa ${p.videoCreditsPer5s * 3}. O app mostra o custo antes de gerar.` },
+              { q: 'Como funcionam os créditos?', a: `Cada imagem usa 1 crédito. Vídeo usa ${porSeg} créditos por segundo: um vídeo de 5 s usa ${p.videoCreditsPer5s}, um anúncio de 15 s usa ${p.videoCreditsPer5s * 3}. Arte com muito texto (um comunicado colado, por exemplo) usa 2. O app mostra o custo antes de gerar.` },
               { q: 'O grátis é grátis mesmo?', a: `Sim. Todo mês você ganha ${p.free.images} imagens e um vídeo de ${p.free.videoSeconds} s, sem cartão.` },
               { q: 'E quando acabar?', a: 'As imagens e vídeos do mês renovam no dia 1. Se precisar antes, compre um pacote de créditos ou assine o Premium.' },
               { q: 'Os créditos do mês acumulam?', a: 'Não: os do plano renovam todo dia 1. Os de pacote não vencem.' },
