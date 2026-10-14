@@ -247,7 +247,7 @@ export default function CardDeCandidatoPage() {
       </div>
 
       <div className="mb-5 rounded-xl border border-brand-border bg-brand-surface p-4 text-[12px] leading-relaxed text-brand-dim">
-        Envie a foto do <strong className="text-brand-sub">próprio candidato(a)</strong>. O responsável pelo conteúdo é você — a Criativa AI não é filiada a partidos e a peça não substitui a assessoria jurídico-eleitoral.
+        Envie a foto do <strong className="text-brand-sub">próprio candidato(a)</strong>. O responsável pelo conteúdo é você — a Linha Fácil IA não é filiada a partidos e a peça não substitui a assessoria jurídico-eleitoral.
       </div>
 
       {/* Foto */}

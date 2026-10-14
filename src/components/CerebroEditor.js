@@ -286,7 +286,7 @@ export default function CerebroEditor() {
   const handleDownload = (url) => {
     const link = document.createElement('a');
     link.href = url;
-    link.download = `criativa-${Date.now()}.png`;
+    link.download = `linhafacil-${Date.now()}.png`;
     document.body.appendChild(link); link.click(); document.body.removeChild(link);
   };
 

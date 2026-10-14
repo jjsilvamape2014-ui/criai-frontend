@@ -81,7 +81,7 @@ export default function Home() {
       {/* NAV */}
       <nav className="flex items-center justify-between px-10 py-5 max-w-[1180px] mx-auto">
         <a href="/" className="font-display font-extrabold text-[17px] text-brand-text">
-          CRIATIVA<span className="text-brand-accent">.</span>AI
+          LINHA FÁCIL<span className="text-brand-accent"> IA</span>
         </a>
         <div className="flex items-center gap-[26px]">
           <a href="/plans" className="text-[14px] text-brand-tert hover:text-brand-text transition-colors">Planos</a>
@@ -220,9 +220,9 @@ export default function Home() {
             </div>
           </div>
           <div>
-            <ImageSlot src="/showcase/comp-criativa.webp" label="Criativa AI: frase correta" className="border-brand-accent" />
+            <ImageSlot src="/showcase/comp-criativa.webp" label="Linha Fácil IA: frase correta" className="border-brand-accent" />
             <div className="mt-3 flex items-center gap-3">
-              <span className="rounded-md bg-brand-accent px-2.5 py-1 text-xs font-medium text-brand-bg">Criativa AI</span>
+              <span className="rounded-md bg-brand-accent px-2.5 py-1 text-xs font-medium text-brand-bg">Linha Fácil IA</span>
               <span className="text-sm text-brand-tert">frase correta, pronta para publicar</span>
             </div>
           </div>
@@ -235,7 +235,7 @@ export default function Home() {
       {/* GALERIA */}
       <section className="px-10 max-w-[1180px] mx-auto pt-20">
         <SectionHead
-          label="Feito com a Criativa"
+          label="Feito com a Linha Fácil IA"
           title="Saídas reais, prompt à mostra"
           right="Cada imagem com a descrição que a gerou."
         />
@@ -341,9 +341,9 @@ export default function Home() {
       <footer className="mt-[80px] border-t border-brand-border px-10 py-[26px]">
         <div className="max-w-[1180px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <span className="font-display font-extrabold text-[14px] text-brand-tert">
-            CRIATIVA<span className="text-brand-accent">.</span>AI
+            LINHA FÁCIL<span className="text-brand-accent"> IA</span>
           </span>
-          <span className="text-[12px] text-brand-dim">© 2026 Criativa AI · Todos os direitos reservados</span>
+          <span className="text-[12px] text-brand-dim">© 2026 Linha Fácil IA · Todos os direitos reservados</span>
         </div>
       </footer>
     </div>

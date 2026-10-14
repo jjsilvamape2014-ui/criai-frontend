@@ -9,7 +9,7 @@ export const metadata = {
 const config = {
   badge: 'Gerador de imagens com IA',
   h1: 'Criar imagem com IA é simples: fale o que você quer.',
-  lede: 'Escreva uma frase em português — um pôster, uma arte para o feed, um cartaz de promoção — e a Criativa AI gera em segundos, em 4K e com o texto escrito corretamente.',
+  lede: 'Escreva uma frase em português — um pôster, uma arte para o feed, um cartaz de promoção — e a Linha Fácil IA gera em segundos, em 4K e com o texto escrito corretamente.',
   examplePrompt: 'Pôster de açaí com o preço R$ 12,90 em destaque, fundo roxo',
   heroImage: '/showcase/hero-acai.webp',
   stepsIntro: {
@@ -32,7 +32,7 @@ const config = {
   ],
   faq: [
     { q: 'É grátis mesmo criar imagem com IA?', a: 'Sim. O plano gratuito dá 10 imagens por mês em 4K, sem cartão de crédito. Para usar mais existe o Premium (R$ 49,90/mês, 50 imagens) e os pacotes de créditos.' },
-    { q: 'A IA escreve o texto certo em português?', a: 'Sim, essa é a especialidade da Criativa AI. Usamos modelos treinados para renderizar acentuação e ortografia corretas em português — preços, nomes e chamadas saem nítidos.' },
+    { q: 'A IA escreve o texto certo em português?', a: 'Sim, essa é a especialidade da Linha Fácil IA. Usamos modelos treinados para renderizar acentuação e ortografia corretas em português — preços, nomes e chamadas saem nítidos.' },
     { q: 'Preciso instalar algum programa?', a: 'Não. Tudo roda no navegador: você cria a conta, escreve o pedido e baixa a imagem pronta.' },
     { q: 'Posso usar as imagens comercialmente?', a: 'Sim, as imagens geradas são suas para usar em anúncios, redes sociais, sites e materiais impressos.' },
   ],

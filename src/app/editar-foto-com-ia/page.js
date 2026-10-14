@@ -1,7 +1,7 @@
 import SeoPage from '@/components/SeoPage';
 
 export const metadata = {
-  title: 'Editar Foto com IA Online – Trocar Fundo, Remover Pessoa | Criativa AI',
+  title: 'Editar Foto com IA Online – Trocar Fundo, Remover Pessoa | Linha Fácil IA',
   description: 'Editar foto com IA online e de graça: troque o fundo, remova pessoas, coloque chapéu, ajuste iluminação conversando com o Cérebro. Sem instalar nada.',
   alternates: { canonical: '/editar-foto-com-ia' },
 };
@@ -15,7 +15,7 @@ const config = {
   stepsIntro: {
     label: 'Como funciona',
     title: 'Edição por conversa, sem Photoshop',
-    right: 'O Cérebro é o agente da Criativa AI que edita usando suas fotos como referência.',
+    right: 'O Cérebro é o agente da Linha Fácil IA que edita usando suas fotos como referência.',
   },
   steps: [
     { title: 'Envie suas fotos', body: 'Suba até 4 imagens no Cérebro — pode ser uma selfie, a foto do produto ou o card de aniversário.' },

@@ -1,15 +1,15 @@
 import SeoPage from '@/components/SeoPage';
 
 export const metadata = {
-  title: 'Transformar Foto em Vídeo com IA – Carrossel e Capa de Vídeo | Criativa AI',
-  description: 'Transformar foto em vídeo com IA: gere a capa, o post ou a imagem do carrossel com texto em português escrito certo — o Conversor de vídeo da Criativa AI anima suas imagens.',
+  title: 'Transformar Foto em Vídeo com IA – Carrossel e Capa de Vídeo | Linha Fácil IA',
+  description: 'Transformar foto em vídeo com IA: gere a capa, o post ou a imagem do carrossel com texto em português escrito certo — o Conversor de vídeo da Linha Fácil IA anima suas imagens.',
   alternates: { canonical: '/transformar-foto-em-video' },
 };
 
 const config = {
   badge: 'Imagens e vídeos com IA',
   h1: 'Transformar foto em vídeo e vender mais no feed.',
-  lede: 'Crie a capa, o cartaz e a arte do carrossel com texto em português correto — e depois anime a imagem com o Conversor de vídeo da Criativa AI, tudo conversando no Cérebro.',
+  lede: 'Crie a capa, o cartaz e a arte do carrossel com texto em português correto — e depois anime a imagem com o Conversor de vídeo da Linha Fácil IA, tudo conversando no Cérebro.',
   examplePrompt: 'Capa de vídeo com o título Como Vender Mais no Instagram, alto contraste',
   heroImage: '/showcase/capa-video.webp',
   stepsIntro: {
@@ -31,7 +31,7 @@ const config = {
     { cat: 'Anúncio de produto', prompt: 'Anúncio de hambúrguer artesanal com o preço R$ 29,90 e a chamada Peça já', src: '/showcase/anuncio-hamburguer.webp' },
   ],
   faq: [
-    { q: 'A Criativa AI transforma foto em vídeo?', a: 'Sim. O Cérebro recebe sua imagem e gera um vídeo curto animado — ideal para Reels, TikTok e Stories.' },
+    { q: 'A Linha Fácil IA transforma foto em vídeo?', a: 'Sim. O Cérebro recebe sua imagem e gera um vídeo curto animado — ideal para Reels, TikTok e Stories.' },
     { q: 'Preciso editar vídeo em programas?', a: 'Não. Tudo é pedido em português, como numa conversa, direto no navegador.' },
     { q: 'O título do vídeo escreve certo?', a: 'Sim. Primeiro você gera a capa com o Cérebro, que escreve o título em português corretamente; depois a imagem é animada.' },
     { q: 'É grátis transformar foto em vídeo?', a: 'O plano gratuito inclui 10 imagens e 1 vídeo de 5 s por mês. O Premium (R$ 49,90/mês) dá 15 s de vídeo por mês, e dá para somar pacotes de créditos.' },

@@ -251,7 +251,7 @@ export default function LandingGenerator({ initialPrompt = '', scrollOnSet = fal
           <div className="flex flex-col gap-2 p-3 border-t border-brand-border">
             <a
               href={result.url}
-              download={`criativa-imagem.png`}
+              download={`linhafacil-imagem.png`}
               className="block text-center text-sm py-2.5 rounded-lg bg-brand-accent text-brand-bg font-semibold hover:bg-brand-accentHover transition-colors"
             >
               Baixar imagem
