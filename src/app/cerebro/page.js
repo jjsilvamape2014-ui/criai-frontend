@@ -16,7 +16,7 @@ export default function CerebroPage() {
   return (
     <div className="min-h-screen bg-brand-bg">
       <Header />
-      <main className="mx-auto w-full max-w-[860px] px-4 sm:px-6 pt-16 pb-0">
+      <main className="mx-auto w-full max-w-[1440px] px-3 sm:px-5 pt-16 pb-0">
         <CerebroEditor />
       </main>
     </div>
