@@ -106,3 +106,8 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-brand-dim;
 }
+
+/* barra de abas do celular (AppShell) não cobre o fim da página */
+@media (max-width: 639px) {
+  body.has-tabbar { padding-bottom: calc(56px + env(safe-area-inset-bottom)); }
+}

@@ -1,5 +1,6 @@
 import { Bricolage_Grotesque, Instrument_Sans, JetBrains_Mono } from 'next/font/google';
 import VisitTracker from '@/components/VisitTracker';
+import AppShell from '@/components/AppShell';
 import './globals.css';
 
 const bricolage = Bricolage_Grotesque({
@@ -27,6 +28,13 @@ const jetbrains = JetBrains_Mono({
 });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ia.linhafacil2026.com.br';
+
+export const viewport = {
+  themeColor: '#0B0A0C',
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+};
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
@@ -60,7 +68,8 @@ export const metadata = {
   other: {
     'google-site-verification': 'Oke-oVcZAkOPXT6B45TJfDMgst5Pw4LdhV919SbcTYY',
   },
-  icons: { icon: '/linhafacil-logo.png' },
+  icons: { icon: [{ url: '/icon-192.png', sizes: '192x192', type: 'image/png' }] },
+  appleWebApp: { capable: true, title: 'Linha Fácil IA', statusBarStyle: 'black-translucent' },
 };
 
 export default function RootLayout({ children }) {
@@ -69,6 +78,7 @@ export default function RootLayout({ children }) {
       <body className={`${bricolage.variable} ${instrument.variable} ${jetbrains.variable} antialiased min-h-screen font-sans`}>
         {children}
         <VisitTracker />
+        <AppShell />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

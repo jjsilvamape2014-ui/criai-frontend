@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { clearAuthTokenCookie } from '@/lib/auth-cookie';
+import InstallApp from '@/components/InstallApp';
 
 const NAV = [
   { href: '/cerebro', label: 'Criar', match: (p) => p.startsWith('/cerebro') },
@@ -14,9 +15,11 @@ export default function Header() {
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [path, setPath] = useState('');
+  const [owner, setOwner] = useState(false);
 
   useEffect(() => {
     setPath(window.location.pathname);
+    try { setOwner(localStorage.getItem('criai_owner') === '1'); } catch {}
     const token = localStorage.getItem('token');
     if (token) {
       api.getProfile().then(setUser).catch(() => {
@@ -36,7 +39,7 @@ export default function Header() {
   const credits = user ? (user.creditsImages || 0) + (user.creditsPurchased || 0) : null;
 
   return (
-    <header className="fixed top-0 inset-x-0 z-50 bg-brand-bg/90 backdrop-blur-md border-b border-brand-border">
+    <header className="fixed top-0 inset-x-0 z-50 bg-brand-bg/90 backdrop-blur-md border-b border-brand-border" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
       <div className="max-w-[1180px] mx-auto h-16 px-4 sm:px-8 flex items-center gap-6">
         <a href={user ? '/cerebro' : '/'} className="font-display font-extrabold text-[17px] text-brand-text shrink-0">
           LINHA FÁCIL<span className="text-brand-accent"> IA</span>
@@ -102,6 +105,10 @@ export default function Header() {
                         <a href="/plans" className="sm:hidden block px-4 py-2.5 text-sm text-brand-sub hover:text-brand-text hover:bg-white/[0.03]">
                           {credits.toLocaleString('pt-BR')} créditos
                         </a>
+                      )}
+                      <InstallApp className="block w-full text-left px-4 py-2.5 text-sm text-brand-accent hover:bg-white/[0.03]" />
+                      {owner && (
+                        <a href="/admin" className="block px-4 py-2.5 text-sm text-brand-sub hover:text-brand-text hover:bg-white/[0.03]">Painel do dono</a>
                       )}
                       <div className="border-t border-brand-border mt-1 pt-1">
                         <button onClick={handleLogout} className="block w-full text-left px-4 py-2.5 text-sm text-brand-tert hover:text-brand-text hover:bg-white/[0.03]">
