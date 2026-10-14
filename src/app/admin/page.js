@@ -36,7 +36,7 @@ export default function AdminPage() {
     setCarregando(true);
     setErro('');
     Promise.all([api.getAdminResumo(dias), api.getAdminConversas(dias * 24, 60)])
-      .then(([r, c]) => { if (vivo) { setResumo(r); setConversas(Array.isArray(c) ? c : []); } })
+      .then(([r, c]) => { if (vivo) { setResumo(r); setConversas(Array.isArray(c) ? c : []); try { localStorage.setItem('criai_owner', '1'); } catch {} } })
       .catch((e) => { if (vivo) setErro(e.status === 403 || e.status === 401 ? 'Esta página é só para o dono do app. Entre com a conta de administrador.' : (e.message || 'Não consegui carregar os dados.')); })
       .finally(() => { if (vivo) setCarregando(false); });
     // atualiza sozinho a cada 60 s (sem piscar a tela)
