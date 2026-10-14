@@ -6,7 +6,7 @@ import { clearAuthTokenCookie } from '@/lib/auth-cookie';
 
 const NAV = [
   { href: '/cerebro', label: 'Criar', match: (p) => p.startsWith('/cerebro') },
-  { href: '/dashboard#recentes', label: 'Minhas criações', match: (p) => p.startsWith('/dashboard') },
+  { href: '/dashboard', label: 'Minhas criações', match: (p) => p.startsWith('/dashboard') },
   { href: '/plans', label: 'Planos', match: (p) => p.startsWith('/plans') },
 ];
 
