@@ -34,7 +34,7 @@ const config = {
     { q: 'Posso trocar o fundo de uma foto minha?', a: 'Sim. Basta enviar a foto no Cérebro e pedir: “troca o fundo para um estúdio branco” ou “fundo de praia com sol”. A IA refaz a imagem mantendo você.' },
     { q: 'A edição mantém minha aparência?', a: 'Sim, o Cérebro usa suas fotos como referência para preservar o rosto e suas características na nova imagem.' },
     { q: 'É preciso saber Photoshop?', a: 'Não. Toda edição é pedida em português, como numa conversa. Se não gostar, peça de outro jeito.' },
-    { q: 'Editar foto com IA é grátis?', a: 'O plano gratuito dá 10 imagens por mês. O Premium remove os limites para quem edita bastante.' },
+    { q: 'Editar foto com IA é grátis?', a: 'O plano gratuito dá 10 imagens por mês. O Premium (R$ 49,90/mês) dá 50 imagens por mês, e dá para somar pacotes de créditos.' },
   ],
   related: [
     { label: 'Criar imagem com IA', href: '/criar-imagem-com-ia' },

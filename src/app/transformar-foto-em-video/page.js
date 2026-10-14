@@ -34,7 +34,7 @@ const config = {
     { q: 'A Criativa AI transforma foto em vídeo?', a: 'Sim. O Cérebro recebe sua imagem e gera um vídeo curto animado — ideal para Reels, TikTok e Stories.' },
     { q: 'Preciso editar vídeo em programas?', a: 'Não. Tudo é pedido em português, como numa conversa, direto no navegador.' },
     { q: 'O título do vídeo escreve certo?', a: 'Sim. Primeiro você gera a capa com o Cérebro, que escreve o título em português corretamente; depois a imagem é animada.' },
-    { q: 'É grátis transformar foto em vídeo?', a: 'O plano gratuito inclui 10 imagens por mês. O Premium oferece gerações ilimitadas, incluindo vídeos.' },
+    { q: 'É grátis transformar foto em vídeo?', a: 'O plano gratuito inclui 10 imagens e 1 vídeo de 5 s por mês. O Premium (R$ 49,90/mês) dá 15 s de vídeo por mês, e dá para somar pacotes de créditos.' },
   ],
   related: [
     { label: 'Criar imagem com IA', href: '/criar-imagem-com-ia' },

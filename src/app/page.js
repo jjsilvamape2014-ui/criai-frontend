@@ -288,11 +288,11 @@ export default function Home() {
               <span className="text-[14px] text-brand-dim">para sempre</span>
             </div>
             <ul className="mt-6 space-y-2.5 text-sm">
-              <li className="flex items-center gap-2.5 text-brand-sub"><span className="text-brand-green">✓</span> 10 imagens por mês em 4K</li>
+              <li className="flex items-center gap-2.5 text-brand-sub"><span className="text-brand-green">✓</span> 10 imagens por mês</li>
+              <li className="flex items-center gap-2.5 text-brand-sub"><span className="text-brand-green">✓</span> 1 vídeo de 5 s por mês</li>
               <li className="flex items-center gap-2.5 text-brand-sub"><span className="text-brand-green">✓</span> Sem watermark</li>
               <li className="flex items-center gap-2.5 text-brand-sub"><span className="text-brand-green">✓</span> Texto em português nítido</li>
-              <li className="flex items-center gap-2.5 text-brand-dim"><span className="text-brand-red">✗</span> Imagens ilimitadas</li>
-              <li className="flex items-center gap-2.5 text-brand-dim"><span className="text-brand-red">✗</span> Modelos premium e prioridade na fila</li>
+              <li className="flex items-center gap-2.5 text-brand-dim"><span className="text-brand-red">✗</span> Anúncio em vídeo de 15 s</li>
             </ul>
             <a href="/register" className="mt-8 block w-full rounded-[10px] border border-[#3A343A] py-3 text-center text-sm font-semibold text-brand-text hover:border-brand-borderStrong transition-colors">
               Começar grátis
@@ -302,19 +302,18 @@ export default function Home() {
           {/* Premium */}
           <div className="relative rounded-[16px] border border-brand-accent bg-[#17110E] p-[26px]">
             <span className="absolute -top-[11px] left-[26px] rounded-full bg-brand-accent px-3 py-[3px] text-[11px] font-bold uppercase text-brand-bg">
-              Sem limites
+              Mais popular
             </span>
             <p className="text-[14px] font-semibold text-brand-accent">Premium</p>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="font-display font-extrabold text-brand-text text-[42px]" style={{ letterSpacing: '-1.6px' }}>R$ 39,99</span>
+              <span className="font-display font-extrabold text-brand-text text-[42px]" style={{ letterSpacing: '-1.6px' }}>R$ 49,90</span>
               <span className="text-[14px] text-brand-tert">por mês</span>
             </div>
             <ul className="mt-6 space-y-2.5 text-sm">
-              <li className="flex items-center gap-2.5 text-brand-sub"><span className="text-brand-accent">✓</span> Imagens ilimitadas em 4K</li>
-              <li className="flex items-center gap-2.5 text-brand-sub"><span className="text-brand-accent">✓</span> Todos os estilos de anúncio</li>
-              <li className="flex items-center gap-2.5 text-brand-sub"><span className="text-brand-accent">✓</span> Modelos exclusivos premium</li>
-              <li className="flex items-center gap-2.5 text-brand-sub"><span className="text-brand-accent">✓</span> Upscale 4K automático</li>
-              <li className="flex items-center gap-2.5 text-brand-sub"><span className="text-brand-accent">✓</span> Sem fila — prioridade máxima</li>
+              <li className="flex items-center gap-2.5 text-brand-sub"><span className="text-brand-accent">✓</span> 50 imagens por mês</li>
+              <li className="flex items-center gap-2.5 text-brand-sub"><span className="text-brand-accent">✓</span> 15 s de vídeo por mês (1 anúncio de 15 s)</li>
+              <li className="flex items-center gap-2.5 text-brand-sub"><span className="text-brand-accent">✓</span> Anúncio em vídeo com narração</li>
+              <li className="flex items-center gap-2.5 text-brand-sub"><span className="text-brand-accent">✓</span> Pacotes de créditos para usar mais</li>
             </ul>
             <a href="/plans" className="mt-8 block w-full rounded-[10px] bg-brand-accent py-3 text-center text-sm font-semibold text-brand-bg hover:bg-brand-accentHover transition-colors">
               Assinar Premium

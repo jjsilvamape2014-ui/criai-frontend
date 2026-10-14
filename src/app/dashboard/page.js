@@ -42,6 +42,7 @@ export default function MinhasCriacoes() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState('');
+  const [aviso, setAviso] = useState('');
   const [filtro, setFiltro] = useState('todas');
   const [aberta, setAberta] = useState(null);
   const [confirmando, setConfirmando] = useState(false);
@@ -66,6 +67,17 @@ export default function MinhasCriacoes() {
     if (!token) { clearAuthTokenCookie(); window.location.href = '/login'; return; }
     setAuthTokenCookie(token);
     load();
+    // Volta do Stripe (/dashboard?success=true&session_id=...): confirma o pagamento.
+    // Sem isto o plano só ativava se o webhook chegasse.
+    const q = new URLSearchParams(window.location.search);
+    const sid = q.get('session_id');
+    if (q.get('success') === 'true' && sid) {
+      setAviso('Confirmando seu pagamento…');
+      api.confirmPayment(sid)
+        .then(() => setAviso('Pagamento confirmado! Seus créditos já estão na conta.'))
+        .catch(() => setAviso('Recebemos você de volta do pagamento, mas não consegui confirmar agora. Se os créditos não aparecerem em alguns minutos, fale com a gente.'))
+        .finally(() => window.history.replaceState(null, '', '/dashboard'));
+    }
   }, [load]);
 
   useEffect(() => {
@@ -146,6 +158,7 @@ export default function MinhasCriacoes() {
           ))}
         </div>
 
+        {aviso && <p role="status" className="mt-6 rounded-xl border border-brand-accent/30 bg-brand-accent/10 px-4 py-3 text-sm text-brand-text">{aviso}</p>}
         {erro && <p role="alert" className="mt-6 rounded-xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-sm text-red-200">{erro}</p>}
 
         {loading ? (

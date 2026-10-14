@@ -35,7 +35,7 @@ export default function RegisterPage() {
           <div className="card-glow">
             <h1 className="text-2xl font-bold text-white mb-2">Crie sua conta</h1>
             <p className="text-gray-400 text-sm mb-6">
-              Ganhe <b className="text-white">10 imagens e 2 videos gratis</b> todo mes. Sem cartao de credito.
+              Ganhe <b className="text-white">10 imagens e 1 vídeo curto grátis</b> todo mês. Sem cartão de crédito.
             </p>
             {error && (
               <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4">
