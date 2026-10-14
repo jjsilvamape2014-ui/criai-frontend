@@ -16,7 +16,7 @@ export default function SeoPage({ config }) {
     lede,
     examplePrompt,
     heroImage,
-    heroImageLabel = 'Saída real da Criativa AI',
+    heroImageLabel = 'Saída real da Linha Fácil IA',
     stepsIntro,
     steps,
     galleryLabel,
@@ -32,7 +32,7 @@ export default function SeoPage({ config }) {
       {/* NAV */}
       <nav className="flex items-center justify-between px-10 py-5 max-w-[1180px] mx-auto">
         <a href="/" className="font-display font-extrabold text-[17px] text-brand-text">
-          CRIATIVA<span className="text-brand-accent">.</span>AI
+          LINHA FÁCIL<span className="text-brand-accent"> IA</span>
         </a>
         <div className="flex items-center gap-[26px]">
           <a href="/plans" className="text-[14px] text-brand-tert hover:text-brand-text transition-colors">Planos</a>
@@ -192,9 +192,9 @@ export default function SeoPage({ config }) {
       <footer className="mt-[80px] border-t border-brand-border px-10 py-[26px]">
         <div className="max-w-[1180px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <span className="font-display font-extrabold text-[14px] text-brand-tert">
-            CRIATIVA<span className="text-brand-accent">.</span>AI
+            LINHA FÁCIL<span className="text-brand-accent"> IA</span>
           </span>
-          <span className="text-[12px] text-brand-dim">© 2026 Criativa AI · Todos os direitos reservados</span>
+          <span className="text-[12px] text-brand-dim">© 2026 Linha Fácil IA · Todos os direitos reservados</span>
         </div>
       </footer>
 

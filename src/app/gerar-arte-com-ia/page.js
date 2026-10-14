@@ -1,7 +1,7 @@
 import SeoPage from '@/components/SeoPage';
 
 export const metadata = {
-  title: 'Gerar Arte com IA Grátis – Quadros e Artes Digitais | Criativa AI',
+  title: 'Gerar Arte com IA Grátis – Quadros e Artes Digitais | Linha Fácil IA',
   description: 'Gerar arte com IA de graça: descreva a cena e receba quadros, artes digitais e capas em 4K, sem watermark. Explore estilos abstratos, tons terrosos e muito mais.',
   alternates: { canonical: '/gerar-arte-com-ia' },
 };
@@ -9,7 +9,7 @@ export const metadata = {
 const config = {
   badge: 'Arte digital com IA',
   h1: 'Gerar arte com IA, do rascunho mental ao quadro.',
-  lede: 'Descreva a cena que está na sua cabeça e a Criativa AI transforma em arte: composições abstratas, paisagens, capas e decoração — em 4K, sem marca d’água.',
+  lede: 'Descreva a cena que está na sua cabeça e a Linha Fácil IA transforma em arte: composições abstratas, paisagens, capas e decoração — em 4K, sem marca d’água.',
   examplePrompt: 'Composição abstrata em tons terrosos, formato retrato',
   heroImage: '/showcase/arte-parede.webp',
   stepsIntro: {

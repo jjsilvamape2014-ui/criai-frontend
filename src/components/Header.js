@@ -39,7 +39,8 @@ export default function Header() {
     <header className="fixed top-0 inset-x-0 z-50 bg-brand-bg/90 backdrop-blur-md border-b border-brand-border">
       <div className="max-w-[1180px] mx-auto h-16 px-4 sm:px-8 flex items-center gap-6">
         <a href={user ? '/cerebro' : '/'} className="font-display font-extrabold text-[17px] text-brand-text shrink-0">
-          CRIATIVA<span className="text-brand-accent">.</span>AI
+          LINHA FÁCIL<span className="text-brand-accent"> IA</span>
+          <span className="ml-2 align-middle rounded-full border border-brand-borderStrong px-1.5 py-0.5 font-mono text-[9.5px] font-medium text-brand-tert" style={{ letterSpacing: '1px' }}>BETA</span>
         </a>
 
         {user && (

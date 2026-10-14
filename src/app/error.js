@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 
 export default function Error({ error, reset }) {
   useEffect(() => {
-    console.error('Criativa AI error:', error);
+    console.error('Linha Fácil IA error:', error);
   }, [error]);
 
   return (

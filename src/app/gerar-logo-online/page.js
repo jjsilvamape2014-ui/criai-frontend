@@ -1,7 +1,7 @@
 import SeoPage from '@/components/SeoPage';
 
 export const metadata = {
-  title: 'Gerar Logo Online Grátis com IA – Logo com Nome Escrito Certo | Criativa AI',
+  title: 'Gerar Logo Online Grátis com IA – Logo com Nome Escrito Certo | Linha Fácil IA',
   description: 'Gerar logo online grátis com IA: descreva o nome da sua marca e receba um logotipo com o texto escrito certo, em 4K e sem watermark. Sem cartão para começar.',
   alternates: { canonical: '/gerar-logo-online' },
 };
@@ -9,7 +9,7 @@ export const metadata = {
 const config = {
   badge: 'Logotipo com nome escrito certo',
   h1: 'Gerar logo online, com o nome da sua marca escrito certo.',
-  lede: 'A maioria das IAs erra letras e acentuação em logotipos. A Criativa AI foi treinada para escrever nomes e frases em português com precisão — perfeita para criar a marca da sua empresa.',
+  lede: 'A maioria das IAs erra letras e acentuação em logotipos. A Linha Fácil IA foi treinada para escrever nomes e frases em português com precisão — perfeita para criar a marca da sua empresa.',
   examplePrompt: 'Logotipo minimalista para a marca Açaí do Norte, traço limpo',
   heroImage: '/showcase/logo-padaria.webp',
   stepsIntro: {
@@ -31,7 +31,7 @@ const config = {
     { cat: 'Anúncio com logo', prompt: 'Anúncio de hambúrguer artesanal com o preço R$ 29,90 e a chamada Peça já', src: '/showcase/anuncio-hamburguer.webp' },
   ],
   faq: [
-    { q: 'O nome da minha marca sai escrito certo?', a: 'Sim. Os modelos da Criativa AI renderizam texto, incluindo nomes com acentuação — o problema mais comum de outras IAs de imagem.' },
+    { q: 'O nome da minha marca sai escrito certo?', a: 'Sim. Os modelos da Linha Fácil IA renderizam texto, incluindo nomes com acentuação — o problema mais comum de outras IAs de imagem.' },
     { q: 'É grátis gerar logo online?', a: 'O plano gratuito inclui 10 imagens por mês em 4K, sem cartão. Dá para criar e testar seu logotipo sem pagar nada.' },
     { q: 'Posso usar o logo no CNPJ e nas redes sociais?', a: 'Sim. As imagens geradas são suas e podem ser usadas em redes sociais, site, materiais impressos e apresentações.' },
     { q: 'Preciso saber design para fazer um logo?', a: 'Não. Você descreve o nome e o estilo; a IA cuida do resto. Se quiser refinar, o Cérebro ajusta cores e elementos por conversa.' },

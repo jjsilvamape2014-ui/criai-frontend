@@ -24,7 +24,7 @@ export default function AuthShell({ title, subtitle, children }) {
       </main>
 
       <footer className="pb-5 text-center px-4">
-        <p className="text-xs text-gray-600">Criativa AI — crie imagens e vídeos com inteligência artificial</p>
+        <p className="text-xs text-gray-600">Linha Fácil IA — crie imagens e vídeos com inteligência artificial</p>
       </footer>
     </div>
   );
