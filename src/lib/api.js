@@ -216,6 +216,10 @@ class ApiClient {
     return this.request('/credits/packages');
   }
 
+  async getPlans() {
+    return this.request('/credits/plans');
+  }
+
   async getBalance() {
     return this.request('/credits/balance');
   }

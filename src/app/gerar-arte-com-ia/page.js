@@ -34,7 +34,7 @@ const config = {
     { q: 'Posso gerar arte para vender ou usar num livro?', a: 'Sim. As imagens geradas são suas para uso comercial, incluindo impressões, capas e produtos.' },
     { q: 'Dá para escolher o estilo da arte?', a: 'Sim. Você descreve o estilo no prompt — abstrato, minimalista, aquarela, futurista — ou usa os estilos prontos da plataforma.' },
     { q: 'A qualidade serve para impressão?', a: 'Sim, as imagens saem em 4K, adequadas para quadros, posters e materiais impressos.' },
-    { q: 'Gerar arte com IA é grátis?', a: 'O plano gratuito dá 10 imagens por mês em 4K. O Premium é ilimitado para quem cria bastante.' },
+    { q: 'Gerar arte com IA é grátis?', a: 'O plano gratuito dá 10 imagens por mês em 4K. O Premium (R$ 49,90/mês) dá 50 imagens e 15 s de vídeo por mês, e dá para somar pacotes de créditos.' },
   ],
   related: [
     { label: 'Criar imagem com IA', href: '/criar-imagem-com-ia' },

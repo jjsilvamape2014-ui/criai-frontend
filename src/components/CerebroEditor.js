@@ -263,7 +263,7 @@ export default function CerebroEditor() {
     } catch (err) {
       if (err.data?.code === 'NO_CREDITS') {
         // o servidor explica o caso (ex.: apresentador custa 3 e há alternativa animada)
-        setError({ type: 'NO_CREDITS', message: err.data?.error || 'Seus créditos acabaram. Assine o plano por R$ 39,99/mês para continuar criando.' });
+        setError({ type: 'NO_CREDITS', message: err.data?.error || 'Seus créditos acabaram. Veja os planos e pacotes para continuar criando.' });
       } else if (err.data?.code === 'GEN_FAILED') {
         setError({ type: 'GENERIC', message: 'Não conseguimos gerar agora. Tente novamente.' });
       } else {
@@ -563,7 +563,7 @@ export default function CerebroEditor() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="rounded-2xl p-8 max-w-md w-full border border-brand-borderStrong bg-brand-surface shadow-2xl">
             <h3 className="font-display text-2xl font-bold text-brand-text mb-2 mt-0">Crie sua conta gratuita</h3>
-            <p className="text-brand-sub mb-6">Ganhe 10 imagens e 2 vídeos grátis todo mês. Sem cartão de crédito.</p>
+            <p className="text-brand-sub mb-6">Ganhe 10 imagens e 1 vídeo curto grátis todo mês. Sem cartão de crédito.</p>
             <div className="space-y-3">
               <a href="/register" className="block text-center rounded-[10px] bg-brand-accent py-3 text-sm font-semibold text-brand-bg hover:bg-brand-accentHover">Criar conta grátis</a>
               <a href="/login" className="block text-center rounded-[10px] border border-brand-borderStrong py-3 text-sm font-semibold text-brand-text hover:border-brand-dim">Já tenho conta</a>

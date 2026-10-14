@@ -156,7 +156,7 @@ export default function VideoGenerator() {
         setUser(prev => prev ? { ...prev, ...data.credits } : null);
       } catch (err) {
         if (err.data?.code === 'NO_CREDITS') {
-          setError({ type: 'NO_CREDITS', message: 'Seus créditos de vídeo acabaram! Assine o plano por R$ 39,99/mês.' });
+          setError({ type: 'NO_CREDITS', message: 'Seus créditos acabaram. Veja os planos e pacotes para continuar.' });
         } else {
           const detail = err.data?.details || err.message;
           setError({ type: 'GENERIC', message: `Não consegui gerar o anúncio falado. ${detail ? 'Detalhe: ' + detail : 'Tente novamente.'}` });
@@ -175,7 +175,7 @@ export default function VideoGenerator() {
         setUser(prev => prev ? { ...prev, ...data.credits } : null);
       } catch (err) {
         if (err.data?.code === 'NO_CREDITS') {
-          setError({ type: 'NO_CREDITS', message: err.data?.error || 'Seus créditos de vídeo acabaram! Assine o plano por R$ 39,99/mês.' });
+          setError({ type: 'NO_CREDITS', message: err.data?.error || 'Seus créditos acabaram. Veja os planos e pacotes para continuar.' });
         } else {
           setError({ type: 'GENERIC', message: err.message || 'Erro ao gerar vídeo. Tente novamente.' });
         }
@@ -200,7 +200,7 @@ export default function VideoGenerator() {
       setUser(prev => prev ? { ...prev, ...data.credits } : null);
     } catch (err) {
       if (err.data?.code === 'NO_CREDITS') {
-        setError({ type: 'NO_CREDITS', message: err.data?.error || 'Seus créditos de vídeo acabaram! Assine o plano por R$ 39,99/mês.' });
+        setError({ type: 'NO_CREDITS', message: err.data?.error || 'Seus créditos acabaram. Veja os planos e pacotes para continuar.' });
       } else {
         setError({ type: 'GENERIC', message: err.message || 'Erro ao gerar vídeo. Tente novamente.' });
       }
@@ -657,7 +657,7 @@ export default function VideoGenerator() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="bg-dark-900 rounded-2xl p-8 max-w-md w-full border border-white/10 shadow-2xl">
             <h3 className="text-xl font-bold text-white mb-2">Crie sua conta gratuita</h3>
-            <p className="text-gray-400 mb-6">Ganhe 2 vídeos grátis todo mês. Sem cartão de crédito.</p>
+            <p className="text-gray-400 mb-6">Ganhe 10 imagens e 1 vídeo curto grátis todo mês. Sem cartão de crédito.</p>
             <div className="space-y-3">
               <a href="/register" className="btn-primary block text-center">Criar conta grátis</a>
               <a href="/login" className="btn-secondary block text-center">Já tenho conta</a>

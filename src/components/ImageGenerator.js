@@ -75,7 +75,7 @@ export default function ImageGenerator() {
       setHistory(prev => [{ id: data.generationId, prompt, imageUrl: data.imageUrl, type: 'IMAGE', status: 'COMPLETED', createdAt: new Date().toISOString() }, ...prev].slice(0, 12));
     } catch (err) {
       if (err.data?.code === 'NO_CREDITS') {
-        setError({ type: 'NO_CREDITS', message: 'Seus creditos acabaram! Assine o plano por R$ 39,99/mes para continuar criando.' });
+        setError({ type: 'NO_CREDITS', message: 'Seus créditos acabaram. Veja os planos e pacotes para continuar criando.' });
       } else {
         setError({ type: 'GENERIC', message: err.message || 'Erro ao gerar imagem. Tente novamente.' });
       }
@@ -218,7 +218,7 @@ export default function ImageGenerator() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="glass rounded-2xl p-8 max-w-md w-full border border-white/10 shadow-2xl animate-fade-up">
             <h3 className="text-xl font-bold text-white mb-2">Crie sua conta gratuita</h3>
-            <p className="text-gray-400 mb-6">Ganhe 10 imagens e 2 videos gratis todo mes. Sem cartao de credito.</p>
+            <p className="text-gray-400 mb-6">Ganhe 10 imagens e 1 vídeo curto grátis todo mês. Sem cartão de crédito.</p>
             <div className="space-y-3">
               <a href="/register" className="btn-primary block text-center">Criar conta gratis</a>
               <a href="/login" className="btn-secondary block text-center">Ja tenho conta</a>
