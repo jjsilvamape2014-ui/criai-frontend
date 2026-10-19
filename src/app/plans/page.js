@@ -11,7 +11,7 @@ import Header from '@/components/Header';
 const PADRAO = {
   videoCreditsPer5s: 10,
   free: { images: 10, videoSeconds: 5 },
-  premium: { priceFormatted: 'R$ 39,90', images: 50, videoSeconds: 15 },
+  premium: { priceFormatted: 'R$ 49,90', images: 50, videoSeconds: 15 },
   packages: [
     { id: 'credits_30', name: 'Pacote 30', credits: 30, priceFormatted: 'R$ 19,90' },
     { id: 'credits_100', name: 'Pacote 100', credits: 100, priceFormatted: 'R$ 59,90' },
