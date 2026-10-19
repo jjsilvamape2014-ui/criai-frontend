@@ -11,11 +11,16 @@ import Header from '@/components/Header';
 const PADRAO = {
   videoCreditsPer5s: 10,
   free: { images: 10, videoSeconds: 5 },
-  premium: { priceFormatted: 'R$ 49,90', images: 50, videoSeconds: 15 },
+  premium: { priceFormatted: 'R$ 39,90', images: 50, videoSeconds: 15 },
   packages: [
     { id: 'credits_30', name: 'Pacote 30', credits: 30, priceFormatted: 'R$ 19,90' },
     { id: 'credits_100', name: 'Pacote 100', credits: 100, priceFormatted: 'R$ 59,90' },
     { id: 'credits_250', name: 'Pacote 250', credits: 250, priceFormatted: 'R$ 139,90' },
+  ],
+  videoPackages: [
+    { id: 'video_5', clips: 5, credits: 50, priceFormatted: 'R$ 29,90', pricePerClipFormatted: 'R$ 5,98' },
+    { id: 'video_15', clips: 15, credits: 150, priceFormatted: 'R$ 79,90', pricePerClipFormatted: 'R$ 5,33' },
+    { id: 'video_40', clips: 40, credits: 400, priceFormatted: 'R$ 199,90', pricePerClipFormatted: 'R$ 5,00' },
   ],
 };
 
@@ -122,6 +127,23 @@ export default function PlansPage() {
           </div>
         </section>
 
+        <section aria-labelledby="video-h" className="mx-auto mt-14 max-w-4xl">
+          <h2 id="video-h" className="text-center font-display text-xl font-bold">Pacotes de vídeo</h2>
+          <p className="mt-1 text-center text-sm text-brand-tert">Vídeos de 5 segundos com movimento de câmera. Pagamento único, não vencem — e os créditos também valem para imagem.</p>
+          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            {(p.videoPackages || []).map((pkg) => (
+              <div key={pkg.id} className="rounded-[16px] border border-brand-accent/40 bg-brand-surface p-5 text-center">
+                <p className="text-sm font-semibold text-brand-sub">{pkg.clips} vídeos de 5 s</p>
+                <p className="mt-1 font-display text-3xl font-extrabold">{pkg.priceFormatted}</p>
+                <p className="mt-1 text-[12.5px] text-brand-tert">{pkg.pricePerClipFormatted} por vídeo · {pkg.credits} créditos</p>
+                <button onClick={() => checkout('video', pkg.id)} disabled={!!loading} className="mt-4 w-full rounded-full border border-brand-borderStrong py-2.5 text-sm font-semibold hover:border-brand-dim disabled:opacity-50">
+                  {loading === pkg.id ? 'Abrindo…' : 'Comprar vídeos'}
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+
         <section aria-labelledby="faq-h" className="mx-auto mt-16 max-w-2xl">
           <h2 id="faq-h" className="text-center font-display text-lg font-bold">Perguntas frequentes</h2>
           <div className="mt-4 space-y-2">
@@ -129,6 +151,7 @@ export default function PlansPage() {
               { q: 'Como funcionam os créditos?', a: `Cada imagem usa 1 crédito. Vídeo usa ${porSeg} créditos por segundo: um vídeo de 5 s usa ${p.videoCreditsPer5s}, um anúncio de 15 s usa ${p.videoCreditsPer5s * 3}. Arte com muito texto (um comunicado colado, por exemplo) usa 2. O app mostra o custo antes de gerar.` },
               { q: 'O grátis é grátis mesmo?', a: `Sim. Todo mês você ganha ${p.free.images} imagens e um vídeo de ${p.free.videoSeconds} s, sem cartão.` },
               { q: 'E quando acabar?', a: 'As imagens e vídeos do mês renovam no dia 1. Se precisar antes, compre um pacote de créditos ou assine o Premium.' },
+              { q: 'Quero só vídeo, sem assinar. Dá?', a: `Dá. Os pacotes de vídeo saem mais baratos por vídeo no pacote maior (${(p.videoPackages && p.videoPackages[0] && p.videoPackages[0].pricePerClipFormatted) || 'R$ 5,98'} a ${(p.videoPackages && p.videoPackages[2] && p.videoPackages[2].pricePerClipFormatted) || 'R$ 5,00'} por vídeo de 5 s) e os créditos não vencem.` },
               { q: 'Os créditos do mês acumulam?', a: 'Não: os do plano renovam todo dia 1. Os de pacote não vencem.' },
               { q: 'Posso cancelar o Premium?', a: 'Sim, quando quiser. Você continua com o plano até o fim do período pago.' },
               { q: 'Posso usar comercialmente?', a: 'Sim. O que você cria é seu.' },
