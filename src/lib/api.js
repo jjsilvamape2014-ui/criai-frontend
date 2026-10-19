@@ -166,6 +166,12 @@ class ApiClient {
     return this.request(`/generate/video/estimate?duration=${encodeURIComponent(duration)}`);
   }
 
+  // Lista os 65 movimentos de câmera agrupados: { success, groups, count }
+  // models (opcional) filtra pelos que aquele modelo aceita, ex.: 'kling-v3-i2v'
+  async getMotionPresets(models) {
+    return this.request(`/motion-presets${models ? `?models=${encodeURIComponent(models)}` : ''}`);
+  }
+
   // Admin (só para o dono): resumo de cadastros/uso/compras e as últimas conversas
   async getAdminResumo(days = 30) {
     return this.request(`/admin/resumo?days=${encodeURIComponent(days)}`);
